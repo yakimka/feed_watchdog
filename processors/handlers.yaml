@@ -1,0 +1,6 @@
+receivers:
+  telegram_bot:
+    "@pydailybot":
+      kwargs:
+        name: "@pydailybot"
+        token: 'ENV:PYDAILYBOT_TOKEN'
