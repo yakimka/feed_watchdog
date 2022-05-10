@@ -57,7 +57,7 @@ jobs:
           docker-compose -f docker-compose.yml -f docker-compose.prod.yml config --quiet
           echo "Running checks"
           docker-compose build web
-          docker-compose run --user=root --rm web ./ci.sh
+          docker-compose run --user=root --rm web bash -c "cd /app && ./ci.sh"
           echo "Pushing back the result for future runs"
           docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:dev"
           docker push "${IMAGE_FULL_NAME}:dev"
@@ -66,6 +66,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
+          root_dir: server
           # token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
   # Releasing image, when in `master` branch or tag

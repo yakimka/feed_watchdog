@@ -2,8 +2,8 @@ SHELL:=/usr/bin/env bash
 
 .PHONY: lint
 lint:
-	poetry run flake8 .
-	poetry run mypy ./**/*.py
+	poetry run flake8 server
+	poetry run mypy server/**/*.py
 	make verify_format
 	poetry run doc8 -q docs
 	poetry run yamllint -s .
@@ -23,11 +23,11 @@ test: lint package unit
 
 .PHONY: format
 format:
-	poetry run black --preview .
-	poetry run isort ./**/*.py .
+	poetry run black --preview server
+	poetry run isort --color --src=server ./**/*.py server
 
 
 .PHONY: verify_format
 verify_format:
-	poetry run black --preview --check --diff .
-	poetry run isort --check-only --diff ./**/*.py
+	poetry run black --preview --check --diff server
+	poetry run isort --check-only --diff --src=server ./**/*.py server

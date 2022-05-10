@@ -76,19 +76,23 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 RUN poetry install
 
 # will become mountpoint of our code
-WORKDIR /app
+WORKDIR /app/server
 
 USER app
 
 EXPOSE 8000
 
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
 
 # `production` image used for runtime
 FROM python-base as production
-ENV ENVIRONMENT=production
+ENV ENVIRONMENT=production \
+    WEB_CONCURRENCY=4
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-# TODO better to move code to ./app or ./src
-COPY --chown=app:app . /app/
-WORKDIR /app
+COPY --chown=app:app server /app/server
+WORKDIR /app/server
 
 USER app
+
+CMD ["gunicorn", "wsgi", "-b", "0.0.0.0:8000", "--timeout=90", "--log-file=-", "--worker-tmp-dir='/dev/shm'"]

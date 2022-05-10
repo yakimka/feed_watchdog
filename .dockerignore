@@ -16,9 +16,4 @@
 .github
 .gitlab*
 *.md
-ci.sh
-docker-compose.*.yml
-docker-compose.yml
-Dockerfile
-docs
 tests
