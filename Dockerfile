@@ -61,6 +61,9 @@ COPY poetry.lock pyproject.toml ./
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
 RUN poetry install --no-dev
 
+RUN mkdir -p /var/www/public/{media,static} \
+    && chown -R 1001:1001 /var/www/public
+
 
 # `development` image is used during development / testing
 FROM python-base as development

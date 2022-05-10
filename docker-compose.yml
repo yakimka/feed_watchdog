@@ -31,7 +31,7 @@ services:
           - "*"
 
       volumes:
-        - django-static:/var/www/django/static
+        - ./public:/var/www/public
       depends_on:
         - db
       networks:

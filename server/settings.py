@@ -138,4 +138,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 ###############################################################################
+STATIC_ROOT = "/var/www/public/static/"
+MEDIA_ROOT = "/var/www/public/media/"
+
 from app_settings import *  # noqa: F403, F401, E402, PLC0413
