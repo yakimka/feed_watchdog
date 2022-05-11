@@ -16,7 +16,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - webnet
-    env_file: .env
+    env_file: server/.env
 
   web:
     <<: &web
@@ -36,7 +36,7 @@ services:
         - db
       networks:
         - webnet
-      env_file: .env
+      env_file: server/.env
       environment:
         DJANGO_DATABASE_HOST: db
 
