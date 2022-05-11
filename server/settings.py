@@ -32,6 +32,9 @@ SECRET_KEY = config("FW_SECRET_KEY")
 DEBUG = config("FW_DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS: list[str] = config("FW_ALLOWED_HOSTS", default="", cast=to_list)
+CSRF_TRUSTED_ORIGINS: list[str] = config(
+    "FW_CSRF_TRUSTED_ORIGINS", default="", cast=to_list
+)
 
 AUTH_USER_MODEL = "db.User"
 
