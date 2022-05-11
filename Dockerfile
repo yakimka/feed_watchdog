@@ -38,7 +38,7 @@ RUN addgroup --gid 1001 --system app \
 RUN apt-get update && \
 apt-get install --no-install-recommends -y  \
     make \
-    libpq \
+    libpq5 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
