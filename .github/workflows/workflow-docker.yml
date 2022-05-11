@@ -42,7 +42,7 @@ jobs:
           pip install dump-env
           dump-env \
             -t .env.template \
-            -p 'SECRET_' > .env
+            -p 'SECRET_' > server/.env
           echo "Login into Docker registry"
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
           echo "Debug information"
@@ -87,7 +87,7 @@ jobs:
           pip install dump-env
           dump-env \
             -t .env.template \
-            -p 'SECRET_' > .env
+            -p 'SECRET_' > server/.env
           echo "Login into Docker registry"
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
           echo "Debug information"
