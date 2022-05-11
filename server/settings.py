@@ -12,22 +12,26 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
+
+
+def to_list(value: str) -> list[str]:
+    return [d for d in [s.strip() for s in value.split(" ")] if d]
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "INSECURE_kjukjq1^@5$d!r1^oq9k@tad2(9t*1z)onk(q0z+2qku*^6gk"  # noqa: S105
-)
+SECRET_KEY = config("FW_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("FW_DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS: list[str] = config("FW_ALLOWED_HOSTS", default="", cast=to_list)
 
 AUTH_USER_MODEL = "db.User"
 
@@ -78,14 +82,24 @@ WSGI_APPLICATION = "wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR.parent / "db.sqlite3",
+if config("FW_SQLITE", default=False, cast=bool):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR.parent / "db.sqlite3",
+        }
     }
-}
-
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config("FW_DB_NAME"),
+            "USER": config("FW_DB_USER"),
+            "PASSWORD": config("FW_DB_PASSWORD"),
+            "HOST": config("FW_DB_HOST"),
+            "PORT": config("FW_DB_PORT", default=5432, cast=int),
+        },
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

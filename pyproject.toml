@@ -46,6 +46,7 @@ feedparser = {version = "^6.0.8", extras = ["processors"]}
 aiogram = {version = "^2.20", extras = ["processors"]}
 PyYAML = {version = "^6.0", extras = ["processors"]}
 gunicorn = "^20.1.0"
+python-decouple = "^3.6"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"

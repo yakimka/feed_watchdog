@@ -98,4 +98,4 @@ WORKDIR /app/server
 
 USER app
 
-CMD ["gunicorn", "wsgi", "-b", "0.0.0.0:8000", "--timeout=90", "--log-file=-", "--worker-tmp-dir='/dev/shm'"]
+CMD ["gunicorn", "wsgi", "-b", "0.0.0.0:8000", "--timeout=90", "--log-file=-"]
