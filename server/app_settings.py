@@ -3,7 +3,7 @@ from enum import Enum
 from decouple import config
 
 REDIS_PUB_SUB_URL = config(
-    "FW_REDIS_PUB_SUB_URL", defaulr="redis://localhost:6379"
+    "FW_REDIS_PUB_SUB_URL", default="redis://localhost:6379"
 )
 
 
