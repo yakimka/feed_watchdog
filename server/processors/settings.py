@@ -3,10 +3,13 @@ from enum import Enum
 from pathlib import Path
 
 import yaml
+from decouple import config
 
 BASE_DIR = Path(__file__).parent
 
-REDIS_URL = "redis://localhost:6379/0"
+REDIS_URL = config(
+    "FW_REDIS_PUB_SUB_URL", defaulr="redis://localhost:6379"
+)
 
 
 class Topic(Enum):
@@ -25,6 +28,7 @@ if HANDLERS_CONF_PATH:
         if value.startswith("ENV:"):
             return os.environ[value[4:]].strip()
         return value
+
 
     yaml.Loader.add_constructor(  # type: ignore
         "tag:yaml.org,2002:str", string_constructor
