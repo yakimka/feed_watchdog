@@ -20,14 +20,14 @@ def get_registered_handlers() -> dict[str, list[Any]]:
     }
     for module_name in _parse_modules(parsers.__file__):
         mod = importlib.import_module(
-            f".{module_name}", package="handlers.parsers"
+            f".{module_name}", package="processors.handlers.parsers"
         )
         handlers["parsers"].append((module_name, mod.handler))
 
     handlers_config = settings.HANDLERS_CONFIG
     for module_name in _parse_modules(receivers.__file__):
         mod = importlib.import_module(
-            f".{module_name}", package="handlers.receivers"
+            f".{module_name}", package="processors.handlers.receivers"
         )
         if subhandlers := handlers_config.get("receivers", {}).get(module_name):
             for sub_name, sub_conf in subhandlers.items():
