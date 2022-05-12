@@ -56,9 +56,6 @@ jobs:
           echo "Running checks"
           docker-compose build web
           docker-compose run --user=root --rm web bash -c "cd /app && ./ci.sh"
-          echo "Pushing back the result for future runs"
-          docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:dev"
-          docker push "${IMAGE_FULL_NAME}:dev"
 
       - name: Push image for caching purposes
         if: github.actor != 'dependabot[bot]'
