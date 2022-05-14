@@ -27,8 +27,7 @@ class Collector:
             receiver = stream.receiver
             result.append(
                 ProcessStreamEvent(
-                    # TODO: add uid to Stream model
-                    uid=str(stream.id),
+                    uid=stream.uid,
                     message_template=(
                         stream.message_template or receiver.message_template
                     ),

@@ -3,7 +3,6 @@ import dataclasses
 
 @dataclasses.dataclass()
 class Source:
-    id: int
     name: str
     slug: str
     url: str
@@ -15,7 +14,6 @@ class Source:
 
 @dataclasses.dataclass()
 class Receiver:
-    id: int
     name: str
     slug: str
     type: str
@@ -25,7 +23,7 @@ class Receiver:
 
 @dataclasses.dataclass()
 class Stream:
-    id: int
+    uid: str
     source: Source
     receiver: Receiver
     message_template: str = ""

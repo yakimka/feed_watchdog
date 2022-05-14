@@ -8,6 +8,7 @@ from decouple import config
 BASE_DIR = Path(__file__).parent
 
 REDIS_URL = config("FW_REDIS_PUB_SUB_URL", default="redis://localhost:6379")
+SENTRY_DSN = config("FW_SENTRY_DSN", default="")
 
 
 class Topic(Enum):

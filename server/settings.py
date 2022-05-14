@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 
+import sentry_sdk
 from decouple import config
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -157,5 +159,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 ###############################################################################
 STATIC_ROOT = "/var/www/public/static/"
 MEDIA_ROOT = "/var/www/public/media/"
+
+SENTRY_DSN = config("FW_SENTRY_DSN", default="")
+
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+    )
 
 from app_settings import *  # noqa: F403, F401, E402, PLC0413

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Iterable, Protocol
 
+from processors.adapters.error_tracking import write_warn_message
 from processors.adapters.fetch import fetch_text_from_url
 from processors.domain.logic import mutate_posts_with_stream_data
 from processors.handlers import get_parser_by_name, get_receiver_by_name
@@ -19,6 +20,8 @@ async def process_stream(
     )
     parser = get_parser_by_name(event.source_parser_type)
     posts = await parser(text)
+    if not posts:
+        write_warn_message(f"Can't find posts for {event.source_url}")
     mutate_posts_with_stream_data(event, posts)
     # TODO posts = apply_filters(posts)
 

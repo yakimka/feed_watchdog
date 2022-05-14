@@ -1,8 +1,11 @@
 import asyncio
+import logging
 from functools import partial
 from typing import Callable, Coroutine
 
 import aioredis
+import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 from processors import settings
 from processors.adapters import lock
@@ -16,6 +19,12 @@ async def run(topics: list[str], handler: Callable, subscriber: Subscriber):
 
 
 def main() -> Coroutine:
+    if settings.SENTRY_DSN:
+        sentry_logging = LoggingIntegration(
+            level=logging.INFO, event_level=logging.ERROR
+        )
+        sentry_sdk.init(dsn=settings.SENTRY_DSN, integrations=[sentry_logging])
+
     redis = aioredis.from_url(settings.REDIS_URL)  # type: ignore
     lock.init(redis)  # TODO DI
     pubsub = redis.pubsub()

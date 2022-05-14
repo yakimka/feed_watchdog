@@ -31,7 +31,6 @@ def _handler(text: str) -> list[models.Post]:
             id_field = entry.keymap["guid"]
             posts.append(
                 models.Post(
-                    # TODO make id from url
                     post_id=entry.get(id_field),
                     title=entry.title,
                     url=entry.get("link"),
