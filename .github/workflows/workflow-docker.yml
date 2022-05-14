@@ -54,8 +54,8 @@ jobs:
           echo "Checking config"
           docker-compose -f docker-compose.yml -f docker-compose.prod.yml config --quiet
           echo "Running checks"
-          docker-compose build web
-          docker-compose run --user=root --rm web bash -c "cd /app && ./ci.sh"
+          docker-compose build feed_watchdog
+          docker-compose run --user=root --rm feed_watchdog bash -c "cd /app && ./ci.sh"
 
       - name: Push image for caching purposes
         if: github.actor != 'dependabot[bot]'
@@ -103,7 +103,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build web
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build feed_watchdog
 
       - name: Set version env (GITHUB_REF:10 for extract version from non-v-tags without the 'refs/tags/' prefix)
         run: echo "VERSION=$(echo ${GITHUB_REF:10})" >> $GITHUB_ENV
@@ -113,7 +113,7 @@ jobs:
       - name: Add version tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build web
+          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build feed_watchdog
           docker tag "${IMAGE_FULL_NAME}:latest" "${IMAGE_FULL_NAME}:${VERSION}"
           docker tag "${IMAGE_FULL_NAME}:latest" "${IMAGE_FULL_NAME}:${SHORT_VERSION}"
 

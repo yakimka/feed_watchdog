@@ -9,7 +9,7 @@ set -o pipefail
 
 # Fail CI if `ENVIRONMENT` is not set to `development`:
 if [ "$ENVIRONMENT" != 'development' ]; then
-  echo 'ENVIRONMENT is not set to development. Running tests is not safe.'
+  echo "ENVIRONMENT ($ENVIRONMENT) is not set to development. Running tests is not safe."
   exit 1
 fi
 

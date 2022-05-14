@@ -62,7 +62,6 @@ class Source(models.Model):
 
     def to_domain(self) -> domain_models.Source:
         return domain_models.Source(
-            id=self.id,
             slug=self.slug,
             name=self.name,
             description=self.description,
@@ -85,7 +84,6 @@ class Receiver(models.Model):
 
     def to_domain(self) -> domain_models.Receiver:
         return domain_models.Receiver(
-            id=self.id,
             name=self.name,
             slug=self.slug,
             type=self.type,
@@ -116,7 +114,7 @@ class Stream(models.Model):
 
     def to_domain(self) -> domain_models.Stream:
         return domain_models.Stream(
-            id=self.id,
+            uid=self.uid,
             source=self.source.to_domain(),
             receiver=self.receiver.to_domain(),
             message_template=self.message_template

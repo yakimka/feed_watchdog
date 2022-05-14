@@ -3,6 +3,7 @@ from typing import Optional
 
 import httpx
 
+from processors.adapters.error_tracking import write_warn_message
 from processors.adapters.lock import async_lock
 from processors.domain.logic import domain_from_url
 
@@ -25,6 +26,9 @@ async def fetch_text_from_url(url: str, *, encoding="") -> Optional[str]:
             res.encoding = encoding
 
         if res.status_code >= 400:
+            write_warn_message(
+                f"Can't fetch {url}: {res.status_code}. {res.text}"
+            )
             return None
 
         return res.text
