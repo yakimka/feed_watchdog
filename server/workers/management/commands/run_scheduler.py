@@ -16,7 +16,7 @@ class Command(BaseCommand):
         scheduler = AsyncIOScheduler()
         scheduler.add_job(
             collector.send_events,
-            CronTrigger.from_crontab("* * * * *"),
+            CronTrigger.from_crontab("*/10 * * * *"),
         )
         scheduler.start()
 
