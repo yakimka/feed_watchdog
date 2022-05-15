@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import TYPE_CHECKING, Sequence
 
 from tldextract import tldextract
@@ -22,6 +23,7 @@ def _generate_post_id(post_id: str) -> str:
     return post_id.removeprefix("https://").removeprefix("http://")
 
 
+@lru_cache(maxsize=None)
 def domain_from_url(url: str):
     _, td, tsu = tldextract.extract(url)
     return f"{td}.{tsu}"

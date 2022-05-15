@@ -19,6 +19,8 @@ async def run(topics: list[str], handler: Callable, subscriber: Subscriber):
 
 
 def main() -> Coroutine:
+    logging.basicConfig(level=logging.INFO)
+
     if settings.SENTRY_DSN:
         sentry_logging = LoggingIntegration(
             level=logging.INFO, event_level=logging.ERROR

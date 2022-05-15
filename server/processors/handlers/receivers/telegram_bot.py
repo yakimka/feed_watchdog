@@ -1,16 +1,22 @@
 from __future__ import annotations
 
+import logging
 import string
 from typing import TYPE_CHECKING
 
 from aiogram import Bot
 
 from processors.adapters.lock import async_lock
+from processors.handlers import register_receiver
 
 if TYPE_CHECKING:
     from processors.domain.models import Post
 
 
+logger = logging.getLogger(__name__)
+
+
+@register_receiver(name="telegram_bot")
 class TelegramBot:
     MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
     pause_between_send = 60 / MAX_MESSAGES_PER_MINUTE_PER_GROUP  # seconds
@@ -24,7 +30,7 @@ class TelegramBot:
         return self._name
 
     @async_lock(key=_lock_key, wait_time=pause_between_send)
-    async def send(
+    async def __call__(
         self,
         post: Post,
         *,
@@ -37,13 +43,10 @@ class TelegramBot:
             parse_mode="HTML",
             disable_web_page_preview=disable_link_preview,
         )
+        logger.info("Sent post to %s (%s)", self._name, chat_id)
 
     @staticmethod
     def _make_message_text(post: Post):
         template = string.Template(post.message_template)
         data = post.template_kwargs()
         return template.safe_substitute(data)
-
-
-class Sender(TelegramBot):
-    pass

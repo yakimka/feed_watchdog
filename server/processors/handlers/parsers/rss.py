@@ -5,11 +5,13 @@ import logging
 import feedparser
 
 from processors.domain import models
+from processors.handlers import register_parser
 
 logger = logging.getLogger(__name__)
 
 
-async def handler(text: str) -> list[models.Post]:
+@register_parser()
+async def rss(text: str) -> list[models.Post]:
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _handler, text)
 
