@@ -9,6 +9,6 @@ if TYPE_CHECKING:
 
 
 def write_warn_message(message: str, logger: Optional[Logger] = None) -> None:
-    capture_message(message, level="warning")
     if logger:
         logger.warning(message)
+    capture_message(message, level="warning")

@@ -38,8 +38,8 @@ def _handler(text: str) -> list[models.Post]:
                     raw=json.loads(json.dumps(entry)),
                 ),
             )
-        except Exception as exc:
+        except Exception:  # noqa: PLW0703, PIE786
             entry = json.dumps(entry, sort_keys=True, indent=4)
-            raise ValueError(f"Can't process entry. Entry: {entry}") from exc
+            logger.exception("Failed to parse entry: %s", entry)
 
     return posts

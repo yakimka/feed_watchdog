@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Iterable, Protocol
 
 from processors.adapters.error_tracking import write_warn_message
@@ -12,16 +13,23 @@ if TYPE_CHECKING:
     from processors.storage import Storage
 
 
+logger = logging.getLogger(__name__)
+
+
 async def process_stream(
     event: events.ProcessStreamEvent, storage: Storage
 ) -> None:
     text = await fetch_text_from_url(
-        event.source_url, encoding=event.source_encoding
+        event.source_url, encoding=event.source_encoding, retry=2
     )
+    if not text:
+        return None
     parser = get_parser_by_name(event.source_parser_type)
     posts = await parser(text)
     if not posts:
-        write_warn_message(f"Can't find posts for {event.source_url}")
+        write_warn_message(
+            f"Can't find posts for {event.source_url}", logger=logger
+        )
     mutate_posts_with_stream_data(event, posts)
     # TODO posts = apply_filters(posts)
 

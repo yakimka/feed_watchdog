@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Optional
 
@@ -17,18 +18,38 @@ DEFAULT_UA = (
 
 
 @async_lock(key=lambda url, **_: domain_from_url(url))
-async def fetch_text_from_url(url: str, *, encoding="") -> Optional[str]:
+async def fetch_text_from_url(
+    url: str, *, encoding="", retry=0
+) -> Optional[str]:
     # TODO don't fetch if content is not changed
-    async with httpx.AsyncClient() as client:
-        res = await client.get(url, headers={"user-agent": DEFAULT_UA})
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        while True:
+            try:
+                res = await client.get(
+                    url, headers={"user-agent": DEFAULT_UA}, timeout=30.0
+                )
+                res.raise_for_status()
+            except httpx.HTTPError as e:
+                if retry > 0:
+                    logger.warning(
+                        "Failed to fetch %s with %s and %s retries left."
+                        " Retrying...",
+                        url,
+                        e,
+                        retry,
+                    )
+                    retry -= 1
+                    await asyncio.sleep(3.0)
+                    continue
 
-        if encoding:
-            res.encoding = encoding
+                write_warn_message(
+                    f"Error while fetching {url}: error"
+                    f" {type(e).__name__}\n{e}",
+                    logger=logger,
+                )
+                return None
 
-        if res.status_code >= 400:
-            write_warn_message(
-                f"Can't fetch {url}: {res.status_code}. {res.text}"
-            )
-            return None
+            if encoding:
+                res.encoding = encoding
 
-        return res.text
+            return res.text
