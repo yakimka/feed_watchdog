@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import dataclasses
+import json
 import logging
-from typing import TYPE_CHECKING, Iterable, Protocol
+from typing import IO, TYPE_CHECKING, Callable, Iterable, Protocol
 
 from processors.adapters.error_tracking import write_warn_message
 from processors.adapters.fetch import fetch_text_from_url
@@ -75,11 +76,23 @@ class Configuration:
     pass
 
 
-def parse_configuration():
+def parse_configuration() -> dict:
     handlers = get_registered_handlers()
-    # TODO parse available kwargs for handlers
-    #   and set validation rules with JSON schema
     return {
-        "parsers": [{"type": name} for name, _ in handlers["parsers"]],
-        "receivers": [{"type": name} for name, _ in handlers["receivers"]],
+        "handlers": {
+            "parsers": [
+                {"type": name, "options": options or {}}
+                for name, _, options in handlers["parsers"].values()
+            ],
+            "receivers": [
+                {"type": name, "options": options or {}}
+                for name, _, options in handlers["receivers"].values()
+            ],
+        }
     }
+
+
+def write_configuration(
+    fp: IO[str], parser: Callable[[], dict] = parse_configuration
+):
+    json.dump(parser(), fp, indent=2)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import logging
 import string
 from typing import TYPE_CHECKING
@@ -7,16 +8,28 @@ from typing import TYPE_CHECKING
 from aiogram import Bot
 
 from processors.adapters.lock import async_lock
-from processors.handlers import register_receiver
+from processors.handlers import HandlerOptions, register_receiver
 
 if TYPE_CHECKING:
     from processors.domain.models import Post
 
-
 logger = logging.getLogger(__name__)
 
 
-@register_receiver(name="telegram_bot")
+@dataclasses.dataclass
+class TelegramBotOptions(HandlerOptions):
+    DESCRIPTIONS = {
+        "chat_id": "Telegram chat id",
+        "disable_link_preview": "Disable link preview",
+    }
+
+    chat_id: str
+    disable_link_preview: bool = False
+
+
+@register_receiver(
+    name="telegram_bot", options=TelegramBotOptions.to_json_schema()
+)
 class TelegramBot:
     MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
     pause_between_send = 60 / MAX_MESSAGES_PER_MINUTE_PER_GROUP  # seconds
@@ -34,16 +47,15 @@ class TelegramBot:
         self,
         post: Post,
         *,
-        chat_id: str,
-        disable_link_preview: bool = False,
+        options: TelegramBotOptions,
     ) -> None:
         await self.bot.send_message(
-            chat_id=chat_id,
+            chat_id=options.chat_id,
             text=self._make_message_text(post),
             parse_mode="HTML",
-            disable_web_page_preview=disable_link_preview,
+            disable_web_page_preview=options.disable_link_preview,
         )
-        logger.info("Sent post to %s (%s)", self._name, chat_id)
+        logger.info("Sent post to %s (%s)", self._name, options.chat_id)
 
     @staticmethod
     def _make_message_text(post: Post):
