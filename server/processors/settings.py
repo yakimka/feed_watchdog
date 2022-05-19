@@ -9,6 +9,9 @@ BASE_DIR = Path(__file__).parent
 
 REDIS_URL = config("FW_REDIS_PUB_SUB_URL", default="redis://localhost:6379")
 SENTRY_DSN = config("FW_SENTRY_DSN", default="")
+SHARED_CONFIG_PATH = config(
+    "FW_SHARED_CONFIG_PATH", default="/app/handlers.json"
+)
 
 
 class Topic(Enum):

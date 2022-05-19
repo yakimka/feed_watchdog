@@ -3,10 +3,14 @@ SHELL:=/usr/bin/env bash
 .PHONY: lint
 lint:
 	poetry run flake8 server
-	poetry run mypy server/**/*.py
+	make mypy
 	make verify_format
 	poetry run doc8 -q docs
 	poetry run yamllint -s .
+
+.PHONY: mypy
+mypy:
+	poetry run mypy server/**/*.py
 
 .PHONY: unit
 unit:

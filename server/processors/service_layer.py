@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+import dataclasses
+import json
 import logging
-from typing import TYPE_CHECKING, Iterable, Protocol
+from typing import IO, TYPE_CHECKING, Callable, Iterable, Protocol
 
 from processors.adapters.error_tracking import write_warn_message
 from processors.adapters.fetch import fetch_text_from_url
 from processors.domain.logic import mutate_posts_with_stream_data
-from processors.handlers import get_parser_by_name, get_receiver_by_name
+from processors.handlers import (
+    get_parser_by_name,
+    get_receiver_by_name,
+    get_registered_handlers,
+)
 
 if TYPE_CHECKING:
     from processors.domain import events, models
@@ -59,7 +65,34 @@ async def send_new_posts_to_receiver(
         elif not await storage.post_was_sent(
             post.post_id, event.uid, event.receiver_type
         ):
-            await receiver.send(post, chat_id=event.receiver_recipient)
+            await receiver(post, chat_id=event.receiver_recipient)
             await storage.save_post_sent_flag(
                 post.post_id, event.uid, event.receiver_type
             )
+
+
+@dataclasses.dataclass
+class Configuration:
+    pass
+
+
+def parse_configuration() -> dict:
+    handlers = get_registered_handlers()
+    return {
+        "handlers": {
+            "parsers": [
+                {"type": name, "options": options or {}}
+                for name, _, options in handlers["parsers"].values()
+            ],
+            "receivers": [
+                {"type": name, "options": options or {}}
+                for name, _, options in handlers["receivers"].values()
+            ],
+        }
+    }
+
+
+def write_configuration(
+    fp: IO[str], parser: Callable[[], dict] = parse_configuration
+):
+    json.dump(parser(), fp, indent=2)
