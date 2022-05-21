@@ -35,3 +35,7 @@ format:
 verify_format:
 	poetry run black --preview --check --diff server
 	poetry run isort --check-only --diff --src=server ./**/*.py server
+
+.PHONY: bash
+bash:
+	docker compose exec feed_watchdog bash

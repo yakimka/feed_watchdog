@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import dataclasses
 import importlib
 import os
@@ -5,7 +7,7 @@ import pkgutil
 from collections import defaultdict
 from functools import lru_cache, partial
 from inspect import isclass
-from typing import Any, Callable, NamedTuple, Optional, TypedDict
+from typing import Any, Callable, NamedTuple, Optional, Type, TypedDict
 
 from processors import settings
 
@@ -24,7 +26,7 @@ __all__ = [
 class Handler(NamedTuple):
     name: str
     obj: Callable
-    options: Optional[dict]
+    options_class: Optional[Type[HandlerOptions]]
 
 
 HANDLERS: dict[str, dict[str, Handler]] = defaultdict(dict)
@@ -33,7 +35,7 @@ HANDLERS: dict[str, dict[str, Handler]] = defaultdict(dict)
 def register_handler(
     type: str,  # noqa: PLW0622
     name: Optional[str] = None,
-    options: Optional[dict] = None,
+    options: Optional[Type[HandlerOptions]] = None,
 ):  # noqa: PLW0622
     def wrapper(func_or_class):
         if isclass(func_or_class):
@@ -86,14 +88,19 @@ def _parse_modules(package) -> list[str]:
     return [name for _, name, _ in pkgutil.iter_modules([pkgpath])]
 
 
-def get_parser_by_name(name: str) -> Any:
+def get_handler_by_name(
+    type: str, name: str, options: Optional[dict] = None  # noqa: PLW0622
+) -> Any:
     registered_handlers = get_registered_handlers()
-    return dict(registered_handlers["parsers"])[name]
+    handler = dict(registered_handlers[type])[name]
+    options_ = None
+    if options and handler.options_class:
+        options_ = handler.options_class(**options)
+    return partial(handler.obj, options=options_)
 
 
-def get_receiver_by_name(name: str) -> Any:
-    registered_handlers = get_registered_handlers()
-    return dict(registered_handlers["receivers"])[name]
+get_parser_by_name = partial(get_handler_by_name, "parsers")
+get_receiver_by_name = partial(get_handler_by_name, "receivers")
 
 
 Schema = TypedDict(
@@ -110,10 +117,10 @@ Schema = TypedDict(
 
 @dataclasses.dataclass
 class HandlerOptions:
-    DESCRIPTIONS = {}  # type: dict[str, str]
+    DESCRIPTIONS = {}  # type: dict[str, tuple[str, str]]
 
     @classmethod
-    def descriptions(cls) -> dict[str, str]:
+    def _descriptions(cls) -> dict[str, tuple[str, str]]:
         return {
             field.name: cls.DESCRIPTIONS[field.name]
             for field in dataclasses.fields(cls)
@@ -121,8 +128,14 @@ class HandlerOptions:
         }
 
     @classmethod
+    def field_title(cls, field_name: str) -> str:
+        title = 0
+        return cls._descriptions().get(field_name, ("", ""))[title]
+
+    @classmethod
     def field_description(cls, field_name: str) -> str:
-        return cls.descriptions().get(field_name, "")
+        description = 1
+        return cls._descriptions().get(field_name, ("", ""))[description]
 
     @classmethod
     def to_json_schema(cls) -> Schema:
@@ -137,6 +150,7 @@ class HandlerOptions:
             m = dataclasses.MISSING
             schema["properties"][field.name] = {
                 "type": _python_type_to_json_schema_type(str(field.type)),
+                "title": cls.field_title(field.name),
                 "description": cls.field_description(field.name),
             }
             if field.default is not m:

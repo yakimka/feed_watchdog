@@ -76,7 +76,9 @@ class Receiver(models.Model):
     name = models.CharField(max_length=1024)
     slug = models.SlugField()
     type = models.CharField(max_length=32)
-    recipient = models.CharField(max_length=1024)
+    options = models.JSONField(
+        blank=True, default=dict, help_text="Receiver options"
+    )
     message_template = models.TextField()
 
     def __str__(self):
@@ -87,7 +89,7 @@ class Receiver(models.Model):
             name=self.name,
             slug=self.slug,
             type=self.type,
-            recipient=self.recipient,
+            options=self.options,
             message_template=self.message_template,
         )
 

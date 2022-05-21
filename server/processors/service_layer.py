@@ -52,7 +52,9 @@ async def send_new_posts_to_receiver(
     event: events.ProcessStreamEvent,
     storage: Storage,
 ) -> None:
-    receiver = get_receiver_by_name(event.receiver_type)
+    receiver = get_receiver_by_name(
+        event.receiver_type, options=event.receiver_options
+    )
 
     is_init = (
         await storage.sent_posts_count(event.uid, event.receiver_type) == 0
@@ -65,7 +67,7 @@ async def send_new_posts_to_receiver(
         elif not await storage.post_was_sent(
             post.post_id, event.uid, event.receiver_type
         ):
-            await receiver(post, chat_id=event.receiver_recipient)
+            await receiver(post)
             await storage.save_post_sent_flag(
                 post.post_id, event.uid, event.receiver_type
             )
@@ -81,12 +83,18 @@ def parse_configuration() -> dict:
     return {
         "handlers": {
             "parsers": [
-                {"type": name, "options": options or {}}
-                for name, _, options in handlers["parsers"].values()
+                {
+                    "type": name,
+                    "options": dict(opt.to_json_schema()) if opt else {},
+                }
+                for name, _, opt in handlers["parsers"].values()
             ],
             "receivers": [
-                {"type": name, "options": options or {}}
-                for name, _, options in handlers["receivers"].values()
+                {
+                    "type": name,
+                    "options": dict(opt.to_json_schema()) if opt else {},
+                }
+                for name, _, opt in handlers["receivers"].values()
             ],
         }
     }

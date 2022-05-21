@@ -36,7 +36,7 @@ class Collector:
                     source_encoding=source.encoding,
                     source_tags=list(source.tags),
                     receiver_type=receiver.type,
-                    receiver_recipient=receiver.recipient,
+                    receiver_options=receiver.options,
                 )
             )
         return result
@@ -46,5 +46,4 @@ class Collector:
         self, publisher: Publisher = Provide[Container.publisher]
     ):
         for event in await self.streams_to_events():
-            print(event)
             await publisher.publish(Topic.STREAMS.value, event)
