@@ -9,8 +9,6 @@ from functools import lru_cache, partial
 from inspect import isclass
 from typing import Any, Callable, NamedTuple, Optional, Type, TypedDict
 
-from processors import settings
-
 from . import parsers, receivers
 
 __all__ = [
@@ -38,6 +36,8 @@ def register_handler(
     options: Optional[Type[HandlerOptions]] = None,
 ):  # noqa: PLW0622
     def wrapper(func_or_class):
+        from processors import settings  # noqa: PLC0415
+
         if isclass(func_or_class):
             handler_name = name or func_or_class.__name__
 

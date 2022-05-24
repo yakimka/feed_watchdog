@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import json
 import logging
-from typing import IO, TYPE_CHECKING, Callable, Iterable, Protocol
+from typing import IO, TYPE_CHECKING, Callable, Iterable
 
 from processors.adapters.error_tracking import write_warn_message
 from processors.adapters.fetch import fetch_text_from_url
@@ -40,11 +40,6 @@ async def process_stream(
     # TODO posts = apply_filters(posts)
 
     await send_new_posts_to_receiver(reversed(posts), event, storage)
-
-
-class Receiver(Protocol):
-    async def send(self, post: models.Post) -> None:
-        pass
 
 
 async def send_new_posts_to_receiver(

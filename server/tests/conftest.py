@@ -1,6 +1,25 @@
-import os
+import pytest
 
-# TODO use python-decouple for env vars
-os.environ[
-    "PYDAILYBOT_TOKEN"  # noqa: S105
-] = "111111111:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+from processors import settings
+
+
+@pytest.fixture(autouse=True)
+def _mock_handlers_config(monkeypatch):
+    monkeypatch.setattr(
+        settings,
+        "HANDLERS_CONFIG",
+        {
+            "receivers": {
+                "telegram_bot": {
+                    "mybot": {
+                        "kwargs": {
+                            "name": "mybot",
+                            "token": (
+                                "111111111:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                            ),
+                        }
+                    }
+                }
+            }
+        },
+    )

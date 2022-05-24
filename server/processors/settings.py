@@ -18,12 +18,10 @@ class Topic(Enum):
     STREAMS = "streams"
 
 
-HANDLERS_CONF_PATH = os.environ.get(
-    "HANDLERS_CONF_PATH", BASE_DIR / "handlers.yaml"
-)
+HANDLERS_CONF_PATH = config("FW_HANDLERS_CONF_PATH", "/app/handlers.yaml")
 HANDLERS_CONFIG = {}
 
-if HANDLERS_CONF_PATH:
+if os.path.exists(HANDLERS_CONF_PATH):
 
     def string_constructor(self, node):
         value = self.construct_yaml_str(node)
