@@ -19,17 +19,15 @@ logger = logging.getLogger(__name__)
 @dataclasses.dataclass
 class TelegramBotOptions(HandlerOptions):
     DESCRIPTIONS = {
-        "chat_id": "Telegram chat id",
-        "disable_link_preview": "Disable link preview",
+        "chat_id": ("Chat ID", "Telegram chat id"),
+        "disable_link_preview": ("Disable link preview", ""),
     }
 
     chat_id: str
     disable_link_preview: bool = False
 
 
-@register_receiver(
-    name="telegram_bot", options=TelegramBotOptions.to_json_schema()
-)
+@register_receiver(name="telegram_bot", options=TelegramBotOptions)
 class TelegramBot:
     MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
     pause_between_send = 60 / MAX_MESSAGES_PER_MINUTE_PER_GROUP  # seconds

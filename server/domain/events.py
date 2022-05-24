@@ -18,4 +18,4 @@ class ProcessStreamEvent(Event):
     source_encoding: str
     source_tags: list
     receiver_type: str
-    receiver_recipient: str
+    receiver_options: dict

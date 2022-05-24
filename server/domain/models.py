@@ -17,7 +17,7 @@ class Receiver:
     name: str
     slug: str
     type: str
-    recipient: str
+    options: dict
     message_template: str
 
 

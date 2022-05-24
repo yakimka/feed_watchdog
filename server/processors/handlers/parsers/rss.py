@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 @register_parser()
-async def rss(text: str) -> list[models.Post]:
+async def rss(text: str, *, options=None) -> list[models.Post]:  # noqa: PLW0613
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _handler, text)
 

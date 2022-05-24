@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "db",
     "workers",
+    "better_json_widget",
 ]
 
 MIDDLEWARE = [
@@ -167,5 +168,9 @@ if SENTRY_DSN:
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
     )
+
+SHARED_CONFIG_PATH = config(
+    "FW_SHARED_CONFIG_PATH", default="/app/handlers.json"
+)
 
 from app_settings import *  # noqa: F403, F401, E402, PLC0413
