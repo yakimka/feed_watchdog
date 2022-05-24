@@ -48,7 +48,6 @@ class Subscriber:
                     )
                     if message is not None:
                         event = _parse_event(message)
-                        print(event)
                         asyncio.create_task(on_message(event))
                     await asyncio.sleep(0.01)
 
