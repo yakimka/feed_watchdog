@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import json
 import logging
-from typing import IO, TYPE_CHECKING, Callable, Iterable, Protocol
+from typing import IO, TYPE_CHECKING, Callable, Iterable
 
 from processors.adapters.error_tracking import write_warn_message
 from processors.adapters.fetch import fetch_text_from_url
@@ -42,11 +42,6 @@ async def process_stream(
     await send_new_posts_to_receiver(reversed(posts), event, storage)
 
 
-class Receiver(Protocol):
-    async def send(self, post: models.Post) -> None:
-        pass
-
-
 async def send_new_posts_to_receiver(
     posts: Iterable[models.Post],
     event: events.ProcessStreamEvent,
@@ -59,6 +54,12 @@ async def send_new_posts_to_receiver(
     is_init = (
         await storage.sent_posts_count(event.uid, event.receiver_type) == 0
     )
+    if is_init:
+        write_warn_message(
+            f"Empty database for {event.uid} {event.receiver_type}",
+            logger=logger,
+        )
+    new_posts = 0
     for post in posts:
         if is_init:
             await storage.save_post_sent_flag(
@@ -71,6 +72,16 @@ async def send_new_posts_to_receiver(
             await storage.save_post_sent_flag(
                 post.post_id, event.uid, event.receiver_type
             )
+            new_posts += 1
+    if new_posts:
+        msg = (
+            f"{new_posts} new posts sent to"
+            f" {event.receiver_type} ({event.source_url})"
+        )
+    else:
+        msg = f"No new posts sent to {event.receiver_type} ({event.source_url})"
+
+    logger.info(msg)
 
 
 @dataclasses.dataclass

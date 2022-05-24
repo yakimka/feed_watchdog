@@ -50,9 +50,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "better_json_widget",
     "db",
     "workers",
-    "better_json_widget",
 ]
 
 MIDDLEWARE = [
