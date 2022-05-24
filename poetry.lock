@@ -875,7 +875,7 @@ socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "hypothesis"
-version = "6.46.3"
+version = "6.46.7"
 description = "A library for property-based testing"
 category = "dev"
 optional = false
@@ -1811,7 +1811,7 @@ docs = ["sphinx", "sphinx-autodoc-typehints", "m2r2", "tomlkit"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "1a016fd370f163c321c72f388574094f1141c2748d91a3df3d8178806981f537"
+content-hash = "7c4a3bfeeecca7e7280ad1ab0803fc108470fb9f037666662cc69d4a6ed88b7a"
 
 [metadata.files]
 aiogram = [
@@ -2331,8 +2331,8 @@ httpx = [
     {file = "httpx-0.23.0.tar.gz", hash = "sha256:f28eac771ec9eb4866d3fb4ab65abd42d38c424739e80c08d8d20570de60b0ef"},
 ]
 hypothesis = [
-    {file = "hypothesis-6.46.3-py3-none-any.whl", hash = "sha256:022c269158a2db28c40a005fc477f18a1395025dd8b09ce394e49cd0f36c550a"},
-    {file = "hypothesis-6.46.3.tar.gz", hash = "sha256:8d65fcd14634b08f5b2237f66b9cb188df84a81a5cffd3e9748de24baf0fa535"},
+    {file = "hypothesis-6.46.7-py3-none-any.whl", hash = "sha256:2696cdb9005946bf1d2b215cc91d3fc01625e3342eb8743ddd04b667b2f1882b"},
+    {file = "hypothesis-6.46.7.tar.gz", hash = "sha256:967009fa561b3a3f8363a73d71923357271c37dc7fa27b30c2d21a1b6092b240"},
 ]
 identify = [
     {file = "identify-2.5.0-py2.py3-none-any.whl", hash = "sha256:3acfe15a96e4272b4ec5662ee3e231ceba976ef63fd9980ed2ce9cc415df393f"},
