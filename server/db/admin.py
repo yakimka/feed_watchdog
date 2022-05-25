@@ -13,11 +13,6 @@ admin.site.site_header = "Feed WatchDog"
 admin.site.unregister(Group)
 
 
-@admin.register(models.Source)
-class SourceAdmin(admin.ModelAdmin):
-    prepopulated_fields = {"slug": ("name",)}
-
-
 def load_configuration() -> dict:
     with open(settings.SHARED_CONFIG_PATH) as fp:
         return json.load(fp)
@@ -31,6 +26,26 @@ def get_choices(type):  # noqa: PLW0622
 def fields_config(type):  # noqa: PLW0622
     config = load_configuration()
     return {item["type"]: item["options"] for item in config["handlers"][type]}
+
+
+class SourceAdminForm(ModelForm):
+    parser_type = ChoiceField(choices=partial(get_choices, "parsers"))
+
+    class Meta:
+        model = models.Source
+        fields = "__all__"
+        widgets = {
+            "parser_options": BetterJsonWidget(
+                follow_field="parser_type",
+                schema_mapping=partial(fields_config, "parsers"),
+            ),
+        }
+
+
+@admin.register(models.Source)
+class SourceAdmin(admin.ModelAdmin):
+    form = SourceAdminForm
+    prepopulated_fields = {"slug": ("name",)}
 
 
 class ReceiverAdminForm(ModelForm):
@@ -51,13 +66,6 @@ class ReceiverAdminForm(ModelForm):
 class ReceiverAdmin(admin.ModelAdmin):
     form = ReceiverAdminForm
     prepopulated_fields = {"slug": ("name",)}
-    fields = [
-        "name",
-        "slug",
-        "type",
-        "options",
-        "message_template",
-    ]
 
 
 @admin.register(models.Stream)

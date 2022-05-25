@@ -30,7 +30,9 @@ async def process_stream(
     )
     if not text:
         return None
-    parser = get_parser_by_name(event.source_parser_type)
+    parser = get_parser_by_name(
+        event.source_parser_type, options=event.source_parser_options
+    )
     posts = await parser(text)
     if not posts:
         write_warn_message(

@@ -33,6 +33,7 @@ class Collector:
                     ),
                     source_url=source.url,
                     source_parser_type=source.parser_type,
+                    source_parser_options=source.parser_options,
                     source_encoding=source.encoding,
                     source_tags=list(source.tags),
                     receiver_type=receiver.type,
