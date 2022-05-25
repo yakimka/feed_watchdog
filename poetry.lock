@@ -389,7 +389,7 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-better-json-widget"
-version = "0.1.0"
+version = "0.1.1"
 description = "Better JSON Widget for Django Admin"
 category = "main"
 optional = false
@@ -883,7 +883,7 @@ socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "hypothesis"
-version = "6.46.7"
+version = "6.46.9"
 description = "A library for property-based testing"
 category = "dev"
 optional = false
@@ -2121,8 +2121,8 @@ django = [
     {file = "Django-4.0.4.tar.gz", hash = "sha256:4e8177858524417563cc0430f29ea249946d831eacb0068a1455686587df40b5"},
 ]
 django-better-json-widget = [
-    {file = "django-better-json-widget-0.1.0.tar.gz", hash = "sha256:8ed897ebcbe35cca71bc7fb7813f9d97c78ad1e2040d681b295e54547a90d237"},
-    {file = "django_better_json_widget-0.1.0-py3-none-any.whl", hash = "sha256:fb576b46c648fff336e45dae6df5713d204e697d85e541cb0a204b7aa1aca21d"},
+    {file = "django-better-json-widget-0.1.1.tar.gz", hash = "sha256:a7a7a4f0b3e2fbd49263121f614b6f29a962a6ede1d9e81a4c1013b3178431ac"},
+    {file = "django_better_json_widget-0.1.1-py3-none-any.whl", hash = "sha256:96eca0bae9672b0068b50e5c062c9065f9d6fa10fd6c093dd69669978b33c824"},
 ]
 django-extensions = [
     {file = "django-extensions-3.1.5.tar.gz", hash = "sha256:28e1e1bf49f0e00307ba574d645b0af3564c981a6dfc87209d48cb98f77d0b1a"},
@@ -2343,8 +2343,8 @@ httpx = [
     {file = "httpx-0.23.0.tar.gz", hash = "sha256:f28eac771ec9eb4866d3fb4ab65abd42d38c424739e80c08d8d20570de60b0ef"},
 ]
 hypothesis = [
-    {file = "hypothesis-6.46.7-py3-none-any.whl", hash = "sha256:2696cdb9005946bf1d2b215cc91d3fc01625e3342eb8743ddd04b667b2f1882b"},
-    {file = "hypothesis-6.46.7.tar.gz", hash = "sha256:967009fa561b3a3f8363a73d71923357271c37dc7fa27b30c2d21a1b6092b240"},
+    {file = "hypothesis-6.46.9-py3-none-any.whl", hash = "sha256:5a9629e10700e5c93f761fa310baf127f36f8a9e179e7dae087aeb22b3d1f535"},
+    {file = "hypothesis-6.46.9.tar.gz", hash = "sha256:8b1349dab58cf9bc85687e2721c008e99f23a32fb70e688779c81b0298904160"},
 ]
 identify = [
     {file = "identify-2.5.1-py2.py3-none-any.whl", hash = "sha256:0dca2ea3e4381c435ef9c33ba100a78a9b40c0bab11189c7cf121f75815efeaa"},
