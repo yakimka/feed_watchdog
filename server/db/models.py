@@ -52,6 +52,9 @@ class Source(models.Model):
     slug = models.SlugField()
     url = models.URLField()
     parser_type = models.CharField(max_length=32)
+    parser_options = models.JSONField(
+        blank=True, default=dict, help_text="Parser options"
+    )
     description = models.TextField(blank=True)
     encoding = models.CharField(max_length=16, blank=True)
     tags = models.TextField(blank=True)
@@ -68,6 +71,7 @@ class Source(models.Model):
             url=self.url,
             encoding=self.encoding,
             parser_type=self.parser_type,
+            parser_options=self.parser_options,
             tags=[tag.strip() for tag in self.tags.split(";") if tag.strip()],
         )
 

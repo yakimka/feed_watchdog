@@ -13,11 +13,6 @@ admin.site.site_header = "Feed WatchDog"
 admin.site.unregister(Group)
 
 
-@admin.register(models.Source)
-class SourceAdmin(admin.ModelAdmin):
-    prepopulated_fields = {"slug": ("name",)}
-
-
 def load_configuration() -> dict:
     with open(settings.SHARED_CONFIG_PATH) as fp:
         return json.load(fp)
@@ -31,6 +26,34 @@ def get_choices(type):  # noqa: PLW0622
 def fields_config(type):  # noqa: PLW0622
     config = load_configuration()
     return {item["type"]: item["options"] for item in config["handlers"][type]}
+
+
+class SourceAdminForm(ModelForm):
+    parser_type = ChoiceField(choices=partial(get_choices, "parsers"))
+
+    class Meta:
+        model = models.Source
+        fields = "__all__"
+        widgets = {
+            "parser_options": BetterJsonWidget(
+                follow_field="parser_type",
+                schema_mapping=partial(fields_config, "parsers"),
+            ),
+        }
+
+
+class StreamInlineAdmin(admin.TabularInline):
+    model = models.Stream
+    extra = 0
+
+
+@admin.register(models.Source)
+class SourceAdmin(admin.ModelAdmin):
+    list_display = ("name", "url", "parser_type", "tags")
+    ordering = ("name",)
+    form = SourceAdminForm
+    prepopulated_fields = {"slug": ("name",)}
+    inlines = (StreamInlineAdmin,)
 
 
 class ReceiverAdminForm(ModelForm):
@@ -49,17 +72,15 @@ class ReceiverAdminForm(ModelForm):
 
 @admin.register(models.Receiver)
 class ReceiverAdmin(admin.ModelAdmin):
+    list_display = ("name", "type")
+    ordering = ("name",)
     form = ReceiverAdminForm
     prepopulated_fields = {"slug": ("name",)}
-    fields = [
-        "name",
-        "slug",
-        "type",
-        "options",
-        "message_template",
-    ]
+    inlines = (StreamInlineAdmin,)
 
 
 @admin.register(models.Stream)
 class StreamAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "source", "receiver", "active")
+    ordering = ("source", "receiver")
     list_select_related = ("source", "receiver")

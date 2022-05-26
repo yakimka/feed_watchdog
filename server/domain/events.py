@@ -15,6 +15,7 @@ class ProcessStreamEvent(Event):
     message_template: str
     source_url: str
     source_parser_type: str
+    source_parser_options: dict
     source_encoding: str
     source_tags: list
     receiver_type: str

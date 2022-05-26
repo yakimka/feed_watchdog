@@ -389,7 +389,7 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-better-json-widget"
-version = "0.1.0"
+version = "0.1.1"
 description = "Better JSON Widget for Django Admin"
 category = "main"
 optional = false
@@ -883,7 +883,7 @@ socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "hypothesis"
-version = "6.46.7"
+version = "6.46.9"
 description = "A library for property-based testing"
 category = "dev"
 optional = false
@@ -1688,7 +1688,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.27.27"
+version = "2.27.29"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
@@ -1699,7 +1699,7 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-urllib3"
-version = "1.26.14"
+version = "1.26.15"
 description = "Typing stubs for urllib3"
 category = "dev"
 optional = false
@@ -2121,8 +2121,8 @@ django = [
     {file = "Django-4.0.4.tar.gz", hash = "sha256:4e8177858524417563cc0430f29ea249946d831eacb0068a1455686587df40b5"},
 ]
 django-better-json-widget = [
-    {file = "django-better-json-widget-0.1.0.tar.gz", hash = "sha256:8ed897ebcbe35cca71bc7fb7813f9d97c78ad1e2040d681b295e54547a90d237"},
-    {file = "django_better_json_widget-0.1.0-py3-none-any.whl", hash = "sha256:fb576b46c648fff336e45dae6df5713d204e697d85e541cb0a204b7aa1aca21d"},
+    {file = "django-better-json-widget-0.1.1.tar.gz", hash = "sha256:a7a7a4f0b3e2fbd49263121f614b6f29a962a6ede1d9e81a4c1013b3178431ac"},
+    {file = "django_better_json_widget-0.1.1-py3-none-any.whl", hash = "sha256:96eca0bae9672b0068b50e5c062c9065f9d6fa10fd6c093dd69669978b33c824"},
 ]
 django-extensions = [
     {file = "django-extensions-3.1.5.tar.gz", hash = "sha256:28e1e1bf49f0e00307ba574d645b0af3564c981a6dfc87209d48cb98f77d0b1a"},
@@ -2343,8 +2343,8 @@ httpx = [
     {file = "httpx-0.23.0.tar.gz", hash = "sha256:f28eac771ec9eb4866d3fb4ab65abd42d38c424739e80c08d8d20570de60b0ef"},
 ]
 hypothesis = [
-    {file = "hypothesis-6.46.7-py3-none-any.whl", hash = "sha256:2696cdb9005946bf1d2b215cc91d3fc01625e3342eb8743ddd04b667b2f1882b"},
-    {file = "hypothesis-6.46.7.tar.gz", hash = "sha256:967009fa561b3a3f8363a73d71923357271c37dc7fa27b30c2d21a1b6092b240"},
+    {file = "hypothesis-6.46.9-py3-none-any.whl", hash = "sha256:5a9629e10700e5c93f761fa310baf127f36f8a9e179e7dae087aeb22b3d1f535"},
+    {file = "hypothesis-6.46.9.tar.gz", hash = "sha256:8b1349dab58cf9bc85687e2721c008e99f23a32fb70e688779c81b0298904160"},
 ]
 identify = [
     {file = "identify-2.5.1-py2.py3-none-any.whl", hash = "sha256:0dca2ea3e4381c435ef9c33ba100a78a9b40c0bab11189c7cf121f75815efeaa"},
@@ -2808,12 +2808,12 @@ types-pyyaml = [
     {file = "types_PyYAML-6.0.7-py3-none-any.whl", hash = "sha256:7b273a34f32af9910cf9405728c9d2ad3afc4be63e4048091a1a73d76681fe67"},
 ]
 types-requests = [
-    {file = "types-requests-2.27.27.tar.gz", hash = "sha256:d618d9809fa32f514cf17cea8460814da671c56366fb1c908accca8bf183112b"},
-    {file = "types_requests-2.27.27-py3-none-any.whl", hash = "sha256:6d8463ffe1f6edcf2e5361740a6140e7a16d427c267d83c7c1d3d1298f4e67c5"},
+    {file = "types-requests-2.27.29.tar.gz", hash = "sha256:fb453b3a76a48eca66381cea8004feaaea12835e838196f5c7ac87c75c5c19ef"},
+    {file = "types_requests-2.27.29-py3-none-any.whl", hash = "sha256:014f4f82db7b96c41feea9adaea30e68cd64c230eeab34b70c29bebb26ec74ac"},
 ]
 types-urllib3 = [
-    {file = "types-urllib3-1.26.14.tar.gz", hash = "sha256:2a2578e4b36341ccd240b00fccda9826988ff0589a44ba4a664bbd69ef348d27"},
-    {file = "types_urllib3-1.26.14-py3-none-any.whl", hash = "sha256:5d2388aa76395b1e3999ff789ea5b3283677dad8e9bcf3d9117ba19271fd35d9"},
+    {file = "types-urllib3-1.26.15.tar.gz", hash = "sha256:c89283541ef92e344b7f59f83ea9b5a295b16366ceee3f25ecfc5593c79f794e"},
+    {file = "types_urllib3-1.26.15-py3-none-any.whl", hash = "sha256:6011befa13f901fc934f59bb1fd6973be6f3acf4ebfce427593a27e7f492918f"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.2.0-py3-none-any.whl", hash = "sha256:6657594ee297170d19f67d55c05852a874e7eb634f4f753dbd667855e07c1708"},

@@ -7,6 +7,7 @@ class Source:
     slug: str
     url: str
     parser_type: str
+    parser_options: dict
     encoding: str = ""
     description: str = ""
     tags: tuple | list = ()
