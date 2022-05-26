@@ -44,6 +44,8 @@ class SourceAdminForm(ModelForm):
 
 @admin.register(models.Source)
 class SourceAdmin(admin.ModelAdmin):
+    list_display = ("name", "url", "parser_type", "tags")
+    ordering = ("name",)
     form = SourceAdminForm
     prepopulated_fields = {"slug": ("name",)}
 
@@ -64,10 +66,14 @@ class ReceiverAdminForm(ModelForm):
 
 @admin.register(models.Receiver)
 class ReceiverAdmin(admin.ModelAdmin):
+    list_display = ("name", "type")
+    ordering = ("name",)
     form = ReceiverAdminForm
     prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(models.Stream)
 class StreamAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "source", "receiver", "active")
+    ordering = ("source", "receiver")
     list_select_related = ("source", "receiver")
