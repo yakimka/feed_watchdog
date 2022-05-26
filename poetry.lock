@@ -389,7 +389,7 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-better-json-widget"
-version = "0.1.0"
+version = "0.1.1"
 description = "Better JSON Widget for Django Admin"
 category = "main"
 optional = false
@@ -1819,7 +1819,7 @@ docs = ["sphinx", "sphinx-autodoc-typehints", "m2r2", "tomlkit"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "47412b263254dfc0dd75855c3eaa869f975d8e86fd2532eb52c76e86959ddab4"
+content-hash = "8295273a3e125cf42964c287c6d95b9664beb3f6c9babfc552501c1852cdd475"
 
 [metadata.files]
 aiogram = [
@@ -2121,8 +2121,8 @@ django = [
     {file = "Django-4.0.4.tar.gz", hash = "sha256:4e8177858524417563cc0430f29ea249946d831eacb0068a1455686587df40b5"},
 ]
 django-better-json-widget = [
-    {file = "django-better-json-widget-0.1.0.tar.gz", hash = "sha256:8ed897ebcbe35cca71bc7fb7813f9d97c78ad1e2040d681b295e54547a90d237"},
-    {file = "django_better_json_widget-0.1.0-py3-none-any.whl", hash = "sha256:fb576b46c648fff336e45dae6df5713d204e697d85e541cb0a204b7aa1aca21d"},
+    {file = "django-better-json-widget-0.1.1.tar.gz", hash = "sha256:a7a7a4f0b3e2fbd49263121f614b6f29a962a6ede1d9e81a4c1013b3178431ac"},
+    {file = "django_better_json_widget-0.1.1-py3-none-any.whl", hash = "sha256:96eca0bae9672b0068b50e5c062c9065f9d6fa10fd6c093dd69669978b33c824"},
 ]
 django-extensions = [
     {file = "django-extensions-3.1.5.tar.gz", hash = "sha256:28e1e1bf49f0e00307ba574d645b0af3564c981a6dfc87209d48cb98f77d0b1a"},
