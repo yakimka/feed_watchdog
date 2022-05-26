@@ -42,12 +42,18 @@ class SourceAdminForm(ModelForm):
         }
 
 
+class StreamInlineAdmin(admin.TabularInline):
+    model = models.Stream
+    extra = 0
+
+
 @admin.register(models.Source)
 class SourceAdmin(admin.ModelAdmin):
     list_display = ("name", "url", "parser_type", "tags")
     ordering = ("name",)
     form = SourceAdminForm
     prepopulated_fields = {"slug": ("name",)}
+    inlines = (StreamInlineAdmin,)
 
 
 class ReceiverAdminForm(ModelForm):
@@ -70,6 +76,7 @@ class ReceiverAdmin(admin.ModelAdmin):
     ordering = ("name",)
     form = ReceiverAdminForm
     prepopulated_fields = {"slug": ("name",)}
+    inlines = (StreamInlineAdmin,)
 
 
 @admin.register(models.Stream)
