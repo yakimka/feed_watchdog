@@ -5,20 +5,23 @@ import importlib
 import os
 import pkgutil
 from collections import defaultdict
+from enum import Enum
 from functools import partial
 from inspect import isclass
 from typing import Any, Callable, NamedTuple, Optional, Type, TypedDict
 
-from . import parsers, receivers
-
 __all__ = [
     "get_registered_handlers",
-    "get_parser_by_name",
-    "get_receiver_by_name",
-    "register_parser",
-    "register_receiver",
+    "get_handler_by_name",
+    "register_handler",
     "HandlerOptions",
+    "HandlerType",
 ]
+
+
+class HandlerType(Enum):
+    parsers = "parsers"
+    receivers = "receivers"
 
 
 @dataclasses.dataclass
@@ -126,14 +129,16 @@ def register_handler(
     return wrapper
 
 
-register_parser = partial(register_handler, "parsers")
-register_receiver = partial(register_handler, "receivers")
+def load_handlers() -> None:
+    for item in HandlerType:
+        package = importlib.import_module(
+            f".{item.value}", package="processors.handlers"
+        )
+        _load_modules(package)
 
 
 def get_registered_handlers() -> dict[str, dict[str, Handler]]:
-    # Load all parsers and receivers
-    _load_modules(parsers)
-    _load_modules(receivers)
+    load_handlers()
 
     result = {}
     for handler_type, handlers in HANDLERS.items():
@@ -165,10 +170,6 @@ def get_handler_by_name(
     if options and handler.options_class:
         options_ = handler.options_class(**options)
     return partial(handler.obj, options=options_)
-
-
-get_parser_by_name = partial(get_handler_by_name, "parsers")
-get_receiver_by_name = partial(get_handler_by_name, "receivers")
 
 
 Schema = TypedDict(

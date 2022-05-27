@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import dataclasses
 import json
 import logging
 from typing import IO, TYPE_CHECKING, Callable, Iterable
@@ -9,8 +8,8 @@ from processors.adapters.error_tracking import write_warn_message
 from processors.adapters.fetch import fetch_text_from_url
 from processors.domain.logic import mutate_posts_with_stream_data
 from processors.handlers import (
-    get_parser_by_name,
-    get_receiver_by_name,
+    HandlerType,
+    get_handler_by_name,
     get_registered_handlers,
 )
 
@@ -30,8 +29,10 @@ async def process_stream(
     )
     if not text:
         return None
-    parser = get_parser_by_name(
-        event.source_parser_type, options=event.source_parser_options
+    parser = get_handler_by_name(
+        name=event.source_parser_type,
+        type=HandlerType.parsers.value,
+        options=event.source_parser_options,
     )
     posts = await parser(text)
     if not posts:
@@ -49,8 +50,10 @@ async def send_new_posts_to_receiver(
     event: events.ProcessStreamEvent,
     storage: Storage,
 ) -> None:
-    receiver = get_receiver_by_name(
-        event.receiver_type, options=event.receiver_options
+    receiver = get_handler_by_name(
+        name=event.receiver_type,
+        type=HandlerType.receivers.value,
+        options=event.receiver_options,
     )
 
     is_init = (
@@ -86,31 +89,20 @@ async def send_new_posts_to_receiver(
     logger.info(msg)
 
 
-@dataclasses.dataclass
-class Configuration:
-    pass
-
-
 def parse_configuration() -> dict:
     handlers = get_registered_handlers()
-    return {
-        "handlers": {
-            "parsers": [
-                {
-                    "type": name,
-                    "options": dict(opt.to_json_schema()) if opt else {},
-                }
-                for name, _, opt in handlers["parsers"].values()
-            ],
-            "receivers": [
-                {
-                    "type": name,
-                    "options": dict(opt.to_json_schema()) if opt else {},
-                }
-                for name, _, opt in handlers["receivers"].values()
-            ],
-        }
-    }
+    results: dict = {"handlers": {}}
+
+    for item in HandlerType:
+        results["handlers"][item.value] = [
+            {
+                "type": name,
+                "options": dict(opt.to_json_schema()) if opt else {},
+            }
+            for name, _, opt in handlers[item.value].values()
+        ]
+
+    return results
 
 
 def write_configuration(

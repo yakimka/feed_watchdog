@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from aiogram import Bot
 
 from processors.adapters.lock import async_lock
-from processors.handlers import HandlerOptions, register_receiver
+from processors.handlers import HandlerOptions, HandlerType, register_handler
 
 if TYPE_CHECKING:
     from processors.domain.models import Post
@@ -27,7 +27,11 @@ class TelegramBotOptions(HandlerOptions):
     disable_link_preview: bool = False
 
 
-@register_receiver(name="telegram_bot", options=TelegramBotOptions)
+@register_handler(
+    type=HandlerType.receivers.value,
+    name="telegram_bot",
+    options=TelegramBotOptions,
+)
 class TelegramBot:
     MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
     pause_between_send = 60 / MAX_MESSAGES_PER_MINUTE_PER_GROUP  # seconds
