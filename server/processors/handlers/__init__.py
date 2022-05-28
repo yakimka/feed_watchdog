@@ -20,6 +20,7 @@ __all__ = [
 
 
 class HandlerType(Enum):
+    fetchers = "fetchers"
     parsers = "parsers"
     receivers = "receivers"
 
@@ -57,8 +58,11 @@ class HandlerOptions:
         }
         for field in dataclasses.fields(cls):
             m = dataclasses.MISSING
+            type_name = field.type
+            if not isinstance(type_name, str):
+                type_name = type_name.__name__
             schema["properties"][field.name] = {
-                "type": _python_type_to_json_schema_type(str(field.type)),
+                "type": _python_type_to_json_schema_type(type_name),
                 "title": cls.field_title(field.name),
                 "description": cls.field_description(field.name),
             }

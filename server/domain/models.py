@@ -5,10 +5,10 @@ import dataclasses
 class Source:
     name: str
     slug: str
-    url: str
+    fetcher_type: str
+    fetcher_options: dict
     parser_type: str
     parser_options: dict
-    encoding: str = ""
     description: str = ""
     tags: tuple | list = ()
 

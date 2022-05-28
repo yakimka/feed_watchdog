@@ -29,12 +29,17 @@ def fields_config(type):  # noqa: PLW0622
 
 
 class SourceAdminForm(ModelForm):
+    fetcher_type = ChoiceField(choices=partial(get_choices, "fetchers"))
     parser_type = ChoiceField(choices=partial(get_choices, "parsers"))
 
     class Meta:
         model = models.Source
         fields = "__all__"
         widgets = {
+            "fetcher_options": BetterJsonWidget(
+                follow_field="fetcher_type",
+                schema_mapping=partial(fields_config, "fetchers"),
+            ),
             "parser_options": BetterJsonWidget(
                 follow_field="parser_type",
                 schema_mapping=partial(fields_config, "parsers"),
@@ -49,7 +54,7 @@ class StreamInlineAdmin(admin.TabularInline):
 
 @admin.register(models.Source)
 class SourceAdmin(admin.ModelAdmin):
-    list_display = ("name", "url", "parser_type", "tags")
+    list_display = ("name", "fetcher_type", "parser_type", "tags")
     ordering = ("name",)
     form = SourceAdminForm
     prepopulated_fields = {"slug": ("name",)}

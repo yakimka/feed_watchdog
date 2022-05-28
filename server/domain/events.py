@@ -13,10 +13,10 @@ class Event:
 class ProcessStreamEvent(Event):
     uid: str
     message_template: str
-    source_url: str
+    source_fetcher_type: str
+    source_fetcher_options: {}
     source_parser_type: str
     source_parser_options: dict
-    source_encoding: str
     source_tags: list
     receiver_type: str
     receiver_options: dict
