@@ -14,7 +14,7 @@ class ProcessStreamEvent(Event):
     uid: str
     message_template: str
     source_fetcher_type: str
-    source_fetcher_options: {}
+    source_fetcher_options: dict
     source_parser_type: str
     source_parser_options: dict
     source_tags: list

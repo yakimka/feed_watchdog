@@ -16,7 +16,7 @@ def move_url_to_options(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('db', '0004_source_fetcher_options_source_fetcher_type'),
+        ("db", "0004_source_fetcher_options_source_fetcher_type"),
     ]
 
     operations = [

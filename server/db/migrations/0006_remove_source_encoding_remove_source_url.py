@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('db', '0005_move_url_to_options'),
+        ("db", "0005_move_url_to_options"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='source',
-            name='encoding',
+            model_name="source",
+            name="encoding",
         ),
         migrations.RemoveField(
-            model_name='source',
-            name='url',
+            model_name="source",
+            name="url",
         ),
     ]

@@ -5,7 +5,6 @@ import logging
 from typing import IO, TYPE_CHECKING, Callable, Iterable
 
 from processors.adapters.error_tracking import write_warn_message
-from processors.adapters.fetch import fetch_text_from_url
 from processors.domain.logic import mutate_posts_with_stream_data
 from processors.handlers import (
     HandlerType,
@@ -24,9 +23,12 @@ logger = logging.getLogger(__name__)
 async def process_stream(
     event: events.ProcessStreamEvent, storage: Storage
 ) -> None:
-    text = await fetch_text_from_url(
-        event.source_url, encoding=event.source_encoding, retry=2
+    fetcher = get_handler_by_name(
+        type=HandlerType.fetchers.value,
+        name=event.source_fetcher_type,
+        options=event.source_fetcher_options,
     )
+    text = await fetcher()
     if not text:
         return None
     parser = get_handler_by_name(
@@ -36,9 +38,7 @@ async def process_stream(
     )
     posts = await parser(text)
     if not posts:
-        write_warn_message(
-            f"Can't find posts for {event.source_url}", logger=logger
-        )
+        write_warn_message(f"Can't find posts for {event.uid}", logger=logger)
     mutate_posts_with_stream_data(event, posts)
     # TODO posts = apply_filters(posts)
 
@@ -80,11 +80,10 @@ async def send_new_posts_to_receiver(
             new_posts += 1
     if new_posts:
         msg = (
-            f"{new_posts} new posts sent to"
-            f" {event.receiver_type} ({event.source_url})"
+            f"{new_posts} new posts sent to {event.receiver_type} ({event.uid})"
         )
     else:
-        msg = f"No new posts sent to {event.receiver_type} ({event.source_url})"
+        msg = f"No new posts sent to {event.receiver_type} ({event.uid})"
 
     logger.info(msg)
 

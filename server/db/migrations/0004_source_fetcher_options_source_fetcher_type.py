@@ -6,19 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('db', '0003_source_parser_options'),
+        ("db", "0003_source_parser_options"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='source',
-            name='fetcher_options',
-            field=models.JSONField(blank=True, default=dict, help_text='Parser options'),
+            model_name="source",
+            name="fetcher_options",
+            field=models.JSONField(
+                blank=True, default=dict, help_text="Parser options"
+            ),
         ),
         migrations.AddField(
-            model_name='source',
-            name='fetcher_type',
-            field=models.CharField(default='fetch_text', max_length=32),
+            model_name="source",
+            name="fetcher_type",
+            field=models.CharField(default="fetch_text", max_length=32),
             preserve_default=False,
         ),
     ]
