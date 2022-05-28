@@ -73,7 +73,7 @@ async def send_new_posts_to_receiver(
         elif not await storage.post_was_sent(
             post.post_id, event.uid, event.receiver_type
         ):
-            await receiver(post)
+            await receiver(post, template=event.message_template)
             await storage.save_post_sent_flag(
                 post.post_id, event.uid, event.receiver_type
             )
@@ -97,8 +97,9 @@ def parse_configuration() -> dict:
             {
                 "type": name,
                 "options": dict(opt.to_json_schema()) if opt else {},
+                "return_fields_schema": f_schema,
             }
-            for name, _, opt in handlers[item.value].values()
+            for name, _, opt, f_schema in handlers[item.value].values()
         ]
 
     return results

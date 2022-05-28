@@ -84,10 +84,15 @@ class Handler(NamedTuple):
     name: str
     obj: Callable
     options_class: Optional[Type[HandlerOptions]]
+    return_fields_schema: Optional[dict]
 
 
 RawHandler = tuple[
-    str, Callable, Optional[dict], Optional[Type[HandlerOptions]]
+    str,
+    Callable,
+    Optional[dict],
+    Optional[Type[HandlerOptions]],
+    Optional[dict],
 ]
 HANDLERS: dict[str, dict[str, RawHandler]] = defaultdict(dict)
 
@@ -96,6 +101,7 @@ def register_handler(
     type: str,  # noqa: PLW0622
     name: Optional[str] = None,
     options: Optional[Type[HandlerOptions]] = None,
+    return_fields_schema: Optional[dict] = None,
 ):  # noqa: PLW0622
     def wrapper(func_or_class):
         from processors import settings  # noqa: PLC0415
@@ -112,6 +118,7 @@ def register_handler(
                         func_or_class,
                         kwargs,
                         options,
+                        return_fields_schema,
                     )
             else:
                 HANDLERS[type][handler_name] = (
@@ -119,6 +126,7 @@ def register_handler(
                     func_or_class,
                     {},
                     options,
+                    return_fields_schema,
                 )
 
         elif callable(func_or_class):
@@ -128,6 +136,7 @@ def register_handler(
                 func_or_class,
                 None,
                 options,
+                return_fields_schema,
             )
 
         return func_or_class
@@ -150,9 +159,18 @@ def get_registered_handlers() -> dict[str, dict[str, Handler]]:
     for handler_type, handlers in HANDLERS.items():
         result[handler_type] = {
             name: Handler(
-                name_, obj if kwargs is None else obj(**kwargs), options_class
+                name_,
+                obj if kwargs is None else obj(**kwargs),
+                options_class,
+                return_fields_schema,
             )
-            for name, (name_, obj, kwargs, options_class) in handlers.items()
+            for name, (
+                name_,
+                obj,
+                kwargs,
+                options_class,
+                return_fields_schema,
+            ) in handlers.items()
         }
     return result
 
