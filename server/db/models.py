@@ -50,13 +50,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Source(models.Model):
     name = models.CharField(max_length=1024)
     slug = models.SlugField()
-    url = models.URLField()
+    fetcher_type = models.CharField(max_length=32)
+    fetcher_options = models.JSONField(
+        blank=True, default=dict, help_text="Parser options"
+    )
     parser_type = models.CharField(max_length=32)
     parser_options = models.JSONField(
         blank=True, default=dict, help_text="Parser options"
     )
     description = models.TextField(blank=True)
-    encoding = models.CharField(max_length=16, blank=True)
     tags = models.TextField(blank=True)
     created = models.DateTimeField(default=timezone.now, editable=False)
 
@@ -68,8 +70,8 @@ class Source(models.Model):
             slug=self.slug,
             name=self.name,
             description=self.description,
-            url=self.url,
-            encoding=self.encoding,
+            fetcher_type=self.fetcher_type,
+            fetcher_options=self.fetcher_options,
             parser_type=self.parser_type,
             parser_options=self.parser_options,
             tags=[tag.strip() for tag in self.tags.split(";") if tag.strip()],

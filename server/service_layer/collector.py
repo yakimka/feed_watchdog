@@ -31,10 +31,10 @@ class Collector:
                     message_template=(
                         stream.message_template or receiver.message_template
                     ),
-                    source_url=source.url,
+                    source_fetcher_type=source.fetcher_type,
+                    source_fetcher_options=source.fetcher_options,
                     source_parser_type=source.parser_type,
                     source_parser_options=source.parser_options,
-                    source_encoding=source.encoding,
                     source_tags=list(source.tags),
                     receiver_type=receiver.type,
                     receiver_options=receiver.options,

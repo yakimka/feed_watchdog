@@ -5,20 +5,24 @@ import importlib
 import os
 import pkgutil
 from collections import defaultdict
+from enum import Enum
 from functools import partial
 from inspect import isclass
 from typing import Any, Callable, NamedTuple, Optional, Type, TypedDict
 
-from . import parsers, receivers
-
 __all__ = [
     "get_registered_handlers",
-    "get_parser_by_name",
-    "get_receiver_by_name",
-    "register_parser",
-    "register_receiver",
+    "get_handler_by_name",
+    "register_handler",
     "HandlerOptions",
+    "HandlerType",
 ]
+
+
+class HandlerType(Enum):
+    fetchers = "fetchers"
+    parsers = "parsers"
+    receivers = "receivers"
 
 
 @dataclasses.dataclass
@@ -54,8 +58,13 @@ class HandlerOptions:
         }
         for field in dataclasses.fields(cls):
             m = dataclasses.MISSING
+            type_name = (
+                field.type
+                if isinstance(field.type, str)
+                else field.type.__name__
+            )
             schema["properties"][field.name] = {
-                "type": _python_type_to_json_schema_type(str(field.type)),
+                "type": _python_type_to_json_schema_type(type_name),
                 "title": cls.field_title(field.name),
                 "description": cls.field_description(field.name),
             }
@@ -75,10 +84,15 @@ class Handler(NamedTuple):
     name: str
     obj: Callable
     options_class: Optional[Type[HandlerOptions]]
+    return_fields_schema: Optional[dict]
 
 
 RawHandler = tuple[
-    str, Callable, Optional[dict], Optional[Type[HandlerOptions]]
+    str,
+    Callable,
+    Optional[dict],
+    Optional[Type[HandlerOptions]],
+    Optional[dict],
 ]
 HANDLERS: dict[str, dict[str, RawHandler]] = defaultdict(dict)
 
@@ -87,6 +101,7 @@ def register_handler(
     type: str,  # noqa: PLW0622
     name: Optional[str] = None,
     options: Optional[Type[HandlerOptions]] = None,
+    return_fields_schema: Optional[dict] = None,
 ):  # noqa: PLW0622
     def wrapper(func_or_class):
         from processors import settings  # noqa: PLC0415
@@ -103,6 +118,7 @@ def register_handler(
                         func_or_class,
                         kwargs,
                         options,
+                        return_fields_schema,
                     )
             else:
                 HANDLERS[type][handler_name] = (
@@ -110,6 +126,7 @@ def register_handler(
                     func_or_class,
                     {},
                     options,
+                    return_fields_schema,
                 )
 
         elif callable(func_or_class):
@@ -119,6 +136,7 @@ def register_handler(
                 func_or_class,
                 None,
                 options,
+                return_fields_schema,
             )
 
         return func_or_class
@@ -126,22 +144,33 @@ def register_handler(
     return wrapper
 
 
-register_parser = partial(register_handler, "parsers")
-register_receiver = partial(register_handler, "receivers")
+def load_handlers() -> None:
+    for item in HandlerType:
+        package = importlib.import_module(
+            f".{item.value}", package="processors.handlers"
+        )
+        _load_modules(package)
 
 
 def get_registered_handlers() -> dict[str, dict[str, Handler]]:
-    # Load all parsers and receivers
-    _load_modules(parsers)
-    _load_modules(receivers)
+    load_handlers()
 
     result = {}
     for handler_type, handlers in HANDLERS.items():
         result[handler_type] = {
             name: Handler(
-                name_, obj if kwargs is None else obj(**kwargs), options_class
+                name_,
+                obj if kwargs is None else obj(**kwargs),
+                options_class,
+                return_fields_schema,
             )
-            for name, (name_, obj, kwargs, options_class) in handlers.items()
+            for name, (
+                name_,
+                obj,
+                kwargs,
+                options_class,
+                return_fields_schema,
+            ) in handlers.items()
         }
     return result
 
@@ -165,10 +194,6 @@ def get_handler_by_name(
     if options and handler.options_class:
         options_ = handler.options_class(**options)
     return partial(handler.obj, options=options_)
-
-
-get_parser_by_name = partial(get_handler_by_name, "parsers")
-get_receiver_by_name = partial(get_handler_by_name, "receivers")
 
 
 Schema = TypedDict(
