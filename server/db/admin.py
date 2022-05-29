@@ -70,6 +70,7 @@ class StreamInlineAdmin(admin.TabularInline):
 
 @admin.register(models.Source)
 class SourceAdmin(admin.ModelAdmin):
+    search_fields = ("name", "tags")
     list_display = ("name", "fetcher_type", "parser_type", "tags")
     ordering = ("name",)
     form = SourceAdminForm
@@ -97,6 +98,7 @@ class ReceiverAdminForm(ModelForm):
 
 @admin.register(models.Receiver)
 class ReceiverAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
     list_display = ("name", "type")
     ordering = ("name",)
     form = ReceiverAdminForm
@@ -106,6 +108,7 @@ class ReceiverAdmin(admin.ModelAdmin):
 
 @admin.register(models.Stream)
 class StreamAdmin(admin.ModelAdmin):
+    search_fields = ("source__name", "receiver__name")
     list_display = ("__str__", "source", "receiver", "active")
     ordering = ("source", "receiver")
     list_select_related = ("source", "receiver")
