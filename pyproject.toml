@@ -33,7 +33,7 @@ sphinx = { version = "^4.5",  optional = true }
 sphinx-autodoc-typehints = { version = "^1.18", optional = true }
 m2r2 = { version = "^0.3",  optional = true }
 tomlkit = { version = "^0.10", optional = true }
-Django = "^4.0.4"
+Django = "^4.0.5"
 django-extensions = "^3.1.5"
 redis = "^4.2.2"
 APScheduler = "^3.9.1"
