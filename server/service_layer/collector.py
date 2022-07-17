@@ -38,7 +38,7 @@ class Collector:
                     source_tags=list(source.tags),
                     receiver_type=receiver.type,
                     receiver_options=receiver.options,
-                    filters=[],
+                    filters=stream.filters,
                 )
             )
         return result

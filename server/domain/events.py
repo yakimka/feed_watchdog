@@ -1,5 +1,6 @@
 import dataclasses
-from typing import TypedDict
+
+from domain.models import Filter
 
 
 @dataclasses.dataclass
@@ -8,11 +9,6 @@ class Event:
         data = dataclasses.asdict(self)
         data["__event_name__"] = type(self).__name__
         return data
-
-
-class Filter(TypedDict):
-    type: str
-    options: dict
 
 
 @dataclasses.dataclass

@@ -106,12 +106,18 @@ class ReceiverAdmin(admin.ModelAdmin):
     inlines = (StreamInlineAdmin,)
 
 
+class FilterInlineAdmin(admin.TabularInline):
+    model = models.StreamFilter
+    extra = 0
+
+
 @admin.register(models.Stream)
 class StreamAdmin(admin.ModelAdmin):
     search_fields = ("source__name", "receiver__name")
     list_display = ("__str__", "source", "receiver", "active")
     ordering = ("source", "receiver")
     list_select_related = ("source", "receiver")
+    inlines = (FilterInlineAdmin,)
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super().get_form(request, obj, change, **kwargs)
@@ -119,3 +125,29 @@ class StreamAdmin(admin.ModelAdmin):
             "message_template"
         ].help_text = message_template_help_text()
         return form
+
+
+class FilterAdminForm(ModelForm):
+    type = ChoiceField(choices=partial(get_choices, "filters"))
+
+    class Meta:
+        model = models.Source
+        fields = "__all__"
+        widgets = {
+            "options": BetterJsonWidget(
+                follow_field="type",
+                schema_mapping=partial(fields_config, "filters"),
+            ),
+        }
+
+
+@admin.register(models.Filter)
+class FilterAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "type",
+    )
+    # ordering = ("name",)
+    form = FilterAdminForm
+    # prepopulated_fields = {"slug": ("name",)}
+    # inlines = (StreamInlineAdmin,)
