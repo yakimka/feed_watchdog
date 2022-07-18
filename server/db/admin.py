@@ -147,7 +147,5 @@ class FilterAdmin(admin.ModelAdmin):
         "name",
         "type",
     )
-    # ordering = ("name",)
+    ordering = ("name",)
     form = FilterAdminForm
-    # prepopulated_fields = {"slug": ("name",)}
-    # inlines = (StreamInlineAdmin,)

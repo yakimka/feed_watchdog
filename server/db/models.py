@@ -146,7 +146,7 @@ class Filter(models.Model):
     )
 
     def __str__(self) -> str:
-        return self.name
+        return str(self.name)
 
 
 class StreamFilter(models.Model):

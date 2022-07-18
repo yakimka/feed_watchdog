@@ -1,6 +1,10 @@
-import dataclasses
+from __future__ import annotations
 
-from domain.models import Filter
+import dataclasses
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from domain.models import Filter
 
 
 @dataclasses.dataclass
