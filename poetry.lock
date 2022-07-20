@@ -1681,7 +1681,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "tomlkit"
-version = "0.10.2"
+version = "0.11.1"
 description = "Style preserving TOML library"
 category = "main"
 optional = false
@@ -1836,7 +1836,7 @@ docs = ["sphinx", "sphinx-autodoc-typehints", "m2r2", "tomlkit"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "eb06f973f74605269820ed441eda4a7557305d7dd57f5443df2620b3b9609d1b"
+content-hash = "18a371d403530ae11c58b11dab972f335c9c9be2ba38e8e42bceb76c206d23f5"
 
 [metadata.files]
 aiogram = [
@@ -2816,8 +2816,8 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 tomlkit = [
-    {file = "tomlkit-0.10.2-py3-none-any.whl", hash = "sha256:905cf92c2111ef80d355708f47ac24ad1b6fc2adc5107455940088c9bbecaedb"},
-    {file = "tomlkit-0.10.2.tar.gz", hash = "sha256:30d54c0b914e595f3d10a87888599eab5321a2a69abc773bbefff51599b72db6"},
+    {file = "tomlkit-0.11.1-py3-none-any.whl", hash = "sha256:1c5bebdf19d5051e2e1de6cf70adfc5948d47221f097fcff7a3ffc91e953eaf5"},
+    {file = "tomlkit-0.11.1.tar.gz", hash = "sha256:61901f81ff4017951119cd0d1ed9b7af31c821d6845c8c477587bbdcd5e5854e"},
 ]
 types-pytz = [
     {file = "types-pytz-2022.1.1.tar.gz", hash = "sha256:4e7add70886dc2ee6ee7535c8184a26eeb0ac9dbafae9962cb882d74b9f67330"},
