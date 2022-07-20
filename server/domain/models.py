@@ -23,8 +23,15 @@ class Receiver:
 
 
 @dataclasses.dataclass()
+class Filter:
+    type: str
+    options: dict
+
+
+@dataclasses.dataclass()
 class Stream:
     uid: str
     source: Source
     receiver: Receiver
     message_template: str = ""
+    filters: list[Filter] = dataclasses.field(default_factory=list)

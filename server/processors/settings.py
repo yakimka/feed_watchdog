@@ -29,12 +29,8 @@ if os.path.exists(HANDLERS_CONF_PATH):
             return os.environ[value[4:]].strip()
         return value
 
-    yaml.Loader.add_constructor(  # type: ignore
-        "tag:yaml.org,2002:str", string_constructor
-    )
-    yaml.SafeLoader.add_constructor(  # type: ignore
-        "tag:yaml.org,2002:str", string_constructor
-    )
+    yaml.Loader.add_constructor("tag:yaml.org,2002:str", string_constructor)
+    yaml.SafeLoader.add_constructor("tag:yaml.org,2002:str", string_constructor)
 
     with open(HANDLERS_CONF_PATH) as conf:
         HANDLERS_CONFIG = yaml.safe_load(conf)

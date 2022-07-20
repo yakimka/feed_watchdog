@@ -128,4 +128,30 @@ class Stream(models.Model):
             message_template=self.message_template
             if self.has_message_template
             else "",
+            filters=[
+                domain_models.Filter(
+                    type=item.filter.type, options=item.filter.options
+                )
+                for item in self.streamfilter_set.all()
+                if item.filter
+            ],
         )
+
+
+class Filter(models.Model):
+    name = models.CharField(max_length=1024)
+    type = models.CharField(max_length=32)
+    options = models.JSONField(
+        blank=True, default=dict, help_text="Filter options"
+    )
+
+    def __str__(self) -> str:
+        return str(self.name)
+
+
+class StreamFilter(models.Model):
+    stream = models.ForeignKey(Stream, on_delete=models.CASCADE, db_index=True)
+    filter = models.ForeignKey(Filter, on_delete=models.CASCADE, db_index=True)
+
+    def __str__(self) -> str:
+        return str(self.filter)

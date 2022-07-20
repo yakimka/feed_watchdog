@@ -23,6 +23,7 @@ class HandlerType(Enum):
     fetchers = "fetchers"
     parsers = "parsers"
     receivers = "receivers"
+    filters = "filters"
 
 
 @dataclasses.dataclass
@@ -58,18 +59,22 @@ class HandlerOptions:
         }
         for field in dataclasses.fields(cls):
             m = dataclasses.MISSING
-            type_name = (
-                field.type
-                if isinstance(field.type, str)
-                else field.type.__name__
-            )
+            field_type = field.type
+            extra_properties = {}
+            is_enum = isclass(field.type) and issubclass(field.type, Enum)
+            if is_enum:
+                field_type = _get_enum_values_type(field.type)
+                extra_properties["enum"] = [field.value for field in field.type]
             schema["properties"][field.name] = {
-                "type": _python_type_to_json_schema_type(type_name),
+                **extra_properties,
+                "type": _python_type_to_json_schema_type(field_type),
                 "title": cls.field_title(field.name),
                 "description": cls.field_description(field.name),
             }
+
             if field.default is not m:
-                schema["properties"][field.name]["default"] = field.default
+                default = field.default.value if is_enum else field.default
+                schema["properties"][field.name]["default"] = default
             elif field.default_factory is not m:  # type: ignore
                 schema["properties"][field.name][
                     "default"
@@ -208,14 +213,29 @@ Schema = TypedDict(
 )
 
 
-def _python_type_to_json_schema_type(python_type: str) -> str:
+def _python_type_to_json_schema_type(python_type: Type | str) -> str:
     types = {
         "str": "string",
         "int": "integer",
         "float": "number",
         "bool": "boolean",
     }
+    python_type = (
+        python_type if isinstance(python_type, str) else python_type.__name__
+    )
     try:
         return types[python_type]
     except KeyError:
         raise ValueError(f"Unsupported type {python_type}") from None
+
+
+def _get_enum_values_type(enum_class: Type[Enum]) -> Type:
+    enums: list[Enum] = list(enum_class)
+    klass = type(enums[0].value)
+    is_consistent = all(isinstance(e.value, klass) for e in enums)
+    if not is_consistent:
+        raise ValueError(
+            f"Enum {enum_class.__name__} has inconsistent values types"
+        )
+
+    return klass
