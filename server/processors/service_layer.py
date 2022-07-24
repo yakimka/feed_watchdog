@@ -40,9 +40,22 @@ async def process_stream(
     if not posts:
         write_warn_message(f"Can't find posts for {event.uid}", logger=logger)
     mutate_posts_with_stream_data(event, posts)
-    # TODO posts = apply_filters(posts)
+    posts = await apply_filters(event.filters, posts)
 
     await send_new_posts_to_receiver(reversed(posts), event, storage)
+
+
+async def apply_filters(
+    filters: list, posts: Iterable[models.Post]
+) -> Iterable[models.Post]:
+    for filter_ in filters:
+        filter_func = get_handler_by_name(
+            name=filter_["type"],
+            type=HandlerType.filters.value,
+            options=filter_["options"],
+        )
+        posts = await filter_func(posts)
+    return posts
 
 
 async def send_new_posts_to_receiver(
@@ -50,12 +63,6 @@ async def send_new_posts_to_receiver(
     event: events.ProcessStreamEvent,
     storage: Storage,
 ) -> None:
-    receiver = get_handler_by_name(
-        name=event.receiver_type,
-        type=HandlerType.receivers.value,
-        options=event.receiver_options,
-    )
-
     is_init = (
         await storage.sent_posts_count(event.uid, event.receiver_type) == 0
     )
@@ -64,28 +71,51 @@ async def send_new_posts_to_receiver(
             f"Empty database for {event.uid} {event.receiver_type}",
             logger=logger,
         )
-    new_posts = 0
-    for post in posts:
-        if is_init:
+        for post in posts:
             await storage.save_post_sent_flag(
                 post.post_id, event.uid, event.receiver_type
             )
-        elif not await storage.post_was_sent(
+    else:
+        receiver = get_handler_by_name(
+            name=event.receiver_type,
+            type=HandlerType.receivers.value,
+            options=event.receiver_options,
+        )
+
+        async def callback(post: models.Post):
+            await storage.save_post_sent_flag(
+                post.post_id, event.uid, event.receiver_type
+            )
+
+        new_posts = await _get_new_posts(posts, event=event, storage=storage)
+        await receiver(
+            new_posts,
+            template=event.message_template,
+            squash=event.squash,
+            callback=callback,
+        )
+        logger.info(
+            "%s new posts sent to %s (%s)",
+            len(new_posts),
+            event.receiver_type,
+            event.uid,
+        )
+
+
+async def _get_new_posts(
+    posts: Iterable[models.Post],
+    *,
+    event: events.ProcessStreamEvent,
+    storage: Storage,
+) -> list[models.Post]:
+    new_posts = []
+    for post in posts:
+        if not await storage.post_was_sent(
             post.post_id, event.uid, event.receiver_type
         ):
-            await receiver(post, template=event.message_template)
-            await storage.save_post_sent_flag(
-                post.post_id, event.uid, event.receiver_type
-            )
-            new_posts += 1
-    if new_posts:
-        msg = (
-            f"{new_posts} new posts sent to {event.receiver_type} ({event.uid})"
-        )
-    else:
-        msg = f"No new posts sent to {event.receiver_type} ({event.uid})"
+            new_posts.append(post)
 
-    logger.info(msg)
+    return new_posts
 
 
 def parse_configuration() -> dict:
