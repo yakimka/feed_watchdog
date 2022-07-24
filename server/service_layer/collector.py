@@ -31,6 +31,7 @@ class Collector:
             result.append(
                 ProcessStreamEvent(
                     uid=stream.uid,
+                    squash=stream.squash,
                     message_template=(
                         stream.message_template or receiver.message_template
                     ),

@@ -18,6 +18,7 @@ class Event:
 @dataclasses.dataclass
 class ProcessStreamEvent(Event):
     uid: str
+    squash: bool
     message_template: str
     source_fetcher_type: str
     source_fetcher_options: dict

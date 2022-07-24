@@ -33,5 +33,6 @@ class Stream:
     uid: str
     source: Source
     receiver: Receiver
+    squash: bool
     message_template: str = ""
     filters: list[Filter] = dataclasses.field(default_factory=list)

@@ -143,6 +143,9 @@ class Stream(models.Model):
     )
     intervals = models.ManyToManyField(Interval, blank=True)
     active = models.BooleanField(default=True)
+    squash = models.BooleanField(
+        default=False, help_text="Squash posts in one message"
+    )
     has_message_template = models.BooleanField(default=False)
     message_template = models.TextField(blank=True)
 
@@ -161,6 +164,7 @@ class Stream(models.Model):
             uid=self.uid,
             source=self.source.to_domain(),
             receiver=self.receiver.to_domain(),
+            squash=self.squash,
             message_template=self.message_template
             if self.has_message_template
             else "",
