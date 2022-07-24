@@ -131,7 +131,7 @@ class FilterInlineAdmin(admin.TabularInline):
 
 @admin.register(models.Stream)
 class StreamAdmin(admin.ModelAdmin):
-    search_fields = ("source__name", "receiver__name")
+    search_fields = ("source__name", "receiver__name", "uid")
     list_display = (
         "__str__",
         "source",
