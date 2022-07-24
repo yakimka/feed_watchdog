@@ -3,14 +3,32 @@ from functools import partial
 
 from better_json_widget.widgets import BetterJsonWidget
 from django.conf import settings
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.models import Group
 from django.forms import ChoiceField, ModelForm
+from django.utils.translation import ngettext
 
 from db import models
 
 admin.site.site_header = "Feed WatchDog"
 admin.site.unregister(Group)
+
+
+@admin.action(description="Resave objects")
+def make_published(modeladmin, request, queryset):
+    _i = 0
+    for _i, item in enumerate(queryset, start=1):
+        item.save()
+
+    modeladmin.message_user(
+        request,
+        ngettext(
+            "{} object was successfully resaved.",  # noqa P103
+            "{} objects were successfully resaved.",  # noqa P103
+            _i,
+        ).format(_i),
+        messages.SUCCESS,
+    )
 
 
 def load_configuration() -> dict:
@@ -114,10 +132,20 @@ class FilterInlineAdmin(admin.TabularInline):
 @admin.register(models.Stream)
 class StreamAdmin(admin.ModelAdmin):
     search_fields = ("source__name", "receiver__name")
-    list_display = ("__str__", "source", "receiver", "active")
+    list_display = (
+        "__str__",
+        "source",
+        "receiver",
+        "active",
+    )
+    list_editable = (
+        "receiver",
+        "active",
+    )
     ordering = ("source", "receiver")
     list_select_related = ("source", "receiver")
     inlines = (FilterInlineAdmin,)
+    actions = (make_published,)
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super().get_form(request, obj, change, **kwargs)
@@ -149,3 +177,13 @@ class FilterAdmin(admin.ModelAdmin):
     )
     ordering = ("name",)
     form = FilterAdminForm
+
+
+@admin.register(models.Interval)
+class IntervalAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "cron",
+        "default",
+    )
+    ordering = ("name",)

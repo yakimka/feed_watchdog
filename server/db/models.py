@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import random
+from typing import TYPE_CHECKING
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, UserManager
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from domain import models as domain_models
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -107,18 +113,48 @@ def generate_uid(length=12):
     )
 
 
+class Interval(models.Model):
+    name = models.CharField(max_length=1024)
+    cron = models.CharField(max_length=32, unique=True)
+    default = models.BooleanField(default=False)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return str(self.name)
+
+    @classmethod
+    def create_initial_objects(cls):
+        return cls.objects.create(
+            name="Every 10 minutes",
+            cron="*/10 * * * *",
+            default=True,
+        )
+
+
+def get_default_intervals() -> QuerySet[Interval]:
+    return Interval.objects.filter(default=True)
+
+
 class Stream(models.Model):
     uid = models.CharField(max_length=12, default=generate_uid, unique=True)
     source = models.ForeignKey(Source, on_delete=models.CASCADE, db_index=True)
     receiver = models.ForeignKey(
         Receiver, on_delete=models.CASCADE, db_index=True
     )
+    intervals = models.ManyToManyField(Interval, blank=True)
     active = models.BooleanField(default=True)
     has_message_template = models.BooleanField(default=False)
     message_template = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.source} -> {self.receiver}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.intervals.all():
+            transaction.on_commit(
+                lambda: self.intervals.add(*get_default_intervals())
+            )
 
     def to_domain(self) -> domain_models.Stream:
         return domain_models.Stream(

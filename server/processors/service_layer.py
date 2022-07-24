@@ -40,9 +40,22 @@ async def process_stream(
     if not posts:
         write_warn_message(f"Can't find posts for {event.uid}", logger=logger)
     mutate_posts_with_stream_data(event, posts)
-    # TODO posts = apply_filters(posts)
+    posts = await apply_filters(event.filters, posts)
 
     await send_new_posts_to_receiver(reversed(posts), event, storage)
+
+
+async def apply_filters(
+    filters: list, posts: Iterable[models.Post]
+) -> Iterable[models.Post]:
+    for filter_ in filters:
+        filter_func = get_handler_by_name(
+            name=filter_["type"],
+            type=HandlerType.filters.value,
+            options=filter_["options"],
+        )
+        posts = await filter_func(posts)
+    return posts
 
 
 async def send_new_posts_to_receiver(

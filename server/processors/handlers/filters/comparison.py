@@ -44,18 +44,18 @@ class ComparisonOptions(HandlerOptions):
 async def comparison(
     posts: list[Post], *, options: ComparisonOptions
 ) -> list[Post]:
-    if options.field_type == ComparisonValueType.STRING:
+    if options.field_type == ComparisonValueType.STRING.value:
         value = options.value
-    elif options.field_type == ComparisonValueType.INTEGER:
+    elif options.field_type == ComparisonValueType.INTEGER.value:
         value = int(options.value)
     else:
         raise ValueError(f"Unknown field type: {options.field_type}")
 
     operator_map = {
-        OperatorType.EQUAL: operator.eq,
-        OperatorType.NOT_EQUAL: operator.ne,
-        OperatorType.GREATER_THAN: operator.gt,
-        OperatorType.LESS_THAN: operator.lt,
+        OperatorType.EQUAL.value: operator.eq,
+        OperatorType.NOT_EQUAL.value: operator.ne,
+        OperatorType.GREATER_THAN.value: operator.gt,
+        OperatorType.LESS_THAN.value: operator.lt,
     }
     operator_func = operator_map[options.operator]
     return [

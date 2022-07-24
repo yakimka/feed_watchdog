@@ -12,6 +12,7 @@ from domain.events import ProcessStreamEvent
 if TYPE_CHECKING:
     from adapters.publisher import Publisher
     from adapters.streams import StreamRepository
+    from domain.models import Stream
 
 
 class Collector:
@@ -20,9 +21,11 @@ class Collector:
         self.streams = streams
 
     @sync_to_async
-    def streams_to_events(self) -> list[ProcessStreamEvent]:
+    def streams_to_events(
+        self, streams: list[Stream]
+    ) -> list[ProcessStreamEvent]:
         result = []
-        for stream in self.streams.list():
+        for stream in streams:
             source = stream.source
             receiver = stream.receiver
             result.append(
@@ -45,7 +48,11 @@ class Collector:
 
     @inject
     async def send_events(
-        self, publisher: Publisher = Provide[Container.publisher]
+        self,
+        cron_interval: str = "",
+        publisher: Publisher = Provide[Container.publisher],
     ):
-        for event in await self.streams_to_events():
+        for event in await self.streams_to_events(
+            self.streams.list(cron_interval=cron_interval)
+        ):
             await publisher.publish(Topic.STREAMS.value, event)
