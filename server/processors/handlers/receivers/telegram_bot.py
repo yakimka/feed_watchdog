@@ -105,7 +105,8 @@ class TelegramBot:
                 template, **post.template_kwargs()
             )
             parts.extend((message.strip(), delimiter))
-        parts.pop()
+        if parts:
+            parts.pop()
 
         added_truncated_message = False
         while sum(len(part) for part in parts) > self.MAX_MESSAGE_LENGTH:
