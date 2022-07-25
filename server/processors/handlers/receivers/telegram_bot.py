@@ -89,7 +89,7 @@ class TelegramBot:
             if callback is not None:
                 await callback(post)
 
-    async def _send_squashed_message(
+    async def _send_squashed_message(  # noqa C901
         self,
         posts: Iterable[Post],
         *,
