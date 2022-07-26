@@ -142,12 +142,14 @@ class Stream(models.Model):
         Receiver, on_delete=models.CASCADE, db_index=True
     )
     intervals = models.ManyToManyField(Interval, blank=True)
-    active = models.BooleanField(default=True)
+    receiver_options_override = models.JSONField(
+        blank=True, default=dict, help_text="Receiver options"
+    )
+    message_template = models.TextField(blank=True)
     squash = models.BooleanField(
         default=False, help_text="Squash posts in one message"
     )
-    has_message_template = models.BooleanField(default=False)
-    message_template = models.TextField(blank=True)
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.source} -> {self.receiver}"
@@ -165,9 +167,8 @@ class Stream(models.Model):
             source=self.source.to_domain(),
             receiver=self.receiver.to_domain(),
             squash=self.squash,
-            message_template=self.message_template
-            if self.has_message_template
-            else "",
+            receiver_options_override=self.receiver_options_override,
+            message_template=self.message_template,
             filters=[
                 domain_models.Filter(
                     type=item.filter.type, options=item.filter.options

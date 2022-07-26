@@ -28,6 +28,9 @@ class Collector:
         for stream in streams:
             source = stream.source
             receiver = stream.receiver
+            receiver_options = (
+                receiver.options | stream.receiver_options_override
+            )
             result.append(
                 ProcessStreamEvent(
                     uid=stream.uid,
@@ -41,7 +44,7 @@ class Collector:
                     source_parser_options=source.parser_options,
                     source_tags=list(source.tags),
                     receiver_type=receiver.type,
-                    receiver_options=receiver.options,
+                    receiver_options=receiver_options,
                     filters=stream.filters,
                 )
             )
