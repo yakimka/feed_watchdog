@@ -125,7 +125,7 @@ class ReceiverAdmin(admin.ModelAdmin):
 
 
 class FilterInlineAdmin(admin.TabularInline):
-    model = models.StreamFilter
+    model = models.StreamModifier
     extra = 0
 
 
@@ -156,7 +156,7 @@ class StreamAdmin(admin.ModelAdmin):
 
 
 class FilterAdminForm(ModelForm):
-    type = ChoiceField(choices=partial(get_choices, "filters"))
+    type = ChoiceField(choices=partial(get_choices, "modifiers"))
 
     class Meta:
         model = models.Source
@@ -164,12 +164,12 @@ class FilterAdminForm(ModelForm):
         widgets = {
             "options": BetterJsonWidget(
                 follow_field="type",
-                schema_mapping=partial(fields_config, "filters"),
+                schema_mapping=partial(fields_config, "modifiers"),
             ),
         }
 
 
-@admin.register(models.Filter)
+@admin.register(models.Modifier)
 class FilterAdmin(admin.ModelAdmin):
     list_display = (
         "name",

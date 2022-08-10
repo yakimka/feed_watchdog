@@ -23,7 +23,7 @@ class HandlerType(Enum):
     fetchers = "fetchers"
     parsers = "parsers"
     receivers = "receivers"
-    filters = "filters"
+    modifiers = "modifiers"
 
 
 @dataclasses.dataclass

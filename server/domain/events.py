@@ -4,7 +4,7 @@ import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from domain.models import Filter
+    from domain.models import Modifier
 
 
 @dataclasses.dataclass
@@ -27,4 +27,4 @@ class ProcessStreamEvent(Event):
     source_tags: list
     receiver_type: str
     receiver_options: dict
-    filters: list[Filter]
+    modifiers: list[Modifier]

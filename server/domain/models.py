@@ -23,7 +23,7 @@ class Receiver:
 
 
 @dataclasses.dataclass()
-class Filter:
+class Modifier:
     type: str
     options: dict
 
@@ -36,4 +36,4 @@ class Stream:
     squash: bool
     receiver_options_override: dict
     message_template: str = ""
-    filters: list[Filter] = dataclasses.field(default_factory=list)
+    modifiers: list[Modifier] = dataclasses.field(default_factory=list)

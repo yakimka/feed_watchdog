@@ -169,30 +169,31 @@ class Stream(models.Model):
             squash=self.squash,
             receiver_options_override=self.receiver_options_override,
             message_template=self.message_template,
-            filters=[
-                domain_models.Filter(
-                    type=item.filter.type, options=item.filter.options
+            modifiers=[
+                domain_models.Modifier(
+                    type=item.modifier.type, options=item.modifier.options
                 )
-                for item in self.streamfilter_set.all()
-                if item.filter
+                for item in self.streammodifier_set.all()
             ],
         )
 
 
-class Filter(models.Model):
+class Modifier(models.Model):
     name = models.CharField(max_length=1024)
     type = models.CharField(max_length=32)
     options = models.JSONField(
-        blank=True, default=dict, help_text="Filter options"
+        blank=True, default=dict, help_text="Modifier options"
     )
 
     def __str__(self) -> str:
         return str(self.name)
 
 
-class StreamFilter(models.Model):
+class StreamModifier(models.Model):
     stream = models.ForeignKey(Stream, on_delete=models.CASCADE, db_index=True)
-    filter = models.ForeignKey(Filter, on_delete=models.CASCADE, db_index=True)
+    modifier = models.ForeignKey(
+        Modifier, on_delete=models.CASCADE, db_index=True
+    )
 
     def __str__(self) -> str:
-        return str(self.filter)
+        return str(self.modifier)
