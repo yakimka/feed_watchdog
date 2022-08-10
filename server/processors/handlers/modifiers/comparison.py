@@ -37,11 +37,10 @@ class ComparisonOptions(HandlerOptions):
 
 
 @register_handler(
-    type=HandlerType.filters.value,
-    name="comparison",
+    type=HandlerType.modifiers.value,
     options=ComparisonOptions,
 )
-async def comparison(
+async def compare_and_filter(
     posts: list[Post], *, options: ComparisonOptions
 ) -> list[Post]:
     if options.field_type == ComparisonValueType.STRING.value:

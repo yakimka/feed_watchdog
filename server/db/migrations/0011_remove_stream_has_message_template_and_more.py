@@ -4,19 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('db', '0010_stream_squash'),
+        ("db", "0010_stream_squash"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='stream',
-            name='has_message_template',
+            model_name="stream",
+            name="has_message_template",
         ),
         migrations.AddField(
-            model_name='stream',
-            name='receiver_options_override',
-            field=models.JSONField(blank=True, default=dict, help_text='Receiver options'),
+            model_name="stream",
+            name="receiver_options_override",
+            field=models.JSONField(
+                blank=True, default=dict, help_text="Receiver options"
+            ),
         ),
     ]

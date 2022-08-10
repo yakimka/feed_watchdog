@@ -33,7 +33,7 @@ class TelegramBotOptions(HandlerOptions):
     options=TelegramBotOptions,
 )
 class TelegramBot:
-    MAX_MESSAGE_LENGTH = 500
+    MAX_MESSAGE_LENGTH = 4096
     MAX_MESSAGES_PER_MINUTE_PER_GROUP = 20
     pause_between_send = 60 / MAX_MESSAGES_PER_MINUTE_PER_GROUP  # seconds
 
@@ -98,6 +98,8 @@ class TelegramBot:
         callback: Callable[[Post], Awaitable] = None,
     ) -> None:
         posts = list(posts)
+        if not posts:
+            return
         parts = []
         delimiter = "\n-----\n"
         for post in posts:
