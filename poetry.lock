@@ -448,28 +448,29 @@ typing-extensions = "*"
 
 [[package]]
 name = "dlint"
-version = "0.12.0"
+version = "0.13.0"
 description = "Dlint is a tool for encouraging best coding practices and helping ensure Python code is secure."
 category = "dev"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-flake8 = ">=3.6.0,<5.0.0"
+flake8 = ">=3.6.0,<6.0.0"
 
 [[package]]
 name = "doc8"
-version = "0.11.2"
+version = "1.0.0"
 description = "Style checker for Sphinx (or other) RST documentation"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
-docutils = "*"
+docutils = ">=0.19,<0.21"
 Pygments = "*"
 restructuredtext-lint = ">=0.7"
 stevedore = "*"
+tomli = {version = "*", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "docutils"
@@ -690,7 +691,7 @@ python-versions = "*"
 
 [[package]]
 name = "flake8-pie"
-version = "0.15.0"
+version = "0.16.0"
 description = "A flake8 extension that implements misc. lints"
 category = "dev"
 optional = false
@@ -1075,7 +1076,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "mypy"
-version = "0.942"
+version = "0.971"
 description = "Optional static typing for Python"
 category = "dev"
 optional = false
@@ -1083,7 +1084,7 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 mypy-extensions = ">=0.4.3"
-tomli = ">=1.1.0"
+tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
 typing-extensions = ">=3.10"
 
 [package.extras]
@@ -1873,7 +1874,7 @@ docs = ["sphinx", "sphinx-autodoc-typehints", "m2r2", "tomlkit"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "8497c8faa4fb78e019233be4ed81d3e38fa765c5945eb1bc7d89434459a1bccb"
+content-hash = "e49931853e81d993eff833fd409cdb5c24f949d83a0ade4b7e57b7478a1507e3"
 
 [metadata.files]
 aiogram = []

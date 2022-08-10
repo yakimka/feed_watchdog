@@ -75,7 +75,7 @@ class HandlerOptions:
             if field.default is not m:
                 default = field.default.value if is_enum else field.default
                 schema["properties"][field.name]["default"] = default
-            elif field.default_factory is not m:  # type: ignore
+            elif field.default_factory is not m:
                 schema["properties"][field.name][
                     "default"
                 ] = field.default_factory()
