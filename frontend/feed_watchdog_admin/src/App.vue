@@ -1,19 +1,21 @@
 <template>
   <v-app>
-    <v-main>
-      <HelloWorld/>
-    </v-main>
+    <component :is="layout">
+      <router-view/>
+    </component>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+const DEFAULT_LAYOUT = 'page';
 
 export default {
   name: 'App',
 
-  components: {
-    HelloWorld,
+  computed: {
+    layout() {
+      return (this.$route.meta.layout || DEFAULT_LAYOUT) + '-layout';
+    }
   },
 
   data: () => ({
