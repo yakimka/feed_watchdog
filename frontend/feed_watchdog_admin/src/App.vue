@@ -7,7 +7,7 @@
 </template>
 
 <script>
-const DEFAULT_LAYOUT = 'page';
+const DEFAULT_LAYOUT = 'admin';
 
 export default {
   name: 'App',

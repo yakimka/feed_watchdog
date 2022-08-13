@@ -1,9 +1,0 @@
-<template>
-  <div>
-    <app-bar></app-bar>
-    <left-side-bar></left-side-bar>
-    <v-main>
-      <slot/>
-    </v-main>
-  </div>
-</template>
