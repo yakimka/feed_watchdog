@@ -29,7 +29,7 @@ async def replace_text(
 ) -> list[Post]:
     def replace_text_in_post(post: Post) -> Post:
         value = getattr(post, options.field)
-        value.replace(options.old, options.new)
+        value = value.replace(options.old, options.new)
         setattr(post, options.field, value)
         return post
 
