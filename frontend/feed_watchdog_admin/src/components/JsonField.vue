@@ -13,17 +13,39 @@
       <v-textarea
         filled
         label="Raw Json"
-        v-model="value"
+        v-model="rawValue"
       ></v-textarea>
 
-      <v-text-field
+      <template v-for="item in parsedSchemas[followField]">
+        <v-select v-if="item.enum.length"
+          :key="item.name"
+          v-model="bindValues[item.name]"
+          :items="item.enum"
+          :rules="item.rules"
+          :label="item.title"
+        ></v-select>
+        <v-text-field v-else-if="item.type === 'string'"
           filled
-          label="Title"
-      ></v-text-field>
-      <v-text-field
+          :key="item.name"
+          v-model="bindValues[item.name]"
+          :rules="item.rules"
+          :label="item.title"
+        ></v-text-field>
+        <v-text-field v-else-if="item.type === 'integer' || item.type === 'number'"
           single-line
           type="number"
-      />
+          :key="item.name"
+          v-model="bindValues[item.name]"
+          :rules="item.rules"
+          :label="item.title"
+        ></v-text-field>
+        <v-checkbox v-else-if="item.type === 'boolean'"
+          :key="item.name"
+          v-model="bindValues[item.name]"
+          :rules="item.rules"
+          :label="item.title"
+        ></v-checkbox>
+      </template>
     </v-card-text>
 
     <v-divider></v-divider>
@@ -121,19 +143,25 @@ export default {
   },
   emits: ['update:modelValue'],
   data: () => ({
-    value: '',
+    rawValue: '',
+    store: {},
     parsedValue: [],
     parsedSchemas: {},
   }),
+  computed: {
+    bindValues() {
+      return this.store[this.followField];
+    },
+  },
   methods: {
     parseValue() {
-      if (this.value.trim() === "") {
+      if (this.rawValue.trim() === "") {
         return [];
       }
 
       try {
         let results = [];
-        const parsed = JSON.parse(this.value);
+        const parsed = JSON.parse(this.rawValue);
         if (Array.isArray(parsed)) {
           alert("Root value of Json field must be object. Array is not supported.");
           return null
@@ -196,14 +224,32 @@ export default {
     },
     beautifyValue() {
       try {
-        this.value = JSON.stringify(JSON.parse(this.value), null, 2);
+        this.rawValue = JSON.stringify(JSON.parse(this.rawValue), null, 2);
       } catch (e) {
         return null;
       }
     },
+    initStore() {
+      this.store = {};
+      for (const [schemaName, fields] of Object.entries(this.parsedSchemas)) {
+        this.store[schemaName] = {};
+        for (const field of fields) {
+          let found = false;
+          for (const item of this.parsedValue) {
+            if (item.name === field.name) {
+              found = true;
+              this.store[schemaName][field.name] = item.value;
+            }
+          }
+          if (!found) {
+            this.store[schemaName][field.name] = field.default;
+          }
+        }
+      }
+    },
   },
   mounted() {
-    this.value = this.modelValue;
+    this.rawValue = this.modelValue;
     this.beautifyValue();
 
     this.parsedSchemas = this.parseJsonSchemas();
@@ -211,12 +257,7 @@ export default {
     if (parsedValue !== null) {
       this.parsedValue = parsedValue;
     }
-  },
-  created () {
-    this.form && this.form.register(this);
-  },
-  beforeUnmount () {
-    this.form && this.form.unregister(this);
+    this.initStore();
   }
 }
 </script>
