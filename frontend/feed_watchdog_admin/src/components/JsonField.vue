@@ -12,6 +12,7 @@
     <v-card-text>
       <v-textarea v-if="rawEditMode"
                   v-model="rawValue"
+                  :rules="[json()]"
                   filled
                   label="Raw Json"
       ></v-textarea>
@@ -77,9 +78,11 @@
   </v-card>
 </template>
 
-<script>
-import {required} from "@/validation";
+<script setup>
+import {json, required} from "@/validation";
+</script>
 
+<script>
 export default {
   name: 'JsonSchemaField',
   props: {

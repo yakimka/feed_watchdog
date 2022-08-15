@@ -34,3 +34,13 @@ export function email() {
         return true;
     }
 }
+
+export function json() {
+    return (value) => {
+        try {
+            JSON.parse(value);
+        } catch (e) {
+            return 'Invalid JSON.';
+        }
+    }
+}
