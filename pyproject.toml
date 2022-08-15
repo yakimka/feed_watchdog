@@ -43,7 +43,7 @@ httpx = {version = "^0.23.0", extras = ["processors"]}
 async-timeout = {version = "^4.0.2", extras = ["processors"]}
 tldextract = {version = "^3.2.1", extras = ["processors"]}
 feedparser = {version = "^6.0.8", extras = ["processors"]}
-aiogram = {version = "^2.20", extras = ["processors"]}
+aiogram = {version = "^2.22", extras = ["processors"]}
 PyYAML = {version = "^6.0", extras = ["processors"]}
 gunicorn = "^20.1.0"
 python-decouple = "^3.6"
