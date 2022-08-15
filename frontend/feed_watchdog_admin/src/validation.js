@@ -39,6 +39,7 @@ export function json() {
     return (value) => {
         try {
             JSON.parse(value);
+            return true;
         } catch (e) {
             return 'Invalid JSON.';
         }

@@ -6,7 +6,7 @@
         density="compact"
         flat
     >
-      <v-toolbar-title>Options{{ isChanged ? '*' : '' }}</v-toolbar-title>
+      <v-toolbar-title>{{name}}{{ isChanged ? '*' : '' }}</v-toolbar-title>
     </v-toolbar>
 
     <v-card-text>
@@ -90,6 +90,10 @@ export default {
       type: String,
       default: '',
     },
+    name: {
+      type: String,
+      required: true,
+    },
     followValue: {
       type: String,
       default: '',
@@ -97,66 +101,8 @@ export default {
     },
     jsonSchemaMapping: {
       type: Object,
-      default: () => ({
-        "@pydailybot": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "title": "type",
-          "type": "object",
-          "properties": {
-            "chat_id": {
-              "type": "string",
-              "title": "Chat ID",
-              "description": "Telegram chat id"
-            },
-            "disable_link_preview": {
-              "type": "boolean",
-              "title": "Disable link preview",
-              "description": "",
-              "default": false
-            }
-          },
-          "required": ["chat_id"]
-        },
-        "compare_and_filter": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "title": "type",
-          "type": "object",
-          "properties": {
-            "field": {
-              "type": "string",
-              "title": "Field",
-              "description": "Field name for comparison"
-            },
-            "operator": {
-              "enum": ["=", "!=", ">", "<"],
-              "type": "string",
-              "title": "Operator",
-              "description": "Comparison operator"
-            },
-            "value": {"type": "string", "title": "Value", "description": "Comparison value"},
-            "field_type": {
-              "enum": ["string", "integer"],
-              "type": "string",
-              "title": "Field type",
-              "description": "",
-              "default": "string"
-            }
-          },
-          "required": ["field", "operator", "value"]
-        },
-        "replace_text": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "title": "type",
-          "type": "object",
-          "properties": {
-            "field": {"type": "string", "title": "Field", "description": "Field name"},
-            "old": {"type": "string", "title": "Old value", "description": "Value to replace"},
-            "new": {"type": "string", "title": "New value", "description": "Value to replace with"}
-          },
-          "required": ["field", "old", "new"]
-        }
-      }),
-      required: false,  // TODO make required
+      default: () => ({}),
+      required: false,
     },
   },
   emits: ['update:modelValue'],
@@ -184,7 +130,11 @@ export default {
       return this.store[this.followValue];
     },
     isChanged() {
-      return true;
+      try {
+        return JSON.stringify(this.currentValues) !== JSON.stringify(JSON.parse(this.savedValue));
+      } catch (e) {
+        return true;
+      }
     }
   },
   methods: {
@@ -217,7 +167,7 @@ export default {
     toType(obj) {
       const typeName = ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
       if (typeName === "number" && !(obj.toString().contains("."))) {
-        return "integer".contains("dsd");
+        return "integer";
       }
       return typeName;
     },
@@ -287,13 +237,14 @@ export default {
       this.rawEditMode = !this.rawEditMode;
     },
     dumpStore() {
+      if (!this.currentValues) {
+        this.rawValue = "{}";
+        return;
+      }
       this.rawValue = JSON.stringify(this.currentValues, null, 2);
     },
     loadStore() {
-      const parsedValue = this.parseValue();
-      if (parsedValue !== null) {
-        this.parsedValue = parsedValue;
-      }
+      this.parsedValue = this.parseValue() || [];
       this.initStore();
     },
     restoreSavedValue() {
@@ -303,7 +254,7 @@ export default {
       this.savedValue = this.rawValue;
     }
   },
-  mounted() {
+  created() {
     this.rawValue = this.modelValue;
 
     this.saveValue();
@@ -311,6 +262,7 @@ export default {
 
     this.parsedSchemas = this.parseJsonSchemas();
     this.loadStore();
+    this.dumpStore();
   }
 }
 </script>
