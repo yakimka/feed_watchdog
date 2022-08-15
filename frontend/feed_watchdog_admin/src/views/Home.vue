@@ -8,28 +8,22 @@
       <v-text-field
           v-model="fields.name.value"
           :counter="10"
-          :rules="rules.name"
           :error-messages="fields.name.error"
-          @input="clearError('name')"
+          :rules="rules.name"
           label="Name"
+          @input="clearError('name')"
       ></v-text-field>
-
-      <v-text-field
-          v-model="fields.email.value"
-          :rules="rules.email"
-          :error-messages="fields.email.error"
-          @input="clearError('email')"
-          label="E-mail"
-      ></v-text-field>
-      <json-field></json-field>
       <v-select
           v-model="fields.item.value"
+          :error-messages="fields.item.error"
           :items="fields.item.values"
           :rules="rules.item"
-          :error-messages="fields.item.error"
-          @input="clearError('item')"
           label="Item"
+          @input="clearError('item')"
       ></v-select>
+      <json-field v-model="fields.options.value"
+                  :follow-value="fields.item.value"
+      ></json-field>
 
       <v-btn
           :disabled="!valid"
@@ -45,7 +39,7 @@
 </template>
 
 <script>
-import {required, maxTextLength, email} from "@/validation";
+import {email, maxTextLength, required} from "@/validation";
 import JsonField from "@/components/JsonField";
 
 export default {
@@ -64,6 +58,10 @@ export default {
       item: []
     },
     fields: {
+      options: {
+        value: '{"key": "value"}',
+        error: '',
+      },
       name: {
         value: '',
         error: '',
@@ -76,9 +74,9 @@ export default {
         value: null,
         error: '',
         values: [
-          'Item 1',
-          'Item 2',
-          'Item 3',
+          '@pydailybot',
+          'compare_and_filter',
+          'replace_text',
           'Item 4',
         ]
       },

@@ -6,44 +6,44 @@
         density="compact"
         flat
     >
-      <v-toolbar-title>Options</v-toolbar-title>
+      <v-toolbar-title>Options{{ isChanged ? '*' : '' }}</v-toolbar-title>
     </v-toolbar>
 
     <v-card-text>
-      <v-textarea
-        filled
-        label="Raw Json"
-        v-model="rawValue"
+      <v-textarea v-if="rawEditMode"
+                  v-model="rawValue"
+                  filled
+                  label="Raw Json"
       ></v-textarea>
 
-      <template v-for="item in parsedSchemas[followField]">
+      <template v-for="item in currentSchema" v-else>
         <v-select v-if="item.enum.length"
-          :key="item.name"
-          v-model="bindValues[item.name]"
-          :items="item.enum"
-          :rules="item.rules"
-          :label="item.title"
+                  :key="item.name"
+                  v-model="currentValues[item.name]"
+                  :items="item.enum"
+                  :label="item.title"
+                  :rules="item.rules"
         ></v-select>
         <v-text-field v-else-if="item.type === 'string'"
-          filled
-          :key="item.name"
-          v-model="bindValues[item.name]"
-          :rules="item.rules"
-          :label="item.title"
+                      :key="item.name"
+                      v-model="currentValues[item.name]"
+                      :label="item.title"
+                      :rules="item.rules"
+                      filled
         ></v-text-field>
         <v-text-field v-else-if="item.type === 'integer' || item.type === 'number'"
-          single-line
-          type="number"
-          :key="item.name"
-          v-model="bindValues[item.name]"
-          :rules="item.rules"
-          :label="item.title"
+                      :key="item.name"
+                      v-model="currentValues[item.name]"
+                      :label="item.title"
+                      :rules="item.rules"
+                      single-line
+                      type="number"
         ></v-text-field>
         <v-checkbox v-else-if="item.type === 'boolean'"
-          :key="item.name"
-          v-model="bindValues[item.name]"
-          :rules="item.rules"
-          :label="item.title"
+                    :key="item.name"
+                    v-model="currentValues[item.name]"
+                    :label="item.title"
+                    :rules="item.rules"
         ></v-checkbox>
       </template>
     </v-card-text>
@@ -52,11 +52,26 @@
 
     <v-card-actions>
       <v-spacer></v-spacer>
+      <v-btn v-if="rawEditMode"
+             color="success"
+             depressed
+             @click.stop="restoreSavedValue"
+      >
+        Restore saved
+      </v-btn>
+      <v-btn v-if="rawEditMode"
+             color="success"
+             depressed
+             @click.stop="beautifyValue"
+      >
+        Beautify
+      </v-btn>
       <v-btn
           color="success"
           depressed
+          @click.stop="toggleEditMode"
       >
-        Post
+        {{ rawEditMode ? 'Schema Editor' : 'Raw Json Editor' }}
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -72,9 +87,9 @@ export default {
       type: String,
       default: '',
     },
-    followField: {
+    followValue: {
       type: String,
-      default: '@pydailybot',  // TODO change to ''
+      default: '',
       required: false,
     },
     jsonSchemaMapping: {
@@ -143,15 +158,31 @@ export default {
   },
   emits: ['update:modelValue'],
   data: () => ({
+    rawEditMode: false,
+    savedValue: '',
     rawValue: '',
     store: {},
     parsedValue: [],
     parsedSchemas: {},
   }),
-  computed: {
-    bindValues() {
-      return this.store[this.followField];
+  watch: {
+    currentValues() {
+      this.dumpStore();
     },
+    rawValue() {
+      this.$emit('update:modelValue', this.rawValue);
+    }
+  },
+  computed: {
+    currentSchema() {
+      return this.parsedSchemas[this.followValue];
+    },
+    currentValues() {
+      return this.store[this.followValue];
+    },
+    isChanged() {
+      return true;
+    }
   },
   methods: {
     parseValue() {
@@ -219,7 +250,6 @@ export default {
           });
         }
       }
-      // this.$emit('update:modelValue', this.selectedCategory.id);
       return results;
     },
     beautifyValue() {
@@ -247,17 +277,37 @@ export default {
         }
       }
     },
+    toggleEditMode() {
+      if (this.rawEditMode) {
+        this.loadStore();
+      }
+      this.rawEditMode = !this.rawEditMode;
+    },
+    dumpStore() {
+      this.rawValue = JSON.stringify(this.currentValues, null, 2);
+    },
+    loadStore() {
+      const parsedValue = this.parseValue();
+      if (parsedValue !== null) {
+        this.parsedValue = parsedValue;
+      }
+      this.initStore();
+    },
+    restoreSavedValue() {
+      this.rawValue = this.savedValue;
+    },
+    saveValue() {
+      this.savedValue = this.rawValue;
+    }
   },
   mounted() {
     this.rawValue = this.modelValue;
+
+    this.saveValue();
     this.beautifyValue();
 
     this.parsedSchemas = this.parseJsonSchemas();
-    const parsedValue = this.parseValue();
-    if (parsedValue !== null) {
-      this.parsedValue = parsedValue;
-    }
-    this.initStore();
+    this.loadStore();
   }
 }
 </script>
