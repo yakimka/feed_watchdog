@@ -73,10 +73,18 @@
       <v-btn
           :disabled="!form.valid"
           class="mr-4"
-          color="success"
+          color="primary"
           @click="submit"
       >
-        Submit
+        Save
+      </v-btn>
+      <v-btn
+          :disabled="!form.valid"
+          class="mr-4"
+          color="primary"
+          @click="submit"
+      >
+        Save and create stream
       </v-btn>
     </v-form>
   </v-container>

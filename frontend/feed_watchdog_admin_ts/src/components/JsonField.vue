@@ -1,10 +1,7 @@
 <template>
   <v-card class="mb-5">
     <v-toolbar
-        color="primary"
-        dark
         density="compact"
-        flat
     >
       <v-toolbar-title>{{name}}{{ isChanged ? '*' : '' }}</v-toolbar-title>
       <template v-slot:append v-if="compact">
