@@ -7,6 +7,14 @@
         flat
     >
       <v-toolbar-title>{{name}}{{ isChanged ? '*' : '' }}</v-toolbar-title>
+      <template v-slot:append v-if="compact">
+         <v-btn
+            depressed
+            @click.stop="toggleEditMode"
+        >
+          {{ rawEditMode ? 'Schema' : 'Raw' }}
+        </v-btn>
+      </template>
     </v-toolbar>
 
     <v-card-text>
@@ -49,9 +57,7 @@
       </template>
     </v-card-text>
 
-    <v-divider></v-divider>
-
-    <v-card-actions>
+    <v-card-actions v-if="!compact || (compact && rawEditMode)">
       <v-spacer></v-spacer>
       <v-btn v-if="rawEditMode"
              color="success"
@@ -67,7 +73,7 @@
       >
         Beautify
       </v-btn>
-      <v-btn
+      <v-btn v-if="!compact"
           color="success"
           depressed
           @click.stop="toggleEditMode"
@@ -107,6 +113,10 @@ export default defineComponent({
     modelValue: {
       type: String,
       default: ''
+    },
+    compact: {
+      type: Boolean,
+      default: false
     },
     name: {
       type: String,

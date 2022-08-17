@@ -31,6 +31,7 @@
           @input="clearError('fetcherType')"
       ></v-select>
       <json-field
+          compact
           v-model="form.fields.fetcherOptions.value"
           name="Fetcher options"
           :follow-value="form.fields.fetcherType.value"
@@ -45,6 +46,7 @@
           @input="clearError('parserType')"
       ></v-select>
       <json-field
+          compact
           v-model="form.fields.parserOptions.value"
           name="Parser options"
           :follow-value="form.fields.parserType.value"
@@ -76,7 +78,6 @@
       >
         Submit
       </v-btn>
-
     </v-form>
   </v-container>
 </template>
