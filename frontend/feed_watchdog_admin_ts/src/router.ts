@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '@/views/Home.vue'
+import CreateSource from '@/views/source/CreateSource.vue'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -12,9 +13,17 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'home',
     meta: {
-      title: 'Главная страница'
+      title: 'Home'
     },
     component: Home
+  },
+  {
+    path: '/sources/create',
+    name: 'create-source',
+    meta: {
+      title: 'Create Source'
+    },
+    component: CreateSource
   }
 ]
 
