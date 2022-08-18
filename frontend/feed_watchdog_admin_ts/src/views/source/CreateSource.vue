@@ -6,6 +6,15 @@
         lazy-validation
     >
       <div class="text-h2 mb-5">New Source</div>
+      <v-alert v-if="form.error"
+        class="mb-5"
+        icon="mdi-fire"
+        title="Outlined"
+        variant="outlined"
+        type="error"
+      >
+        {{ form.error }}
+      </v-alert>
       <v-text-field
           v-model="form.fields.name.value"
           :counter="10"
@@ -94,12 +103,14 @@
 import { defineComponent } from 'vue'
 import { required } from '@/validation'
 import JsonField from '@/components/JsonField.vue'
+import SourceAPI, { APIError } from '@/api/source'
 
 export default defineComponent({
   components: { JsonField },
   data: () => ({
     form: {
       valid: true,
+      error: '',
       rules: {
         name: [
           required()
@@ -130,6 +141,7 @@ export default defineComponent({
         },
         fetcherOptions: {
           value: '',
+          error: '',
           jsonSchemaMapping: {
             '@pydailybot': {
               $schema: 'https://json-schema.org/draft/2020-12/schema',
@@ -200,6 +212,7 @@ export default defineComponent({
         },
         parserOptions: {
           value: '',
+          error: '',
           jsonSchemaMapping: {}
         },
         description: {
@@ -211,65 +224,6 @@ export default defineComponent({
           error: '',
           items: []
         }
-      },
-      schema: {
-        '@pydailybot': {
-          $schema: 'https://json-schema.org/draft/2020-12/schema',
-          title: 'type',
-          type: 'object',
-          properties: {
-            chat_id: {
-              type: 'string',
-              title: 'Chat ID',
-              description: 'Telegram chat id'
-            },
-            disable_link_preview: {
-              type: 'boolean',
-              title: 'Disable link preview',
-              description: '',
-              default: false
-            }
-          },
-          required: ['chat_id']
-        },
-        compare_and_filter: {
-          $schema: 'https://json-schema.org/draft/2020-12/schema',
-          title: 'type',
-          type: 'object',
-          properties: {
-            field: {
-              type: 'string',
-              title: 'Field',
-              description: 'Field name for comparison'
-            },
-            operator: {
-              enum: ['=', '!=', '>', '<'],
-              type: 'string',
-              title: 'Operator',
-              description: 'Comparison operator'
-            },
-            value: { type: 'string', title: 'Value', description: 'Comparison value' },
-            field_type: {
-              enum: ['string', 'integer'],
-              type: 'string',
-              title: 'Field type',
-              description: '',
-              default: 'string'
-            }
-          },
-          required: ['field', 'operator', 'value']
-        },
-        replace_text: {
-          $schema: 'https://json-schema.org/draft/2020-12/schema',
-          title: 'type',
-          type: 'object',
-          properties: {
-            field: { type: 'string', title: 'Field', description: 'Field name' },
-            old: { type: 'string', title: 'Old value', description: 'Value to replace' },
-            new: { type: 'string', title: 'New value', description: 'Value to replace with' }
-          },
-          required: ['field', 'old', 'new']
-        }
       }
     }
   }),
@@ -277,9 +231,31 @@ export default defineComponent({
     submit (): void {
       this.validate()
       if (this.form.valid) {
-        alert('Submitted')
-        this.form.fields.name.error = 'Wrong Name!'
+        const source = SourceAPI.createSource({
+          name: this.form.fields.name.value,
+          slug: this.form.fields.slug.value,
+          fetcherType: this.form.fields.fetcherType.value,
+          fetcherOptions: this.form.fields.fetcherOptions.value,
+          parserType: this.form.fields.parserType.value,
+          parserOptions: this.form.fields.parserOptions.value,
+          description: this.form.fields.description.value,
+          tags: this.form.fields.tags.value
+        })
+        console.log(source)
+        this.handleIfError(source)
       }
+    },
+    handleIfError (obj: object): boolean {
+      if ('errorMessage' in obj) {
+        const error = obj as APIError
+        if (error.field && error.field in this.form.fields) {
+          this.form.fields[error.field as keyof typeof this.form.fields].error = error.errorMessage
+        } else {
+          this.form.error = error.errorMessage
+        }
+        return true
+      }
+      return false
     },
     clearError (field: keyof typeof this.form.fields) {
       if (this.form.fields[field].error) {
