@@ -111,6 +111,10 @@ export default defineComponent({
       type: String,
       default: ''
     },
+    savedValue: {
+      type: String,
+      default: ''
+    },
     compact: {
       type: Boolean,
       default: false
@@ -133,7 +137,6 @@ export default defineComponent({
   emits: ['update:modelValue'],
   data: () => ({
     rawEditMode: false,
-    savedValue: '',
     rawValue: '',
     store: {} as { [index: string]: { [index: string]: any } },
     parsedValue: [] as Array<ParsedValue>,
@@ -145,14 +148,19 @@ export default defineComponent({
     },
     rawValue () {
       this.$emit('update:modelValue', this.rawValue)
+    },
+    jsonSchemaMapping () {
+      this.parsedSchemas = this.parseJsonSchemas()
+      this.loadStore()
+      this.dumpStore()
     }
   },
   computed: {
     currentSchema () {
-      return this.parsedSchemas[this.followValue]
+      return this.parsedSchemas[this.followValue] || {}
     },
     currentValues () {
-      return this.store[this.followValue]
+      return this.store[this.followValue] || {}
     },
     isChanged () {
       try {
@@ -280,20 +288,12 @@ export default defineComponent({
     },
     restoreSavedValue (): void {
       this.rawValue = this.savedValue
-    },
-    saveValue (): void {
-      this.savedValue = this.rawValue
     }
   },
   created (): void {
     this.rawValue = this.modelValue
 
-    this.saveValue()
     this.beautifyValue()
-
-    this.parsedSchemas = this.parseJsonSchemas()
-    this.loadStore()
-    this.dumpStore()
   }
 })
 </script>
