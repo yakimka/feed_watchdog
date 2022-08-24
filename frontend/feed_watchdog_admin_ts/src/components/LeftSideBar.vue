@@ -3,9 +3,24 @@
       v-model="navigation.isLeftSideBarOpen"
       bottom
   >
-    <v-list
-        :items="items"
-    ></v-list>
+      <v-card
+    class="mx-auto"
+    max-width="300"
+  >
+    <v-list density="compact">
+      <v-list-item prepend-icon="mdi-home" title="Home" :to="{name: 'home'}"></v-list-item>
+      <v-list-item prepend-icon="mdi-web" title="Sources" :to="{name: 'sources'}">
+        <template v-slot:append>
+          <v-btn
+            icon="mdi-plus"
+            variant="text"
+            title="Add source"
+            :to="{name: 'create-source'}"
+          ></v-btn>
+        </template>
+      </v-list-item>
+    </v-list>
+    </v-card>
   </v-navigation-drawer>
 </template>
 

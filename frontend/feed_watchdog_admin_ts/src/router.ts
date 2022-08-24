@@ -32,6 +32,26 @@ const routes: Array<RouteRecordRaw> = [
     component: Home
   },
   {
+    path: '/sources',
+    name: 'sources',
+    meta: {
+      title: 'Sources',
+      breadcrumbs: [
+        {
+          text: 'Home',
+          href: '/',
+          disabled: false
+        },
+        {
+          text: 'Sources',
+          href: '#',
+          disabled: true
+        }
+      ]
+    },
+    component: Home
+  },
+  {
     path: '/sources/create',
     name: 'create-source',
     meta: {
@@ -54,7 +74,7 @@ const routes: Array<RouteRecordRaw> = [
         }
       ]
     },
-    component: EditSourceForm
+    component: Home
   },
   {
     path: '/sources/:id/edit',
