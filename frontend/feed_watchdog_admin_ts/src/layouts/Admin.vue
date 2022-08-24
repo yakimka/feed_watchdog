@@ -23,7 +23,32 @@ export default defineComponent({
   components: { AppBar, LeftSideBar },
   computed: {
     breadcrumbs (): Breadcrumb[] {
-      return this.$route.meta.breadcrumbs || []
+      const result = []
+      for (const item of this.$route.meta.breadcrumbs || []) {
+        result.push(this.breadcrumbAttrs(item))
+      }
+      return result
+    }
+  },
+  methods: {
+    breadcrumbAttrs (item: Breadcrumb): Breadcrumb {
+      const result = {
+        text: item.text,
+        replace: false
+      } as Breadcrumb
+      if (!item.to && !item.href) {
+        result.href = '#'
+        result.disabled = true
+      }
+      if ('to' in item) {
+        // TODO copy `to`, delete `href`
+        result.href = this.$router.resolve(item.to || {}).path
+        result.disabled = false
+      }
+      if ('disabled' in item) {
+        result.disabled = item.disabled
+      }
+      return result
     }
   }
 })

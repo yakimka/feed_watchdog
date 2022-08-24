@@ -5,7 +5,8 @@ import EditSourceForm from '@/components/EditSourceForm.vue'
 export interface Breadcrumb {
   text: string
   disabled?: boolean
-  href: string
+  href?: string
+  to?: object
 }
 
 declare module 'vue-router' {
@@ -23,9 +24,7 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Home',
       breadcrumbs: [
         {
-          text: 'Home',
-          href: '/',
-          disabled: true
+          text: 'Home'
         }
       ]
     },
@@ -39,13 +38,10 @@ const routes: Array<RouteRecordRaw> = [
       breadcrumbs: [
         {
           text: 'Home',
-          href: '/',
-          disabled: false
+          to: { name: 'home' }
         },
         {
-          text: 'Sources',
-          href: '#',
-          disabled: true
+          text: 'Sources'
         }
       ]
     },
@@ -59,18 +55,14 @@ const routes: Array<RouteRecordRaw> = [
       breadcrumbs: [
         {
           text: 'Home',
-          href: '/',
-          disabled: false
+          to: { name: 'home' }
         },
         {
           text: 'Sources',
-          href: '/sources',
-          disabled: false
+          to: { name: 'sources' }
         },
         {
-          text: 'Create',
-          href: '#',
-          disabled: true
+          text: 'Create'
         }
       ]
     },
@@ -85,18 +77,14 @@ const routes: Array<RouteRecordRaw> = [
       breadcrumbs: [
         {
           text: 'Home',
-          href: '/',
-          disabled: false
+          to: { name: 'home' }
         },
         {
           text: 'Sources',
-          href: '/sources',
-          disabled: false
+          to: { name: 'sources' }
         },
         {
-          text: 'Edit',
-          href: '#',
-          disabled: true
+          text: 'Edit'
         }
       ]
     },
