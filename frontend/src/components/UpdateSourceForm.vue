@@ -1,8 +1,7 @@
 <template>
   <v-container>
       <div class="text-h2 mb-5">
-        <template v-if="formType === 'create'">Create new Source</template>
-        <template v-else>Edit {{ source.name || 'Source' }}</template>
+        Edit {{ source.name || 'Source' }}
       </div>
   </v-container>
   <v-container>
@@ -107,8 +106,7 @@ import JsonField from '@/components/JsonField.vue'
 const props = defineProps({
   id: {
     type: String,
-    default: '',
-    required: false
+    required: true
   }
 })
 
@@ -121,7 +119,6 @@ const {
   parserOptionsSchema,
   availableTags,
   getSource,
-  storeSource,
   updateSource,
   getFetcherTypes,
   getFetcherOptionsSchema,
@@ -139,14 +136,13 @@ const updateSavedOptions = () => {
 }
 
 onMounted(async () => {
+  console.log('onMounted')
   await getFetcherTypes()
   await getFetcherOptionsSchema()
   await getParserTypes()
   await getParserOptionsSchema()
   await getAvailableTags()
-  if (props.id) {
-    await getSource(props.id)
-  }
+  await getSource(props.id)
 
   updateSavedOptions()
 })
@@ -165,16 +161,10 @@ const formErrors = computed(() => {
   }
   return result
 })
-const formType = computed(() => {
-  return props.id ? 'update' : 'create'
-})
 
 const submit = async (event: any) => {
-  if (formType.value === 'create') {
-    await storeSource(event.submitter.id)
-  } else {
-    await updateSource(event.submitter.id)
-  }
+  await updateSource(event.submitter.id)
+
   updateSavedOptions()
 }
 </script>

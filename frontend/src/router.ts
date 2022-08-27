@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '@/views/Home.vue'
-import SaveSourceForm from '@/components/SaveSourceForm.vue'
+import CreateSourceForm from '@/components/CreateSourceForm.vue'
+import UpdateSourceForm from '@/components/UpdateSourceForm.vue'
+import ListSourceForm from '@/components/ListSourceForm.vue'
 
 export interface Breadcrumb {
   text: string
@@ -45,7 +47,7 @@ const routes: Array<RouteRecordRaw> = [
         }
       ]
     },
-    component: Home
+    component: ListSourceForm
   },
   {
     path: '/sources/create',
@@ -66,7 +68,7 @@ const routes: Array<RouteRecordRaw> = [
         }
       ]
     },
-    component: SaveSourceForm
+    component: CreateSourceForm
   },
   {
     path: '/sources/:id/edit',
@@ -88,7 +90,7 @@ const routes: Array<RouteRecordRaw> = [
         }
       ]
     },
-    component: SaveSourceForm
+    component: UpdateSourceForm
   }
 ]
 

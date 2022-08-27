@@ -18,9 +18,31 @@ export default function useSources () {
   const getSources = async () => {
     sources.value = [
       {
-        id: 'some_id',
-        name: 'Some Source',
-        slug: 'some-source',
+        id: '1',
+        name: 'Some Source 1',
+        slug: 'some-source-1',
+        fetcherType: 'some-fetcher-type',
+        fetcherOptions: '{}',
+        parserType: 'some-parser-type',
+        parserOptions: '{}',
+        description: 'Some description',
+        tags: ['some', 'tags']
+      },
+      {
+        id: '2',
+        name: 'Some Source 2',
+        slug: 'some-source-2',
+        fetcherType: 'some-fetcher-type',
+        fetcherOptions: '{}',
+        parserType: 'some-parser-type',
+        parserOptions: '{}',
+        description: 'Some description',
+        tags: ['some', 'tags']
+      },
+      {
+        id: '3',
+        name: 'Some Source 3',
+        slug: 'some-source-3',
         fetcherType: 'some-fetcher-type',
         fetcherOptions: '{}',
         parserType: 'some-parser-type',
