@@ -1,6 +1,9 @@
 <template>
   <v-container>
-      <div class="text-h2 mb-5">Edit {{ source.name || 'Source' }}</div>
+      <div class="text-h2 mb-5">
+        <template v-if="formType === 'create'">Create new Source</template>
+        <template v-else>Edit {{ source.name || 'Source' }}</template>
+      </div>
   </v-container>
   <v-container>
     <v-form
@@ -20,13 +23,11 @@
       </v-alert>
       <v-text-field
           v-model="source.name"
-          :counter="10"
           :error-messages="formErrors.name"
           label="Name"
       ></v-text-field>
       <v-text-field
           v-model="source.slug"
-          :counter="10"
           :error-messages="formErrors.slug"
           label="Slug"
       ></v-text-field>
@@ -106,7 +107,8 @@ import JsonField from '@/components/JsonField.vue'
 const props = defineProps({
   id: {
     type: String,
-    required: true
+    default: '',
+    required: false
   }
 })
 
@@ -119,7 +121,8 @@ const {
   parserOptionsSchema,
   availableTags,
   getSource,
-  saveSource,
+  storeSource,
+  updateSource,
   getFetcherTypes,
   getFetcherOptionsSchema,
   getParserTypes,
@@ -141,7 +144,9 @@ onMounted(async () => {
   await getParserTypes()
   await getParserOptionsSchema()
   await getAvailableTags()
-  await getSource(props.id)
+  if (props.id) {
+    await getSource(props.id)
+  }
 
   updateSavedOptions()
 })
@@ -160,9 +165,16 @@ const formErrors = computed(() => {
   }
   return result
 })
+const formType = computed(() => {
+  return props.id ? 'update' : 'create'
+})
 
 const submit = async (event: any) => {
-  await saveSource(event.submitter.id)
+  if (formType.value === 'create') {
+    await storeSource(event.submitter.id)
+  } else {
+    await updateSource(event.submitter.id)
+  }
   updateSavedOptions()
 }
 </script>

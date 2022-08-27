@@ -45,12 +45,22 @@ export default function useSources () {
     }
   }
 
-  const saveSource = async (type: string) => {
-    console.log('source saved', source.value)
-
+  const handleRedirectsBySaveType = async (type: string) => {
     if (type === 'save-and-create-stream') {
       await router.push({ name: 'home' })
     }
+  }
+
+  const storeSource = async (type: string) => {
+    console.log('source stored', source.value)
+
+    await handleRedirectsBySaveType(type)
+  }
+
+  const updateSource = async (type: string) => {
+    console.log('source updated', source.value)
+
+    await handleRedirectsBySaveType(type)
   }
 
   const getFetcherTypes = async () => {
@@ -150,7 +160,8 @@ export default function useSources () {
     availableTags,
     getSource,
     getSources,
-    saveSource,
+    storeSource,
+    updateSource,
     getFetcherTypes,
     getFetcherOptionsSchema,
     getParserTypes,
