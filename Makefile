@@ -1,18 +1,19 @@
 SHELL:=/usr/bin/env bash
 
-POETRY_RUN=poetry
+POETRY_RUN=docker compose run --rm devtools poetry
+SRC_DIR=server
 
 .PHONY: lint
 lint:
-	$(POETRY_RUN) run flake8 server
+	$(POETRY_RUN) run flake8 $(SRC_DIR)
 	@make mypy
 	@make verify_format
 	$(POETRY_RUN) run doc8 -q docs
-	$(POETRY_RUN) run yamllint -s .
+	#$(POETRY_RUN) run yamllint -s .
 
 .PHONY: mypy
 mypy:
-	$(POETRY_RUN) run mypy server/**/*.py
+	$(POETRY_RUN) run mypy $(SRC_DIR)
 
 .PHONY: unit
 unit:
@@ -32,14 +33,14 @@ test: lint package unit
 
 .PHONY: format
 format:
-	$(POETRY_RUN) run black --preview server
-	$(POETRY_RUN) run isort --color --src=server ./**/*.py server
+	$(POETRY_RUN) run black --preview $(SRC_DIR)
+	$(POETRY_RUN) run isort --color --src=$(SRC_DIR) $(SRC_DIR)
 
 
 .PHONY: verify_format
 verify_format:
-	$(POETRY_RUN) run black --preview --check --diff server
-	$(POETRY_RUN) run isort --check-only --diff --src=server ./**/*.py server
+	$(POETRY_RUN) run black --preview --check --diff $(SRC_DIR)
+	$(POETRY_RUN) run isort --check-only --diff --src=$(SRC_DIR) $(SRC_DIR)
 
 .PHONY: bash
 bash:

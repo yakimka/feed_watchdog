@@ -29,7 +29,7 @@ class Post:
         }
 
     @classmethod
-    def fields_schema(cls):
+    def fields_schema(cls) -> dict:
         return {
             "post_id": {"type": "string"},
             "title": {"type": "string"},

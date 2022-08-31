@@ -9,14 +9,14 @@ from processors.handlers import HandlerOptions, HandlerType, register_handler
 logger = logging.getLogger(__name__)
 
 
-class OperatorType(Enum):
+class OperatorType(str, Enum):
     EQUAL = "="
     NOT_EQUAL = "!="
     GREATER_THAN = ">"
     LESS_THAN = "<"
 
 
-class ComparisonValueType(Enum):
+class ComparisonValueType(str, Enum):
     STRING = "string"
     INTEGER = "integer"
 
@@ -43,6 +43,7 @@ class ComparisonOptions(HandlerOptions):
 async def compare_and_filter(
     posts: list[Post], *, options: ComparisonOptions
 ) -> list[Post]:
+    value: str | int
     if options.field_type == ComparisonValueType.STRING.value:
         value = options.value
     elif options.field_type == ComparisonValueType.INTEGER.value:

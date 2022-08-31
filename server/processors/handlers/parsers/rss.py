@@ -31,7 +31,7 @@ class Post:
         }
 
     @classmethod
-    def fields_schema(cls):
+    def fields_schema(cls) -> dict:
         return {
             "post_id": {"type": "string"},
             "title": {"type": "string"},
@@ -57,7 +57,7 @@ def _handler(text: str) -> list[Post]:
     if not text:
         return posts
 
-    def get_tags(entry):
+    def get_tags(entry: dict) -> tuple[str, ...]:
         return tuple(tag.term for tag in entry.get("tags", []))
 
     feed = feedparser.parse(

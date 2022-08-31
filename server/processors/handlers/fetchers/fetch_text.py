@@ -19,7 +19,7 @@ class FetchTextOptions(HandlerOptions):
 
 
 @register_handler(type=HandlerType.fetchers.value, options=FetchTextOptions)
-async def fetch_text(*, options: FetchTextOptions = None) -> str | None:
+async def fetch_text(*, options: FetchTextOptions) -> str | None:
     return await fetch_text_from_url(
         options.url, encoding=options.encoding, retry=2
     )

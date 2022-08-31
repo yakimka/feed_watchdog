@@ -81,13 +81,13 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 RUN poetry install
 
 # will become mountpoint of our code
-WORKDIR /app/server
+WORKDIR /app
 
 USER app
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--reload"]
 
 
 # `production` image used for runtime

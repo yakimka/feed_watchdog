@@ -36,3 +36,14 @@ services:
     hostname: redis
     image: redis:7
     restart: "no"
+
+  mongo:
+    container_name: mongo
+    hostname: mongo
+    image: mongo:6
+    restart: "no"
+    volumes:
+      - mongo:/data/db
+
+volumes:
+  mongo: {}

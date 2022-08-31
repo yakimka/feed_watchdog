@@ -5,9 +5,9 @@ from functools import partial
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from db.models import Interval
 from django.core.management.base import BaseCommand
 
-from db.models import Interval
 from service_layer.collector import Collector
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class Command(BaseCommand):
             asyncio.get_event_loop().run_forever()
 
 
-def get_context():
+def get_context() -> dict:
     streams_count = Interval.objects.count()
     updated_at = Interval.objects.order_by("-updated")[0].updated
 
@@ -52,7 +52,7 @@ def update_jobs(scheduler, context: dict):
     add_interval_jobs(scheduler)
 
 
-def add_interval_jobs(scheduler):
+def add_interval_jobs(scheduler: AsyncIOScheduler) -> None:
     for interval in Interval.objects.all():
         collect = partial(collect_streams, interval.cron)
         scheduler.add_job(

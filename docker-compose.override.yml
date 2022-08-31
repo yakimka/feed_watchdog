@@ -3,6 +3,16 @@ version: '2'
 
 
 services:
+  devtools:
+    command: sleep infinity
+    env_file: server/.env
+    image: feed_watchdog:dev
+    restart: "no"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+
   feed_watchdog:
     command: python manage.py runserver 0.0.0.0:8000
     ports:
