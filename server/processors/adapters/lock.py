@@ -1,16 +1,11 @@
-from __future__ import annotations
-
 import logging
 from asyncio import sleep
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar
 
+from aioredis import Redis
 from aioredis.exceptions import LockNotOwnedError
 from aioredis.lock import Lock
-
-if TYPE_CHECKING:
-    from aioredis import Redis
-
 
 logger = logging.getLogger(__name__)
 

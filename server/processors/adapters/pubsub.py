@@ -1,19 +1,13 @@
-from __future__ import annotations
-
 import asyncio
 import json
+from collections.abc import Coroutine
 from contextlib import suppress
-from typing import TYPE_CHECKING, Protocol, TypedDict
+from typing import Any, Callable, Optional, Protocol, TypedDict
 
+import aioredis
 import async_timeout
 
 from processors.domain import events
-
-if TYPE_CHECKING:
-    from collections.abc import Coroutine
-    from typing import Any, Callable, Optional
-
-    import aioredis
 
 
 class Event(Protocol):

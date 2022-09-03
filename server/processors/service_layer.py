@@ -1,21 +1,16 @@
-from __future__ import annotations
-
 import json
 import logging
-from typing import IO, TYPE_CHECKING, Callable, Iterable
+from typing import IO, Callable, Iterable
 
 from processors.adapters.error_tracking import write_warn_message
+from processors.domain import events, models
 from processors.domain.logic import mutate_posts_with_stream_data
 from processors.handlers import (
     HandlerType,
     get_handler_by_name,
     get_registered_handlers,
 )
-
-if TYPE_CHECKING:
-    from processors.domain import events, models
-    from processors.storage import Storage
-
+from processors.storage import Storage
 
 logger = logging.getLogger(__name__)
 

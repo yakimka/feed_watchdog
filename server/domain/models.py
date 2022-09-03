@@ -1,8 +1,13 @@
 import dataclasses
 
+from pydantic import BaseModel as PydanticBaseModel
 
-@dataclasses.dataclass()
-class Source:
+
+class BaseModel(PydanticBaseModel):
+    pass
+
+
+class Source(BaseModel):
     name: str
     slug: str
     fetcher_type: str

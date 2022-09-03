@@ -1,18 +1,12 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 from asgiref.sync import sync_to_async
 from dependency_injector.wiring import Provide, inject
 
+from adapters.publisher import Publisher
+from adapters.streams import StreamRepository
 from app_settings import Topic
 from container import Container
 from domain.events import ProcessStreamEvent
-
-if TYPE_CHECKING:
-    from adapters.publisher import Publisher
-    from adapters.streams import StreamRepository
-    from domain.models import Stream
+from domain.models import Stream
 
 
 class Collector:

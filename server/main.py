@@ -1,13 +1,19 @@
 from fastapi import FastAPI
+from starlette.responses import JSONResponse
+
+from api.errors import APIError
+from api.exceptions import ValueExistsError
+from api.routers import router
 
 app = FastAPI()
+app.include_router(router)
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
+@app.exception_handler(ValueExistsError)
+async def http_exception_handler(request, exc):  # noqa: PLW0613
+    return JSONResponse(
+        status_code=400,
+        content={
+            "detail": APIError(message=exc.message, field=exc.field).dict()
+        },
+    )

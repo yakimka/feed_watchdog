@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = "Runs the scheduler"
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: PLW0613
         logger.info("Starting scheduler")
         scheduler = AsyncIOScheduler()
         add_interval_jobs(scheduler)
