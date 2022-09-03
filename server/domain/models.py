@@ -15,16 +15,14 @@ class Source(BaseModel):
     parser_type: str
     parser_options: dict
     description: str = ""
-    tags: tuple | list = ()
+    tags: list = []
 
 
-@dataclasses.dataclass()
-class Receiver:
+class Receiver(BaseModel):
     name: str
     slug: str
     type: str
     options: dict
-    message_template: str
 
 
 @dataclasses.dataclass()

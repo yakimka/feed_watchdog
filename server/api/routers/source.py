@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel
 
-from api.deps.source import get_source_by_slug, get_source_repo
+from api.deps.source import get_by_slug, get_source_repo
 from api.routers.core import ListResponse
-from domain.interfaces import AbstractSourceRepository
+from domain.interfaces import ISourceRepository
 from domain.models import Source as SourceModel
 
 router = APIRouter()
@@ -28,30 +28,57 @@ class Sources(ListResponse):
 
 
 @router.get("/sources", response_model=Sources)
-async def get_sources(
-    sources: AbstractSourceRepository = Depends(get_source_repo),
+async def find(
+    sources: ISourceRepository = Depends(get_source_repo),
 ) -> ListResponse:
     return ListResponse(
-        count=await sources.get_sources_count(),
+        count=await sources.get_count(),
         page=1,
-        results=await sources.get_sources(),
+        results=await sources.find(),
     )
 
 
 @router.post("/sources", response_model=Source, status_code=201)
-async def add_source(
+async def add(
     source: Source = Body(),
-    sources: AbstractSourceRepository = Depends(get_source_repo),
+    sources: ISourceRepository = Depends(get_source_repo),
 ) -> SourceModel:
-    await sources.add_source(source.to_domain())
-    result = await sources.get_source_by_slug(source.slug)
+    await sources.add(source.to_domain())
+    result = await sources.get_by_slug(source.slug)
+    # TODO https://stackoverflow.com/a/68552742
+    assert isinstance(result, SourceModel)  # noqa S101
+    return result
+
+
+@router.put("/sources/{slug}", response_model=Source, status_code=201)
+async def update(
+    slug: str,
+    source: Source = Body(),
+    sources: ISourceRepository = Depends(get_source_repo),
+) -> SourceModel:
+    updated = await sources.update(slug, source.to_domain())
+    if not updated:
+        raise HTTPException(status_code=404, detail="Source not found")
+
+    result = await sources.get_by_slug(source.slug)
     # TODO https://stackoverflow.com/a/68552742
     assert isinstance(result, SourceModel)  # noqa S101
     return result
 
 
 @router.get("/sources/{slug}", response_model=Source)
-async def get_source(
-    source: SourceModel = Depends(get_source_by_slug),
+async def detail(
+    source: SourceModel = Depends(get_by_slug),
 ) -> SourceModel:
     return source
+
+
+@router.delete("/sources/{slug}", status_code=204)
+async def delete(
+    slug: str,
+    sources: ISourceRepository = Depends(get_source_repo),
+) -> str:
+    deleted = await sources.delete_by_slug(slug)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Source not found")
+    return ""
