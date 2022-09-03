@@ -44,4 +44,8 @@ verify_format:
 
 .PHONY: bash
 bash:
-	docker compose exec feed_watchdog bash
+	docker compose run --rm devtools bash
+
+.PHONY: poetry
+poetry:
+	$(POETRY_RUN) $(args)
