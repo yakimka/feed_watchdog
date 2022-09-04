@@ -143,16 +143,22 @@ export default defineComponent({
     parsedSchemas: {} as { [index: string]: Array<ParsedSchema> }
   }),
   watch: {
-    currentValues () {
-      this.dumpStore()
+    currentValues: {
+      handler () {
+        this.dumpStore()
+      },
+      deep: true
     },
     rawValue () {
       this.$emit('update:modelValue', this.rawValue)
     },
-    jsonSchemaMapping () {
-      this.parsedSchemas = this.parseJsonSchemas()
-      this.loadStore()
-      this.dumpStore()
+    jsonSchemaMapping: {
+      handler () {
+        this.parsedSchemas = this.parseJsonSchemas()
+        this.loadStore()
+        this.dumpStore()
+      },
+      deep: true
     }
   },
   computed: {

@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import Source from '@/types/source'
 import Error from '@/types/error'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 export default function useSources () {
   const errors = ref<Error[]>([])
@@ -18,7 +19,6 @@ export default function useSources () {
   const getSources = async () => {
     sources.value = [
       {
-        id: '1',
         name: 'Some Source 1',
         slug: 'some-source-1',
         fetcherType: 'some-fetcher-type',
@@ -29,7 +29,6 @@ export default function useSources () {
         tags: ['some', 'tags']
       },
       {
-        id: '2',
         name: 'Some Source 2',
         slug: 'some-source-2',
         fetcherType: 'some-fetcher-type',
@@ -40,7 +39,6 @@ export default function useSources () {
         tags: ['some', 'tags']
       },
       {
-        id: '3',
         name: 'Some Source 3',
         slug: 'some-source-3',
         fetcherType: 'some-fetcher-type',
@@ -54,33 +52,67 @@ export default function useSources () {
   }
 
   const getSource = async (id: string) => {
-    source.value = {
-      id: id,
-      name: 'Some Source',
-      slug: 'some-source',
-      fetcherType: 'some-fetcher-type',
-      fetcherOptions: '{"chat_id": "123456789"}',
-      parserType: 'some-parser-type',
-      parserOptions: '{}',
-      description: 'Some description',
-      tags: ['some', 'tags']
+    // TODO handle errors
+    try {
+      const response = await axios.get(`/sources/${id}/`)
+      source.value = {
+        name: response.data.name,
+        slug: response.data.slug,
+        fetcherType: response.data.fetcher_type,
+        fetcherOptions: JSON.stringify(response.data.fetcher_options),
+        parserType: response.data.parser_type,
+        parserOptions: JSON.stringify(response.data.parser_options),
+        description: response.data.description,
+        tags: response.data.tags
+      }
+    } catch (error: any) {
+      console.log(error.response.data)
     }
   }
 
   const handleRedirectsBySaveType = async (type: string) => {
+    // TODO redirect to slug
     if (type === 'save-and-create-stream') {
       await router.push({ name: 'home' })
     }
   }
 
   const storeSource = async (type: string) => {
-    console.log('source stored', source.value)
+    // TODO handle errors
+    try {
+      await axios.post('/sources', {
+        name: source.value.name,
+        slug: source.value.slug,
+        fetcher_type: source.value.fetcherType,
+        fetcher_options: JSON.parse(source.value.fetcherOptions),
+        parser_type: source.value.parserType,
+        parser_options: JSON.parse(source.value.parserOptions),
+        description: source.value.description,
+        tags: source.value.tags
+      })
+    } catch (error: any) {
+      console.log(error.response.data)
+    }
 
     await handleRedirectsBySaveType(type)
   }
 
   const updateSource = async (type: string) => {
-    console.log('source updated', source.value)
+    // TODO handle errors
+    try {
+      await axios.put(`/sources/${source.value.slug}/`, {
+        name: source.value.name,
+        slug: source.value.slug,
+        fetcher_type: source.value.fetcherType,
+        fetcher_options: JSON.parse(source.value.fetcherOptions),
+        parser_type: source.value.parserType,
+        parser_options: JSON.parse(source.value.parserOptions),
+        description: source.value.description,
+        tags: source.value.tags
+      })
+    } catch (error: any) {
+      console.log(error.response.data)
+    }
 
     await handleRedirectsBySaveType(type)
   }

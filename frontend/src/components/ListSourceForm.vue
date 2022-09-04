@@ -59,7 +59,7 @@
 <script lang="ts" setup>
 // TODO https://stackoverflow.com/a/65737202
 import { onMounted, reactive } from 'vue'
-import useSources from '@/composables/source'
+import useSources from '@/composables/useSources'
 
 const {
   sources,

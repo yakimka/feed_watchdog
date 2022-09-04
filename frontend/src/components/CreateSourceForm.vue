@@ -100,7 +100,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, computed, ref } from 'vue'
-import useSources from '@/composables/source'
+import useSources from '@/composables/useSources'
 import JsonField from '@/components/JsonField.vue'
 
 const {

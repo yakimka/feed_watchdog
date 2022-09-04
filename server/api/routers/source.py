@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from api.deps.source import get_by_slug, get_source_repo
 from api.routers.core import ListResponse

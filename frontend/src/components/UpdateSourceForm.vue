@@ -7,7 +7,7 @@
   <v-container>
     <v-form
         ref="form"
-        v-model="form.valid"
+        v-model="formValues.valid"
         lazy-validation
         @submit.prevent="submit($event)"
     >
@@ -78,7 +78,7 @@
 
       <v-btn
           id="save"
-          :disabled="!form.valid"
+          :disabled="!formValues.valid"
           class="mr-4"
           color="primary"
           type="submit"
@@ -87,7 +87,7 @@
       </v-btn>
       <v-btn
           id="save-and-create-stream"
-          :disabled="!form.valid"
+          :disabled="!formValues.valid"
           class="mr-4"
           color="primary"
           type="submit"
@@ -100,7 +100,7 @@
 
 <script setup lang="ts">
 import { defineProps, onMounted, reactive, computed, ref } from 'vue'
-import useSources from '@/composables/source'
+import useSources from '@/composables/useSources'
 import JsonField from '@/components/JsonField.vue'
 
 const props = defineProps({
@@ -135,6 +135,7 @@ const updateSavedOptions = () => {
   savedParserOptions.value = source.value.parserOptions
 }
 
+const form = ref(null)
 onMounted(async () => {
   console.log('onMounted')
   await getFetcherTypes()
@@ -145,9 +146,11 @@ onMounted(async () => {
   await getSource(props.id)
 
   updateSavedOptions()
+
+  // await form.value.validate()
 })
 
-const form = reactive({
+const formValues = reactive({
   valid: true
 })
 const formErrors = computed(() => {
