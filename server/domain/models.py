@@ -1,5 +1,3 @@
-import dataclasses
-
 from pydantic import BaseModel as PydanticBaseModel
 
 
@@ -25,18 +23,16 @@ class Receiver(BaseModel):
     options: dict
 
 
-@dataclasses.dataclass()
-class Modifier:
+class Modifier(BaseModel):
     type: str
     options: dict
 
 
-@dataclasses.dataclass()
-class Stream:
-    uid: str
+class Stream(BaseModel):
     source: Source
     receiver: Receiver
+    slug: str
     squash: bool
     receiver_options_override: dict
-    message_template: str = ""
-    modifiers: list[Modifier] = dataclasses.field(default_factory=list)
+    message_template: str
+    modifiers: list[Modifier] = []

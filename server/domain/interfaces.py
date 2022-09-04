@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from domain.models import Receiver, Source
+from domain.models import Receiver, Source, Stream
 
 
 class ISourceRepository:
@@ -48,6 +48,32 @@ class IReceiverRepository:
 
     @abstractmethod
     async def get_by_slug(self, slug: str) -> Receiver | None:
+        pass
+
+    @abstractmethod
+    async def delete_by_slug(self, slug: str) -> None:
+        pass
+
+
+class IStreamRepository:
+    @abstractmethod
+    async def find(self) -> list[Stream]:
+        pass
+
+    @abstractmethod
+    async def get_count(self) -> int:
+        pass
+
+    @abstractmethod
+    async def add(self, stream: Stream) -> str:
+        pass
+
+    @abstractmethod
+    async def update(self, slug: str, stream: Stream) -> None:
+        pass
+
+    @abstractmethod
+    async def get_by_slug(self, slug: str) -> Stream | None:
         pass
 
     @abstractmethod
