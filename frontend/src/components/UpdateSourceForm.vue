@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, reactive, computed, ref } from 'vue'
+import { defineProps, onMounted, reactive, computed, ref, watch } from 'vue'
 import useSources from '@/composables/useSources'
 import JsonField from '@/components/JsonField.vue'
 
@@ -137,7 +137,6 @@ const updateSavedOptions = () => {
 
 const form = ref(null)
 onMounted(async () => {
-  console.log('onMounted')
   await getFetcherTypes()
   await getFetcherOptionsSchema()
   await getParserTypes()
@@ -146,13 +145,28 @@ onMounted(async () => {
   await getSource(props.id)
 
   updateSavedOptions()
-
-  // await form.value.validate()
 })
 
 const formValues = reactive({
   valid: true
 })
+// HACK: this is a workaround for cases when the form is not validated
+// (v-model="..." is set to null)
+watch(formValues, async (value) => {
+  if (form.value && value.valid === null) {
+    await form.value.validate()
+  }
+})
+watch(
+  () => source,
+  async () => {
+    if (form.value && formValues.valid === null) {
+      await form.value.validate()
+    }
+  },
+  { deep: true }
+)
+
 const formErrors = computed(() => {
   const result: { [key: string ]: string} = {}
   for (const error of errors.value) {

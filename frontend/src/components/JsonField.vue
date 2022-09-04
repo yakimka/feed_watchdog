@@ -143,6 +143,12 @@ export default defineComponent({
     parsedSchemas: {} as { [index: string]: Array<ParsedSchema> }
   }),
   watch: {
+    modelValue () {
+      this.rawValue = this.modelValue
+      if (!this.rawEditMode) {
+        this.loadStore()
+      }
+    },
     currentValues: {
       handler () {
         this.dumpStore()
@@ -170,7 +176,7 @@ export default defineComponent({
     },
     isChanged () {
       try {
-        return JSON.stringify(this.currentValues) !== JSON.stringify(JSON.parse(this.savedValue))
+        return JSON.stringify(JSON.parse(this.rawValue)) !== JSON.stringify(JSON.parse(this.savedValue))
       } catch (e) {
         return true
       }

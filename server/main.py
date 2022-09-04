@@ -21,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.exception_handler(ValueExistsError)
 async def http_exception_handler(request, exc):  # noqa: PLW0613
     return JSONResponse(
