@@ -20,6 +20,7 @@
                   :rules="[json()]"
                   filled
                   label="Raw Json"
+                  :error-messages="errorMessages"
       ></v-textarea>
 
       <template v-for="item in currentSchema" v-else>
@@ -132,6 +133,11 @@ export default defineComponent({
       type: Object,
       default: () => ({}),
       required: false
+    },
+    errorMessages: {
+      type: [String, Array],
+      default: () => ([]),
+      required: false
     }
   },
   emits: ['update:modelValue'],
@@ -163,6 +169,14 @@ export default defineComponent({
         this.parsedSchemas = this.parseJsonSchemas()
         this.loadStore()
         this.dumpStore()
+      },
+      deep: true
+    },
+    errorMessages: {
+      handler (value) {
+        if (value.length) {
+          this.setEditMode(true)
+        }
       },
       deep: true
     }
@@ -282,10 +296,13 @@ export default defineComponent({
       }
     },
     toggleEditMode (): void {
-      if (this.rawEditMode) {
+      this.setEditMode(!this.rawEditMode)
+    },
+    setEditMode (value: boolean): void {
+      if (!value) {
         this.loadStore()
       }
-      this.rawEditMode = !this.rawEditMode
+      this.rawEditMode = value
     },
     dumpStore (): void {
       if (!this.currentValues) {

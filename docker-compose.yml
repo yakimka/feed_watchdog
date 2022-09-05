@@ -12,6 +12,8 @@ services:
     hostname: feed_watchdog
     image: feed_watchdog:dev
     restart: "no"
+    depends_on:
+      - mongo
     volumes:
       - ./public:/var/www/public
 

@@ -7,7 +7,6 @@
   <v-container>
     <v-form
         ref="form"
-        v-model="formValues.valid"
         lazy-validation
         @submit.prevent="submit($event)"
     >
@@ -78,7 +77,6 @@
 
       <v-btn
           id="save"
-          :disabled="!formValues.valid"
           class="mr-4"
           color="primary"
           type="submit"
@@ -87,7 +85,6 @@
       </v-btn>
       <v-btn
           id="save-and-create-stream"
-          :disabled="!formValues.valid"
           class="mr-4"
           color="primary"
           type="submit"
@@ -147,26 +144,6 @@ onMounted(async () => {
   updateSavedOptions()
 })
 
-const formValues = reactive({
-  valid: true
-})
-// HACK: this is a workaround for cases when the form is not validated
-// (v-model="..." is set to null)
-watch(formValues, async (value) => {
-  if (form.value && value.valid === null) {
-    await form.value.validate()
-  }
-})
-watch(
-  () => source,
-  async () => {
-    if (form.value && formValues.valid === null) {
-      await form.value.validate()
-    }
-  },
-  { deep: true }
-)
-
 const formErrors = computed(() => {
   const result: { [key: string ]: string} = {}
   for (const error of errors.value) {
@@ -180,8 +157,21 @@ const formErrors = computed(() => {
 })
 
 const submit = async (event: any) => {
-  await updateSource(event.submitter.id)
+  if (!await isValid()) {
+    // TODO scroll to top
+    console.log('Form is not valid')
+    return
+  }
 
+  await updateSource(event.submitter.id)
   updateSavedOptions()
+}
+
+const isValid = async () => {
+  if (form.value) {
+    const result = await form.value.validate()
+    return result.valid
+  }
+  return false
 }
 </script>

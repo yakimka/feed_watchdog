@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, validator
 
 from api.deps.source import get_by_slug, get_source_repo
 from api.routers.core import ListResponse
@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 class Source(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1)
     slug: str
     fetcher_type: str
     fetcher_options: dict

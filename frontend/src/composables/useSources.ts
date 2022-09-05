@@ -3,6 +3,7 @@ import Source from '@/types/source'
 import Error from '@/types/error'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { parseErrors } from '@/errors'
 
 export default function useSources () {
   const errors = ref<Error[]>([])
@@ -111,6 +112,7 @@ export default function useSources () {
         tags: source.value.tags
       })
     } catch (error: any) {
+      errors.value = parseErrors(error.response.data.error.details)
       console.log(error.response.data)
     }
 

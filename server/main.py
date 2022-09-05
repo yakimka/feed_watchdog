@@ -1,8 +1,9 @@
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from api.errors import APIError
+from api.errors import ErrorResponse, FieldError
 from api.exceptions import ValueExistsError
 from api.routers import router
 
@@ -26,7 +27,19 @@ app.add_middleware(
 async def http_exception_handler(request, exc):  # noqa: PLW0613
     return JSONResponse(
         status_code=400,
-        content={
-            "detail": APIError(message=exc.message, field=exc.field).dict()
-        },
+        content=ErrorResponse(
+            type="duplicate_key",
+            message="Object with duplicated value detected",
+            details=[
+                FieldError(field=exc.field, message=exc.message),
+            ],
+        ).to_response(),
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):  # noqa: PLW0613
+    return JSONResponse(
+        status_code=422,
+        content=ErrorResponse.from_validation_error(exc).to_response(),
     )
