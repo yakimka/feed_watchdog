@@ -13,7 +13,7 @@
       <v-alert v-if="formErrors.nonFieldError"
         class="mb-5"
         icon="mdi-fire"
-        title="Outlined"
+        title="Error"
         variant="outlined"
         type="error"
       >
@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, reactive, computed, ref, watch } from 'vue'
+import { defineProps, onMounted, computed, ref } from 'vue'
 import useSources from '@/composables/useSources'
 import JsonField from '@/components/JsonField.vue'
 

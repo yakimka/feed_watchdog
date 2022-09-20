@@ -1,5 +1,7 @@
 <template>
   <div>
+    <Dialog></Dialog>
+
     <app-bar></app-bar>
     <left-side-bar></left-side-bar>
     <v-main>
@@ -17,11 +19,13 @@
 import { defineComponent } from 'vue'
 import AppBar from '@/components/AppBar.vue'
 import LeftSideBar from '@/components/LeftSideBar.vue'
+import Dialog from '@/components/Dialog.vue'
 import { Breadcrumb } from '@/router'
 
 export default defineComponent({
-  components: { AppBar, LeftSideBar },
+  components: { AppBar, LeftSideBar, Dialog },
   computed: {
+    // TODO nove breadcrumbs do component
     breadcrumbs (): Breadcrumb[] {
       const result = []
       for (const item of this.$route.meta.breadcrumbs || []) {

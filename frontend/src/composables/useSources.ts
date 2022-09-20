@@ -3,7 +3,7 @@ import Source from '@/types/source'
 import Error from '@/types/error'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import { parseErrors } from '@/errors'
+import { parseResponseErrors, handle404 } from '@/errors'
 
 export default function useSources () {
   const errors = ref<Error[]>([])
@@ -53,9 +53,8 @@ export default function useSources () {
   }
 
   const getSource = async (id: string) => {
-    // TODO handle errors
     try {
-      const response = await axios.get(`/sources/${id}/`)
+      const response = await axios.get(`/sources/${id}`)
       source.value = {
         name: response.data.name,
         slug: response.data.slug,
@@ -67,7 +66,10 @@ export default function useSources () {
         tags: response.data.tags
       }
     } catch (error: any) {
-      console.log(error.response.data)
+      if (await handle404(error, router, history)) {
+        return
+      }
+      errors.value = parseResponseErrors(error)
     }
   }
 
@@ -112,8 +114,7 @@ export default function useSources () {
         tags: source.value.tags
       })
     } catch (error: any) {
-      errors.value = parseErrors(error.response.data.error.details)
-      console.log(error.response.data)
+      errors.value = parseResponseErrors(error)
     }
 
     await handleRedirectsBySaveType(type)
