@@ -7,7 +7,13 @@ import { parseResponseErrors, handle404 } from '@/errors'
 
 export default function useSources () {
   const errors = ref<Error[]>([])
-  const sources = ref<SourceList>({} as SourceList)
+  const sources = ref<SourceList>({
+    count: 0,
+    page: 0,
+    pageSize: 0,
+    pages: 0,
+    results: []
+  })
   const source = ref<Source>({} as Source)
   const fetcherTypes = ref<string[]>([])
   const fetcherOptionsSchema = ref<object>({})
@@ -117,6 +123,14 @@ export default function useSources () {
     await handleRedirectsBySaveType(type)
   }
 
+  const deleteSource = async (id: string) => {
+    try {
+      await axios.delete(`/sources/${id}/`)
+    } catch (error: any) {
+      console.log(error.response.data)
+    }
+  }
+
   const getFetcherTypes = async () => {
     fetcherTypes.value = [
       '@pydailybot',
@@ -216,6 +230,7 @@ export default function useSources () {
     getSources,
     storeSource,
     updateSource,
+    deleteSource,
     getFetcherTypes,
     getFetcherOptionsSchema,
     getParserTypes,

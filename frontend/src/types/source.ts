@@ -15,5 +15,4 @@ export interface SourceList {
   pageSize: number
   pages: number
   results: Source[]
-
 }

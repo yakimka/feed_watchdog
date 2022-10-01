@@ -25,6 +25,7 @@
         <th class="text-left">Fetcher Type</th>
         <th class="text-left">Parser Type</th>
         <th class="text-left">Tags</th>
+        <th class="text-left">Actions</th>
       </tr>
       </thead>
       <tbody>
@@ -33,7 +34,7 @@
       >
         <td>
           <v-tooltip activator="parent" v-if="source.description">{{ source.description }}</v-tooltip>
-          <router-link :to="{name: 'edit-source', params: {id: source.slug}}">{{source.name}}</router-link>
+          <router-link class="text-decoration-none font-weight-bold" :to="{name: 'edit-source', params: {id: source.slug}}">{{source.name}}</router-link>
         </td>
         <td>{{source.slug}}</td>
         <td>{{ source.fetcherType }}</td>
@@ -44,6 +45,47 @@
           >
             {{ tag }}
           </v-chip>
+        </td>
+        <td>
+          <v-btn
+            :loading="buttonsLoading[source.slug]"
+            :disabled="buttonsLoading[source.slug]"
+            icon="mdi-circle-edit-outline"
+            variant="text"
+            title="Edit"
+            :to="{name: 'edit-source', params: {id: source.slug}}"
+          ></v-btn>
+          <v-dialog
+            v-model="deleteDialog[source.slug]"
+            max-width="290"
+          >
+            <template v-slot:activator="{ props }">
+              <v-btn
+                :loading="buttonsLoading[source.slug]"
+                :disabled="buttonsLoading[source.slug]"
+                icon="mdi-delete-outline"
+                variant="text"
+                title="Delete"
+                v-bind="props"
+              ></v-btn>
+            </template>
+            <v-card>
+              <v-card-title class="text-h5">
+                Delete source
+              </v-card-title>
+              <v-card-text>Delete {{ source.name }}? </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="green darken-1"
+                  text
+                  @click="deleteSourceAndRefreshList(source.slug)"
+                >
+                  Yes
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </td>
       </tr>
       </tbody>
@@ -65,8 +107,12 @@ import { debounce } from '@/utils/debounce'
 
 const {
   sources,
-  getSources
+  getSources,
+  deleteSource
 } = useSources()
+
+const buttonsLoading = reactive({} as {[key: string]: boolean})
+const deleteDialog = reactive({} as {[key: string]: boolean})
 
 const page = ref(1)
 const filters = reactive({
@@ -75,8 +121,16 @@ const filters = reactive({
 
 const fetchSources = debounce(async () => {
   console.log('fetchSources')
-  await getSources(filters.search, page.value, 100)
+  await getSources(filters.search, page.value, 50)
 })
+
+const deleteSourceAndRefreshList = async (id: string) => {
+  buttonsLoading[id] = true
+  delete deleteDialog[id]
+  await deleteSource(id)
+  delete buttonsLoading[id]
+  await fetchSources()
+}
 
 watch(
   () => page.value,
