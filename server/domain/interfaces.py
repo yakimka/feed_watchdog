@@ -1,15 +1,24 @@
 from abc import abstractmethod
 
+from pydantic import BaseModel
+
 from domain.models import Receiver, Source, Stream
+
+
+class SourceQuery(BaseModel):
+    search: str = ""
+    page: int = 1
+    page_size: int = 100
+    sort_by: str = "name"
 
 
 class ISourceRepository:
     @abstractmethod
-    async def find(self) -> list[Source]:
+    async def find(self, query: SourceQuery = SourceQuery()) -> list[Source]:
         pass
 
     @abstractmethod
-    async def get_count(self) -> int:
+    async def get_count(self, query: SourceQuery = SourceQuery()) -> int:
         pass
 
     @abstractmethod

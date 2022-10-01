@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel, Field, validator
 
+from adapters.repositories.source import SourceQuery
+from api.deps.pagination import Pagination, get_pagination_params
 from api.deps.source import get_by_slug, get_source_repo
 from api.routers.core import ListResponse
 from domain.interfaces import ISourceRepository
@@ -30,11 +32,19 @@ class Sources(ListResponse):
 @router.get("/sources", response_model=Sources)
 async def find(
     sources: ISourceRepository = Depends(get_source_repo),
+    q: str = "",
+    pagination: Pagination = Depends(get_pagination_params),
 ) -> ListResponse:
+    query = SourceQuery(
+        search=q,
+        page=pagination.page,
+        page_size=pagination.page_size,
+    )
     return ListResponse(
-        count=await sources.get_count(),
+        count=await sources.get_count(query),
         page=1,
-        results=await sources.find(),
+        results=await sources.find(query),
+        page_size=pagination.page_size,
     )
 
 

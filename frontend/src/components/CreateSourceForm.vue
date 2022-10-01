@@ -7,14 +7,13 @@
   <v-container>
     <v-form
         ref="form"
-        v-model="form.valid"
         lazy-validation
         @submit.prevent="submit($event)"
     >
       <v-alert v-if="formErrors.nonFieldError"
         class="mb-5"
         icon="mdi-fire"
-        title="Outlined"
+        title="Error"
         variant="outlined"
         type="error"
       >
@@ -25,11 +24,12 @@
           :error-messages="formErrors.name"
           label="Name"
       ></v-text-field>
-      <v-text-field
-          v-model="source.slug"
-          :error-messages="formErrors.slug"
-          label="Slug"
-      ></v-text-field>
+      <slug-field
+        :follow-value="source.name || ''"
+        v-model="source.slug"
+        :error-messages="formErrors.slug"
+        label="Slug"
+      ></slug-field>
       <v-select
           v-model="source.fetcherType"
           :error-messages="formErrors.fetcherType"
@@ -78,7 +78,6 @@
 
       <v-btn
           id="save"
-          :disabled="!form.valid"
           class="mr-4"
           color="primary"
           type="submit"
@@ -87,7 +86,6 @@
       </v-btn>
       <v-btn
           id="save-and-create-stream"
-          :disabled="!form.valid"
           class="mr-4"
           color="primary"
           type="submit"
@@ -99,9 +97,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, computed, ref } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import useSources from '@/composables/useSources'
 import JsonField from '@/components/JsonField.vue'
+import SlugField from '@/components/SlugField.vue'
+import { scrollToTop } from '@/utils/pageNavigation'
 
 const {
   errors,
@@ -137,9 +137,8 @@ onMounted(async () => {
   updateSavedOptions()
 })
 
-const form = reactive({
-  valid: true
-})
+const form = ref(null)
+
 const formErrors = computed(() => {
   const result: { [key: string ]: string} = {}
   for (const error of errors.value) {
@@ -153,7 +152,22 @@ const formErrors = computed(() => {
 })
 
 const submit = async (event: any) => {
+  if (!await isValid()) {
+    scrollToTop()
+    // TODO Add global error message?
+    console.log('Form is not valid')
+    return
+  }
+
   await storeSource(event.submitter.id)
   updateSavedOptions()
+}
+
+const isValid = async () => {
+  if (form.value) {
+    const result = await form.value.validate()
+    return result.valid
+  }
+  return false
 }
 </script>

@@ -10,6 +10,7 @@
     >
       <v-row>
         <v-text-field
+          v-model="filters.search"
           label="Search"
         ></v-text-field>
       </v-row>
@@ -19,22 +20,22 @@
     <v-table fixed-header>
       <thead>
       <tr>
-        <th class="text-left">ID</th>
         <th class="text-left">Name</th>
+        <th class="text-left">Slug</th>
         <th class="text-left">Fetcher Type</th>
         <th class="text-left">Parser Type</th>
         <th class="text-left">Tags</th>
       </tr>
       </thead>
       <tbody>
-      <tr v-for="source in sources"
-          :key="source.id"
+      <tr v-for="source in sources.results"
+          :key="source.slug"
       >
-        <td><router-link :to="{name: 'edit-source', params: {id: source.id}}">{{source.id}}</router-link></td>
         <td>
           <v-tooltip activator="parent" v-if="source.description">{{ source.description }}</v-tooltip>
-          <router-link :to="{name: 'edit-source', params: {id: source.id}}">{{source.name}}</router-link>
+          <router-link :to="{name: 'edit-source', params: {id: source.slug}}">{{source.name}}</router-link>
         </td>
+        <td>{{source.slug}}</td>
         <td>{{ source.fetcherType }}</td>
         <td>{{ source.parserType }}</td>
         <td>
@@ -48,9 +49,9 @@
       </tbody>
     </v-table>
       <v-pagination
-        v-model="pagination.page"
+        v-model="page"
         :total-visible="10"
-        :length="pagination.pagesTotal"
+        :length="sources.pages"
         class="mt-5"
       ></v-pagination>
   </v-container>
@@ -58,20 +59,41 @@
 
 <script lang="ts" setup>
 // TODO https://stackoverflow.com/a/65737202
-import { onMounted, reactive } from 'vue'
+import { onMounted, ref, reactive, watch } from 'vue'
 import useSources from '@/composables/useSources'
+import { debounce } from '@/utils/debounce'
 
 const {
   sources,
   getSources
 } = useSources()
 
-onMounted(async () => {
-  await getSources()
+const page = ref(1)
+const filters = reactive({
+  search: ''
 })
 
-const pagination = reactive({
-  page: 1,
-  pagesTotal: 10
+const fetchSources = debounce(async () => {
+  console.log('fetchSources')
+  await getSources(filters.search, page.value, 100)
+})
+
+watch(
+  () => page.value,
+  async () => {
+    await fetchSources()
+  },
+  { deep: true }
+)
+watch(
+  () => filters,
+  async () => {
+    await fetchSources()
+  },
+  { deep: true }
+)
+
+onMounted(async () => {
+  await fetchSources()
 })
 </script>

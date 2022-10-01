@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import Source from '@/types/source'
+import { SourceList, Source } from '@/types/source'
 import Error from '@/types/error'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
@@ -7,7 +7,7 @@ import { parseResponseErrors, handle404 } from '@/errors'
 
 export default function useSources () {
   const errors = ref<Error[]>([])
-  const sources = ref<Source[]>([])
+  const sources = ref<SourceList>({} as SourceList)
   const source = ref<Source>({} as Source)
   const fetcherTypes = ref<string[]>([])
   const fetcherOptionsSchema = ref<object>({})
@@ -17,39 +17,37 @@ export default function useSources () {
 
   const router = useRouter()
 
-  const getSources = async () => {
-    sources.value = [
-      {
-        name: 'Some Source 1',
-        slug: 'some-source-1',
-        fetcherType: 'some-fetcher-type',
-        fetcherOptions: '{}',
-        parserType: 'some-parser-type',
-        parserOptions: '{}',
-        description: 'Some description',
-        tags: ['some', 'tags']
-      },
-      {
-        name: 'Some Source 2',
-        slug: 'some-source-2',
-        fetcherType: 'some-fetcher-type',
-        fetcherOptions: '{}',
-        parserType: 'some-parser-type',
-        parserOptions: '{}',
-        description: 'Some description',
-        tags: ['some', 'tags']
-      },
-      {
-        name: 'Some Source 3',
-        slug: 'some-source-3',
-        fetcherType: 'some-fetcher-type',
-        fetcherOptions: '{}',
-        parserType: 'some-parser-type',
-        parserOptions: '{}',
-        description: 'Some description',
-        tags: ['some', 'tags']
+  const getSources = async (q: string, page: number, pageSize: number) => {
+    const response = await axios.get('/sources', {
+      params: {
+        q: q,
+        page: page,
+        page_size: pageSize
       }
-    ]
+    })
+
+    const sourceListResult = {
+      count: response.data.count,
+      page: response.data.page,
+      pageSize: response.data.page_size,
+      pages: response.data.pages,
+      results: [] as Source[]
+    }
+
+    console.log(response.data)
+    for (const item of response.data.results) {
+      sourceListResult.results.push({
+        name: item.name,
+        slug: item.slug,
+        fetcherType: item.fetcher_type,
+        fetcherOptions: JSON.stringify(item.fetcher_options),
+        parserType: item.parser_type,
+        parserOptions: JSON.stringify(item.parser_options),
+        description: item.description,
+        tags: item.tags
+      })
+    }
+    sources.value = sourceListResult
   }
 
   const getSource = async (id: string) => {
@@ -66,10 +64,7 @@ export default function useSources () {
         tags: response.data.tags
       }
     } catch (error: any) {
-      if (await handle404(error, router, history)) {
-        return
-      }
-      errors.value = parseResponseErrors(error)
+      await handle404(error, router, history)
     }
   }
 
@@ -95,6 +90,7 @@ export default function useSources () {
       })
     } catch (error: any) {
       console.log(error.response.data)
+      errors.value = parseResponseErrors(error)
     }
 
     await handleRedirectsBySaveType(type)
@@ -114,6 +110,7 @@ export default function useSources () {
         tags: source.value.tags
       })
     } catch (error: any) {
+      console.log(error.response.data)
       errors.value = parseResponseErrors(error)
     }
 

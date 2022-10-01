@@ -1,4 +1,4 @@
-import { snakeToCamel } from '@/utils'
+import { snakeToCamel } from '@/utils/case'
 import Error from '@/types/error'
 import { Router } from 'vue-router'
 

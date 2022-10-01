@@ -99,6 +99,7 @@
 import { defineProps, onMounted, computed, ref } from 'vue'
 import useSources from '@/composables/useSources'
 import JsonField from '@/components/JsonField.vue'
+import { scrollToTop } from '@/utils/pageNavigation'
 
 const props = defineProps({
   id: {
@@ -158,7 +159,8 @@ const formErrors = computed(() => {
 
 const submit = async (event: any) => {
   if (!await isValid()) {
-    // TODO scroll to top
+    scrollToTop()
+    // TODO Add global error message?
     console.log('Form is not valid')
     return
   }
