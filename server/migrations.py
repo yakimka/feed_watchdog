@@ -1,9 +1,10 @@
 import mongodex
-from pymongo import ASCENDING
+from pymongo import ASCENDING, TEXT
 
 collections = {
     "sources": [
         mongodex.Index({"slug": ASCENDING}, unique=True),
+        mongodex.Index({"name": TEXT}, weights={}),
     ],
 }
 
