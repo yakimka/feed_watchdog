@@ -91,7 +91,7 @@
       </tbody>
     </v-table>
       <v-pagination
-        v-model="page"
+        v-model="filters.page"
         :total-visible="10"
         :length="sources.pages"
         class="mt-5"
@@ -100,10 +100,12 @@
 </template>
 
 <script lang="ts" setup>
-// TODO https://stackoverflow.com/a/65737202
-import { onMounted, ref, reactive, watch } from 'vue'
+import { onMounted, reactive, watch } from 'vue'
 import useSources from '@/composables/useSources'
-import { debounce } from '@/utils/debounce'
+import { useRouter, useRoute, LocationQuery } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
 
 const {
   sources,
@@ -114,15 +116,16 @@ const {
 const buttonsLoading = reactive({} as {[key: string]: boolean})
 const deleteDialog = reactive({} as {[key: string]: boolean})
 
-const page = ref(1)
 const filters = reactive({
+  page: 1,
+  pageSize: 50,
   search: ''
 })
 
-const fetchSources = debounce(async () => {
-  console.log('fetchSources')
-  await getSources(filters.search, page.value, 50)
-})
+// TODO debounce for search
+const fetchSources = async () => {
+  await getSources(filters.search, filters.page, filters.pageSize)
+}
 
 const deleteSourceAndRefreshList = async (id: string) => {
   buttonsLoading[id] = true
@@ -132,22 +135,52 @@ const deleteSourceAndRefreshList = async (id: string) => {
   await fetchSources()
 }
 
-watch(
-  () => page.value,
-  async () => {
-    await fetchSources()
-  },
-  { deep: true }
-)
+const setQueryToURL = (params: object) => {
+  router.replace({
+    query: removeEmptyValues({
+      ...route.query,
+      ...params
+    }, Object.keys(params))
+  })
+}
+
+const getParamsFromURL = (): LocationQuery => {
+  return route.query
+}
+
+const removeEmptyValues = (obj: any, keys: string[] = []) => {
+  for (const propName in obj) {
+    if ((propName.length && keys.includes(propName)) && !obj[propName]) {
+      delete obj[propName]
+    }
+  }
+  return obj
+}
+
+const parseFiltersFromURL = () => {
+  const params = getParamsFromURL()
+  if (params.page) {
+    filters.page = parseInt(params.page as string)
+  }
+  if (params.pageSize) {
+    filters.pageSize = parseInt(params.pageSize as string)
+  }
+  if (params.search) {
+    filters.search = params.search as string
+  }
+}
+
 watch(
   () => filters,
   async () => {
+    setQueryToURL(filters)
     await fetchSources()
   },
   { deep: true }
 )
 
 onMounted(async () => {
+  parseFiltersFromURL()
   await fetchSources()
 })
 </script>

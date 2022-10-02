@@ -40,7 +40,6 @@ export default function useSources () {
       results: [] as Source[]
     }
 
-    console.log(response.data)
     for (const item of response.data.results) {
       sourceListResult.results.push({
         name: item.name,
@@ -95,7 +94,6 @@ export default function useSources () {
         tags: source.value.tags
       })
     } catch (error: any) {
-      console.log(error.response.data)
       errors.value = parseResponseErrors(error)
     }
 
@@ -116,7 +114,6 @@ export default function useSources () {
         tags: source.value.tags
       })
     } catch (error: any) {
-      console.log(error.response.data)
       errors.value = parseResponseErrors(error)
     }
 
