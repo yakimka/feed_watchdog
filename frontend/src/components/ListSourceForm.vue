@@ -10,13 +10,25 @@
     >
       <v-row>
         <v-text-field
-          v-model="filters.search"
+          v-model="filtersDebounced.search"
           label="Search"
         ></v-text-field>
       </v-row>
     </v-form>
   </v-container>
-  <v-container fluid>
+
+  <v-progress-linear v-if="pageisLoading"
+    indeterminate
+    color="primary"
+  ></v-progress-linear>
+
+  <v-container style="position: relative" fluid>
+    <v-overlay
+      :model-value="pageisLoading"
+      contained
+      persistent
+    ></v-overlay>
+
     <v-table fixed-header>
       <thead>
       <tr>
@@ -100,9 +112,11 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import useSources from '@/composables/useSources'
 import { useRouter, useRoute, LocationQuery } from 'vue-router'
+import { scrollToTop } from '@/utils/pageNavigation'
+import { debounce } from '@/utils/debounce'
 
 const router = useRouter()
 const route = useRoute()
@@ -115,17 +129,22 @@ const {
 
 const buttonsLoading = reactive({} as {[key: string]: boolean})
 const deleteDialog = reactive({} as {[key: string]: boolean})
+const pageisLoading = ref(true)
 
 const filters = reactive({
   page: 1,
-  pageSize: 50,
+  pageSize: 50
+})
+const filtersDebounced = reactive({
   search: ''
 })
 
-// TODO debounce for search
 const fetchSources = async () => {
-  await getSources(filters.search, filters.page, filters.pageSize)
+  pageisLoading.value = true
+  await getSources(filtersDebounced.search, filters.page, filters.pageSize)
+  pageisLoading.value = false
 }
+const fetchSourcesDebounced = debounce(fetchSources)
 
 const deleteSourceAndRefreshList = async (id: string) => {
   buttonsLoading[id] = true
@@ -166,21 +185,44 @@ const parseFiltersFromURL = () => {
     filters.pageSize = parseInt(params.pageSize as string)
   }
   if (params.search) {
-    filters.search = params.search as string
+    filtersDebounced.search = params.search as string
   }
 }
 
+let initialized = false
 watch(
   () => filters,
   async () => {
-    setQueryToURL(filters)
-    await fetchSources()
+    if (initialized) {
+      setQueryToURL(filters)
+      console.log('fetch')
+      await fetchSources()
+    }
   },
   { deep: true }
+)
+watch(
+  () => filtersDebounced,
+  async () => {
+    if (initialized) {
+      setQueryToURL(filtersDebounced)
+      console.log('fetch debounced')
+      await fetchSourcesDebounced()
+    }
+  },
+  { deep: true }
+)
+
+watch(
+  () => filters.page,
+  async () => {
+    scrollToTop()
+  }
 )
 
 onMounted(async () => {
   parseFiltersFromURL()
   await fetchSources()
+  initialized = true
 })
 </script>
