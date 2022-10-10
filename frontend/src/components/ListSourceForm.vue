@@ -102,12 +102,25 @@
       </tr>
       </tbody>
     </v-table>
-      <v-pagination
-        v-model="filters.page"
-        :total-visible="10"
-        :length="sources.pages"
-        class="mt-5"
-      ></v-pagination>
+    <v-row>
+      <v-col cols="10">
+        <v-pagination
+          v-model="pagination.page"
+          :total-visible="10"
+          :length="sources.pages"
+          class="mt-5"
+        ></v-pagination>
+      </v-col>
+      <v-col cols="2">
+        <v-select
+          class="mt-5"
+          v-model="pagination.pageSize"
+          :items="[25, 50, 100]"
+          variant="plain"
+          label="Page Size"
+        ></v-select>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -131,9 +144,9 @@ const buttonsLoading = reactive({} as {[key: string]: boolean})
 const deleteDialog = reactive({} as {[key: string]: boolean})
 const pageisLoading = ref(true)
 
-const filters = reactive({
+const pagination = reactive({
   page: 1,
-  pageSize: 50
+  pageSize: 25
 })
 const filtersDebounced = reactive({
   search: ''
@@ -141,10 +154,9 @@ const filtersDebounced = reactive({
 
 const fetchSources = async () => {
   pageisLoading.value = true
-  await getSources(filtersDebounced.search, filters.page, filters.pageSize)
+  await getSources(filtersDebounced.search, pagination.page, pagination.pageSize)
   pageisLoading.value = false
 }
-const fetchSourcesDebounced = debounce(fetchSources)
 
 const deleteSourceAndRefreshList = async (id: string) => {
   buttonsLoading[id] = true
@@ -178,24 +190,23 @@ const removeEmptyValues = (obj: any, keys: string[] = []) => {
 
 const parseFiltersFromURL = () => {
   const params = getParamsFromURL()
-  if (params.page) {
-    filters.page = parseInt(params.page as string)
-  }
-  if (params.pageSize) {
-    filters.pageSize = parseInt(params.pageSize as string)
-  }
   if (params.search) {
     filtersDebounced.search = params.search as string
+  }
+  if (params.pageSize) {
+    pagination.pageSize = parseInt(params.pageSize as string)
+  }
+  if (params.page) {
+    pagination.page = parseInt(params.page as string)
   }
 }
 
 let initialized = false
 watch(
-  () => filters,
+  () => pagination,
   async () => {
     if (initialized) {
-      setQueryToURL(filters)
-      console.log('fetch')
+      setQueryToURL(pagination)
       await fetchSources()
     }
   },
@@ -203,18 +214,18 @@ watch(
 )
 watch(
   () => filtersDebounced,
-  async () => {
+  debounce(async () => {
     if (initialized) {
-      setQueryToURL(filtersDebounced)
-      console.log('fetch debounced')
-      await fetchSourcesDebounced()
+      pagination.page = 1
+      setQueryToURL({ ...pagination, ...filtersDebounced })
+      await fetchSources()
     }
-  },
+  }),
   { deep: true }
 )
 
 watch(
-  () => filters.page,
+  () => pagination.page,
   async () => {
     scrollToTop()
   }
