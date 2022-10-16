@@ -4,7 +4,9 @@
         Create new Source
       </div>
   </v-container>
-  <v-container>
+  <progress-container
+    :is-loading="pageisLoading"
+  >
     <v-form
         ref="form"
         lazy-validation
@@ -23,18 +25,21 @@
           v-model="source.name"
           :error-messages="formErrors.name"
           label="Name"
+          :rules="[required()]"
       ></v-text-field>
       <slug-field
         :follow-value="source.name || ''"
         v-model="source.slug"
         :error-messages="formErrors.slug"
         label="Slug"
+        :rules="[required()]"
       ></slug-field>
       <v-select
           v-model="source.fetcherType"
           :error-messages="formErrors.fetcherType"
           :items="fetcherTypes"
           label="Fetcher Type"
+          :rules="[required()]"
       ></v-select>
       <json-field
           compact
@@ -49,7 +54,8 @@
           v-model="source.parserType"
           :error-messages="formErrors.parserType"
           :items="parserTypes"
-          label="Fetcher Type"
+          label="Parser Type"
+          :rules="[required()]"
       ></v-select>
       <json-field
           compact
@@ -93,7 +99,7 @@
         Save and create stream
       </v-btn>
     </v-form>
-  </v-container>
+  </progress-container>
 </template>
 
 <script setup lang="ts">
@@ -102,6 +108,8 @@ import useSources from '@/composables/useSources'
 import JsonField from '@/components/JsonField.vue'
 import SlugField from '@/components/SlugField.vue'
 import { scrollToTop } from '@/utils/pageNavigation'
+import ProgressContainer from '@/components/ProgressContainer.vue'
+import { required } from '@/validation'
 
 const {
   errors,
@@ -117,6 +125,7 @@ const {
   getAvailableTags
 } = useSources()
 
+const pageisLoading = ref(true)
 const savedFetcherOptions = ref('')
 const savedParserOptions = ref('')
 
@@ -131,6 +140,7 @@ onMounted(async () => {
   await getAvailableTags()
 
   updateSavedOptions()
+  pageisLoading.value = false
 })
 
 const form = ref(null)
@@ -150,13 +160,13 @@ const formErrors = computed(() => {
 const submit = async (event: any) => {
   if (!await isValid()) {
     scrollToTop()
-    // TODO Add global error message?
-    console.log('Form is not valid')
     return
   }
 
+  pageisLoading.value = true
   await storeSource(event.submitter.id)
   updateSavedOptions()
+  pageisLoading.value = false
 }
 
 const isValid = async () => {

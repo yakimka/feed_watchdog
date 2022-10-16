@@ -156,8 +156,6 @@ const formErrors = computed(() => {
 const submit = async (event: any) => {
   if (!await isValid()) {
     scrollToTop()
-    // TODO Add global error message?
-    console.log('Form is not valid')
     return
   }
 

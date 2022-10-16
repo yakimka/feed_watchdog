@@ -3,13 +3,12 @@ import Error from '@/types/error'
 import { Router } from 'vue-router'
 
 export function parseResponseErrors (error: any): Error[] {
-  if (error.message) {
-    return [{ message: error.message }]
-  }
-
   const validationErrors = error.response.data?.error.details
   if (validationErrors) {
     return parseValidationErrors(validationErrors)
+  }
+  if (error.message) {
+    return [{ message: error.message }]
   }
   return []
 }

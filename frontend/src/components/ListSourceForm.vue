@@ -17,17 +17,10 @@
     </v-form>
   </v-container>
 
-  <v-progress-linear v-if="pageisLoading"
-    indeterminate
-    color="primary"
-  ></v-progress-linear>
-
-  <v-container style="position: relative" fluid>
-    <v-overlay
-      :model-value="pageisLoading"
-      contained
-      persistent
-    ></v-overlay>
+  <progress-container
+    :fluid="true"
+    :is-loading="pageisLoading"
+  >
 
     <v-table fixed-header>
       <thead>
@@ -121,7 +114,7 @@
         ></v-select>
       </v-col>
     </v-row>
-  </v-container>
+  </progress-container>
 </template>
 
 <script lang="ts" setup>
@@ -130,6 +123,7 @@ import useSources from '@/composables/useSources'
 import { useRouter, useRoute, LocationQuery } from 'vue-router'
 import { scrollToTop } from '@/utils/pageNavigation'
 import { debounce } from '@/utils/debounce'
+import ProgressContainer from '@/components/ProgressContainer.vue'
 
 const router = useRouter()
 const route = useRoute()

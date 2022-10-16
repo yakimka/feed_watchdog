@@ -1,6 +1,6 @@
 export function required () {
   return (value: any) => {
-    if (!value) {
+    if (!value?.length) {
       return 'Field is required.'
     }
     return true
