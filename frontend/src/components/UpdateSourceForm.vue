@@ -118,9 +118,7 @@ const {
   availableTags,
   getSource,
   updateSource,
-  getFetcherTypes,
   getFetcherOptionsSchema,
-  getParserTypes,
   getParserOptionsSchema,
   getAvailableTags
 } = useSources()
@@ -135,9 +133,7 @@ const updateSavedOptions = () => {
 
 const form = ref(null)
 onMounted(async () => {
-  await getFetcherTypes()
   await getFetcherOptionsSchema()
-  await getParserTypes()
   await getParserOptionsSchema()
   await getAvailableTags()
   await getSource(props.id)

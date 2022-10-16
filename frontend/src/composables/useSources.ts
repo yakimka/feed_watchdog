@@ -81,7 +81,6 @@ export default function useSources () {
   }
 
   const storeSource = async (type: string) => {
-    // TODO handle errors
     try {
       await axios.post('/sources', {
         name: source.value.name,
@@ -101,7 +100,6 @@ export default function useSources () {
   }
 
   const updateSource = async (type: string) => {
-    // TODO handle errors
     try {
       await axios.put(`/sources/${source.value.slug}/`, {
         name: source.value.name,
@@ -128,86 +126,24 @@ export default function useSources () {
     }
   }
 
-  const getFetcherTypes = async () => {
-    fetcherTypes.value = [
-      '@pydailybot',
-      'compare_and_filter',
-      'replace_text',
-      'Item 4'
-    ]
-  }
-
   const getFetcherOptionsSchema = async () => {
-    fetcherOptionsSchema.value = {
-      '@pydailybot': {
-        $schema: 'https://json-schema.org/draft/2020-12/schema',
-        title: 'type',
-        type: 'object',
-        properties: {
-          chat_id: {
-            type: 'string',
-            title: 'Chat ID',
-            description: 'Telegram chat id'
-          },
-          disable_link_preview: {
-            type: 'boolean',
-            title: 'Disable link preview',
-            description: '',
-            default: false
-          }
-        },
-        required: ['chat_id']
-      },
-      compare_and_filter: {
-        $schema: 'https://json-schema.org/draft/2020-12/schema',
-        title: 'type',
-        type: 'object',
-        properties: {
-          field: {
-            type: 'string',
-            title: 'Field',
-            description: 'Field name for comparison'
-          },
-          operator: {
-            enum: ['=', '!=', '>', '<'],
-            type: 'string',
-            title: 'Operator',
-            description: 'Comparison operator'
-          },
-          value: { type: 'string', title: 'Value', description: 'Comparison value' },
-          field_type: {
-            enum: ['string', 'integer'],
-            type: 'string',
-            title: 'Field type',
-            description: '',
-            default: 'string'
-          }
-        },
-        required: ['field', 'operator', 'value']
-      },
-      replace_text: {
-        $schema: 'https://json-schema.org/draft/2020-12/schema',
-        title: 'type',
-        type: 'object',
-        properties: {
-          field: { type: 'string', title: 'Field', description: 'Field name' },
-          old: { type: 'string', title: 'Old value', description: 'Value to replace' },
-          new: { type: 'string', title: 'New value', description: 'Value to replace with' }
-        },
-        required: ['field', 'old', 'new']
-      }
+    const response = await axios.get('/processors/config/fetchers')
+    fetcherOptionsSchema.value = response.data
+
+    fetcherTypes.value = []
+    for (const key in response.data) {
+      fetcherTypes.value.push(key)
     }
   }
 
-  const getParserTypes = async () => {
-    parserTypes.value = [
-      'rss',
-      'reddit_json'
-    ]
-  }
-
   const getParserOptionsSchema = async () => {
-    parserOptionsSchema.value = {}
+    const response = await axios.get('/processors/config/parsers')
+    parserOptionsSchema.value = response.data
+
+    parserTypes.value = []
+    for (const key in response.data) {
+      parserTypes.value.push(key)
+    }
   }
 
   const getAvailableTags = async () => {
@@ -228,9 +164,7 @@ export default function useSources () {
     storeSource,
     updateSource,
     deleteSource,
-    getFetcherTypes,
     getFetcherOptionsSchema,
-    getParserTypes,
     getParserOptionsSchema,
     getAvailableTags
   }

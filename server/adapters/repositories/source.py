@@ -19,7 +19,8 @@ class MongoSourceRepository(ISourceRepository):
             .limit(query.page_size)
         )
         return [
-            Source.parse_obj(item) for item in await cursor.to_list(query.page_size)
+            Source.parse_obj(item)
+            for item in await cursor.to_list(query.page_size)
         ]
 
     def _make_find_query(self, query: SourceQuery) -> dict:

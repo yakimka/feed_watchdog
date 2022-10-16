@@ -1,3 +1,4 @@
+import abc
 from abc import abstractmethod
 
 from pydantic import BaseModel
@@ -12,7 +13,7 @@ class SourceQuery(BaseModel):
     sort_by: str = "name"
 
 
-class ISourceRepository:
+class ISourceRepository(abc.ABC):
     @abstractmethod
     async def find(self, query: SourceQuery = SourceQuery()) -> list[Source]:
         pass
@@ -38,7 +39,7 @@ class ISourceRepository:
         pass
 
 
-class IReceiverRepository:
+class IReceiverRepository(abc.ABC):
     @abstractmethod
     async def find(self) -> list[Receiver]:
         pass
@@ -64,7 +65,7 @@ class IReceiverRepository:
         pass
 
 
-class IStreamRepository:
+class IStreamRepository(abc.ABC):
     @abstractmethod
     async def find(self) -> list[Stream]:
         pass
@@ -87,4 +88,10 @@ class IStreamRepository:
 
     @abstractmethod
     async def delete_by_slug(self, slug: str) -> None:
+        pass
+
+
+class IProcessorsConfigurationRepository(abc.ABC):
+    @abstractmethod
+    def get_config(self, handler: str) -> dict:
         pass

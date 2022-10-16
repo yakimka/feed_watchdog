@@ -112,9 +112,7 @@ const {
   parserOptionsSchema,
   availableTags,
   storeSource,
-  getFetcherTypes,
   getFetcherOptionsSchema,
-  getParserTypes,
   getParserOptionsSchema,
   getAvailableTags
 } = useSources()
@@ -128,9 +126,7 @@ const updateSavedOptions = () => {
 }
 
 onMounted(async () => {
-  await getFetcherTypes()
   await getFetcherOptionsSchema()
-  await getParserTypes()
   await getParserOptionsSchema()
   await getAvailableTags()
 
