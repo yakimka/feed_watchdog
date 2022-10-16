@@ -5,7 +5,7 @@
       </div>
   </v-container>
   <progress-container
-    :is-loading="pageisLoading"
+    :is-loading="pageIsLoading"
   >
     <v-form
         ref="form"
@@ -125,7 +125,7 @@ const {
   getAvailableTags
 } = useSources()
 
-const pageisLoading = ref(true)
+const pageIsLoading = ref(true)
 const savedFetcherOptions = ref('')
 const savedParserOptions = ref('')
 
@@ -140,7 +140,7 @@ onMounted(async () => {
   await getAvailableTags()
 
   updateSavedOptions()
-  pageisLoading.value = false
+  pageIsLoading.value = false
 })
 
 const form = ref(null)
@@ -163,10 +163,10 @@ const submit = async (event: any) => {
     return
   }
 
-  pageisLoading.value = true
+  pageIsLoading.value = true
   await storeSource(event.submitter.id)
   updateSavedOptions()
-  pageisLoading.value = false
+  pageIsLoading.value = false
 }
 
 const isValid = async () => {

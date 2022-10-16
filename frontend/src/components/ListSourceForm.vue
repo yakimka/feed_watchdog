@@ -76,7 +76,7 @@
             </template>
             <v-card>
               <v-card-title class="text-h5">
-                Delete source
+                Are you sure?
               </v-card-title>
               <v-card-text>Delete {{ source.name }}? </v-card-text>
               <v-card-actions>

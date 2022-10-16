@@ -4,7 +4,9 @@
         Edit {{ source.name || 'Source' }}
       </div>
   </v-container>
-  <v-container>
+  <progress-container
+    :is-loading="pageIsLoading"
+  >
     <v-form
         ref="form"
         lazy-validation
@@ -23,17 +25,20 @@
           v-model="source.name"
           :error-messages="formErrors.name"
           label="Name"
+          :rules="[required()]"
       ></v-text-field>
       <v-text-field
           v-model="source.slug"
           :error-messages="formErrors.slug"
           label="Slug"
+          :rules="[required()]"
       ></v-text-field>
       <v-select
           v-model="source.fetcherType"
           :error-messages="formErrors.fetcherType"
           :items="fetcherTypes"
           label="Fetcher Type"
+          :rules="[required()]"
       ></v-select>
       <json-field
           compact
@@ -48,7 +53,8 @@
           v-model="source.parserType"
           :error-messages="formErrors.parserType"
           :items="parserTypes"
-          label="Fetcher Type"
+          label="Parser Type"
+          :rules="[required()]"
       ></v-select>
       <json-field
           compact
@@ -91,8 +97,38 @@
       >
         Save and create stream
       </v-btn>
+      <v-dialog
+        v-model="deleteDialog"
+        max-width="290"
+      >
+        <template v-slot:activator="{ props }">
+          <v-btn
+              class="float-right"
+              color="red"
+              v-bind="props"
+          >
+            Delete
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-title class="text-h5">
+            Are you sure?
+          </v-card-title>
+          <v-card-text>Delete {{ source.name }}? </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="green darken-1"
+              text
+              @click="deleteSourceAndRedirect()"
+            >
+              Yes
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-form>
-  </v-container>
+  </progress-container>
 </template>
 
 <script setup lang="ts">
@@ -100,6 +136,9 @@ import { defineProps, onMounted, computed, ref } from 'vue'
 import useSources from '@/composables/useSources'
 import JsonField from '@/components/JsonField.vue'
 import { scrollToTop } from '@/utils/pageNavigation'
+import ProgressContainer from '@/components/ProgressContainer.vue'
+import { required } from '@/validation'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   id: {
@@ -118,13 +157,18 @@ const {
   availableTags,
   getSource,
   updateSource,
+  deleteSource,
   getFetcherOptionsSchema,
   getParserOptionsSchema,
   getAvailableTags
 } = useSources()
 
+const pageIsLoading = ref(true)
+const deleteDialog = ref(false)
 const savedFetcherOptions = ref('')
 const savedParserOptions = ref('')
+
+const router = useRouter()
 
 const updateSavedOptions = () => {
   savedFetcherOptions.value = source.value.fetcherOptions
@@ -139,6 +183,7 @@ onMounted(async () => {
   await getSource(props.id)
 
   updateSavedOptions()
+  pageIsLoading.value = false
 })
 
 const formErrors = computed(() => {
@@ -159,8 +204,17 @@ const submit = async (event: any) => {
     return
   }
 
+  pageIsLoading.value = true
   await updateSource(event.submitter.id)
   updateSavedOptions()
+  pageIsLoading.value = false
+}
+
+const deleteSourceAndRedirect = async () => {
+  pageIsLoading.value = true
+  deleteDialog.value = false
+  await deleteSource(source.value.slug)
+  await router.push({ name: 'sources' })
 }
 
 const isValid = async () => {
