@@ -5,7 +5,7 @@
       </div>
   </v-container>
   <progress-container
-    :is-loading="pageIsLoading"
+    :is-loading="formIsLoading"
   >
     <v-form
         ref="form"
@@ -132,13 +132,13 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, computed, ref } from 'vue'
+import { defineProps, onMounted, ref } from 'vue'
 import useSources from '@/composables/useSources'
-import JsonField from '@/components/core/JsonField.vue'
-import { scrollToTop } from '@/utils/pageNavigation'
-import ProgressContainer from '@/components/core/ProgressContainer.vue'
+import useForm from '@/composables/useForm'
 import { required } from '@/validation'
 import { useRouter } from 'vue-router'
+import JsonField from '@/components/core/JsonField.vue'
+import ProgressContainer from '@/components/core/ProgressContainer.vue'
 
 const props = defineProps({
   id: {
@@ -163,7 +163,16 @@ const {
   getAvailableTags
 } = useSources()
 
-const pageIsLoading = ref(true)
+const {
+  form,
+  formErrors,
+  formIsLoading,
+  submit
+} = useForm(errors, async (event) => {
+  await updateSource(event.submitter.id)
+  updateSavedOptions()
+})
+
 const deleteDialog = ref(false)
 const savedFetcherOptions = ref('')
 const savedParserOptions = ref('')
@@ -175,7 +184,13 @@ const updateSavedOptions = () => {
   savedParserOptions.value = source.value.parserOptions
 }
 
-const form = ref(null)
+const deleteSourceAndRedirect = async () => {
+  formIsLoading.value = true
+  deleteDialog.value = false
+  await deleteSource(source.value.slug)
+  await router.push({ name: 'sources' })
+}
+
 onMounted(async () => {
   await getFetcherOptionsSchema()
   await getParserOptionsSchema()
@@ -183,45 +198,6 @@ onMounted(async () => {
   await getSource(props.id)
 
   updateSavedOptions()
-  pageIsLoading.value = false
+  formIsLoading.value = false
 })
-
-const formErrors = computed(() => {
-  const result: { [key: string ]: string} = {}
-  for (const error of errors.value) {
-    if (!error.field) {
-      result.nonFieldError = error.message
-    } else {
-      result[error.field] = error.message
-    }
-  }
-  return result
-})
-
-const submit = async (event: any) => {
-  if (!await isValid()) {
-    scrollToTop()
-    return
-  }
-
-  pageIsLoading.value = true
-  await updateSource(event.submitter.id)
-  updateSavedOptions()
-  pageIsLoading.value = false
-}
-
-const deleteSourceAndRedirect = async () => {
-  pageIsLoading.value = true
-  deleteDialog.value = false
-  await deleteSource(source.value.slug)
-  await router.push({ name: 'sources' })
-}
-
-const isValid = async () => {
-  if (form.value) {
-    const result = await form.value.validate()
-    return result.valid
-  }
-  return false
-}
 </script>

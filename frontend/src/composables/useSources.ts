@@ -74,9 +74,10 @@ export default function useSources () {
   }
 
   const handleRedirectsBySaveType = async (type: string) => {
-    // TODO redirect to slug
     if (type === 'save-and-create-stream') {
       await router.push({ name: 'home' })
+    } else {
+      await router.push({ name: 'edit-source', params: { id: source.value.slug } })
     }
   }
 

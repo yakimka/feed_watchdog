@@ -5,7 +5,7 @@
       </div>
   </v-container>
   <progress-container
-    :is-loading="pageIsLoading"
+    :is-loading="formIsLoading"
   >
     <v-form
         ref="form"
@@ -103,13 +103,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import useSources from '@/composables/useSources'
+import { required } from '@/validation'
+import useForm from '@/composables/useForm'
 import JsonField from '@/components/core/JsonField.vue'
 import SlugField from '@/components/core/SlugField.vue'
-import { scrollToTop } from '@/utils/pageNavigation'
 import ProgressContainer from '@/components/core/ProgressContainer.vue'
-import { required } from '@/validation'
 
 const {
   errors,
@@ -125,7 +125,16 @@ const {
   getAvailableTags
 } = useSources()
 
-const pageIsLoading = ref(true)
+const {
+  form,
+  formErrors,
+  formIsLoading,
+  submit
+} = useForm(errors, async (event) => {
+  await storeSource(event.submitter.id)
+  updateSavedOptions()
+})
+
 const savedFetcherOptions = ref('')
 const savedParserOptions = ref('')
 
@@ -140,40 +149,6 @@ onMounted(async () => {
   await getAvailableTags()
 
   updateSavedOptions()
-  pageIsLoading.value = false
+  formIsLoading.value = false
 })
-
-const form = ref(null)
-
-const formErrors = computed(() => {
-  const result: { [key: string ]: string} = {}
-  for (const error of errors.value) {
-    if (!error.field) {
-      result.nonFieldError = error.message
-    } else {
-      result[error.field] = error.message
-    }
-  }
-  return result
-})
-
-const submit = async (event: any) => {
-  if (!await isValid()) {
-    scrollToTop()
-    return
-  }
-
-  pageIsLoading.value = true
-  await storeSource(event.submitter.id)
-  updateSavedOptions()
-  pageIsLoading.value = false
-}
-
-const isValid = async () => {
-  if (form.value) {
-    const result = await form.value.validate()
-    return result.valid
-  }
-  return false
-}
 </script>
