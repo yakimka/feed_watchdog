@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '@/views/Home.vue'
-import CreateSourceForm from '@/components/CreateSourceForm.vue'
-import UpdateSourceForm from '@/components/UpdateSourceForm.vue'
-import ListSourceForm from '@/components/ListSourceForm.vue'
-import Form404 from '@/components/Form404.vue'
+import CreateSourceForm from '@/components/source/CreateSourceForm.vue'
+import UpdateSourceForm from '@/components/source/UpdateSourceForm.vue'
+import ListSourceForm from '@/components/source/ListSourceForm.vue'
+import Form404 from '@/components/admin/Form404.vue'
 
 export interface Breadcrumb {
   text: string

@@ -17,9 +17,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import AppBar from '@/components/AppBar.vue'
-import LeftSideBar from '@/components/LeftSideBar.vue'
-import Dialog from '@/components/Dialog.vue'
+import AppBar from '@/components/admin/AppBar.vue'
+import LeftSideBar from '@/components/admin/LeftSideBar.vue'
+import Dialog from '@/components/admin/Dialog.vue'
 import { Breadcrumb } from '@/router'
 
 export default defineComponent({

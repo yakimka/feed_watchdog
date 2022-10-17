@@ -123,7 +123,7 @@ import useSources from '@/composables/useSources'
 import { useRouter, useRoute, LocationQuery } from 'vue-router'
 import { scrollToTop } from '@/utils/pageNavigation'
 import { debounce } from '@/utils/debounce'
-import ProgressContainer from '@/components/ProgressContainer.vue'
+import ProgressContainer from '@/components/core/ProgressContainer.vue'
 
 const router = useRouter()
 const route = useRoute()

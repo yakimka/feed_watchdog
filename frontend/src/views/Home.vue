@@ -44,7 +44,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { email, maxTextLength, required } from '@/validation'
-import JsonField from '@/components/JsonField.vue'
+import JsonField from '@/components/core/JsonField.vue'
 
 export default defineComponent({
   components: { JsonField },

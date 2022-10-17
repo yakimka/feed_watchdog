@@ -134,9 +134,9 @@
 <script setup lang="ts">
 import { defineProps, onMounted, computed, ref } from 'vue'
 import useSources from '@/composables/useSources'
-import JsonField from '@/components/JsonField.vue'
+import JsonField from '@/components/core/JsonField.vue'
 import { scrollToTop } from '@/utils/pageNavigation'
-import ProgressContainer from '@/components/ProgressContainer.vue'
+import ProgressContainer from '@/components/core/ProgressContainer.vue'
 import { required } from '@/validation'
 import { useRouter } from 'vue-router'
 

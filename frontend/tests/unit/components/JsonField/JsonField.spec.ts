@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils'
-import JsonField from '@/components/JsonField.vue'
+import JsonField from '@/components/core/JsonField.vue'
 
 describe('JsonField.vue', () => {
   it('renders field name', () => {

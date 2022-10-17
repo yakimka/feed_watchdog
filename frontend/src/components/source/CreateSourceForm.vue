@@ -105,10 +105,10 @@
 <script setup lang="ts">
 import { onMounted, computed, ref } from 'vue'
 import useSources from '@/composables/useSources'
-import JsonField from '@/components/JsonField.vue'
-import SlugField from '@/components/SlugField.vue'
+import JsonField from '@/components/core/JsonField.vue'
+import SlugField from '@/components/core/SlugField.vue'
 import { scrollToTop } from '@/utils/pageNavigation'
-import ProgressContainer from '@/components/ProgressContainer.vue'
+import ProgressContainer from '@/components/core/ProgressContainer.vue'
 import { required } from '@/validation'
 
 const {
