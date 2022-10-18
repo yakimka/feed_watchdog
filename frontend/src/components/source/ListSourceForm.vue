@@ -1,28 +1,25 @@
 <template>
-  <v-container fluid>
-    <div class="text-h2 mb-5">
+  <list-component
+    v-model:pagination="pagination"
+    :total-pages="sources.pages"
+    :filters="true"
+    :is-loading="pageIsLoading"
+    @filtersInput="onFiltersInput"
+  >
+    <template v-slot:header>
       Sources
-    </div>
-  </v-container>
-  <v-container fluid>
-    <v-form
-      ref="form"
-      @input="onFiltersInput"
-    >
+    </template>
+
+    <template v-slot:filters>
       <v-row>
         <v-text-field
           v-model="filters.search"
           label="Search"
         ></v-text-field>
       </v-row>
-    </v-form>
-  </v-container>
+    </template>
 
-  <progress-container
-    :fluid="true"
-    :is-loading="pageIsLoading"
-  >
-    <v-table fixed-header>
+    <template v-slot:tableContent>
       <thead>
       <tr>
         <th class="text-left">Name</th>
@@ -94,27 +91,8 @@
         </td>
       </tr>
       </tbody>
-    </v-table>
-    <v-row>
-      <v-col cols="10">
-        <v-pagination
-          v-model="pagination.page"
-          :total-visible="10"
-          :length="sources.pages"
-          class="mt-5"
-        ></v-pagination>
-      </v-col>
-      <v-col cols="2">
-        <v-select
-          class="mt-5"
-          v-model="pagination.pageSize"
-          :items="[25, 50, 100]"
-          variant="plain"
-          label="Page Size"
-        ></v-select>
-      </v-col>
-    </v-row>
-  </progress-container>
+    </template>
+  </list-component>
 </template>
 
 <script lang="ts" setup>
@@ -123,7 +101,7 @@ import useSources from '@/composables/useSources'
 import { debounce } from '@/utils/debounce'
 import usePagination from '@/composables/usePagination'
 import useURL from '@/composables/useURL'
-import ProgressContainer from '@/components/core/ProgressContainer.vue'
+import ListComponent from '@/components/core/ListComponent.vue'
 
 const {
   sources,
@@ -149,7 +127,6 @@ const filters = reactive({
 })
 
 const onFiltersInput = debounce(async () => {
-  pagination.page = 1
   setQueryToURL(filters)
   await fetchSources()
 })
