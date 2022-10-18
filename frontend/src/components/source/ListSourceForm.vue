@@ -101,7 +101,7 @@ import useSources from '@/composables/useSources'
 import { debounce } from '@/utils/debounce'
 import usePagination from '@/composables/usePagination'
 import useURL from '@/composables/useURL'
-import ListComponent from '@/components/core/ListComponent.vue'
+import ListComponent from '@/components/core/AdminList.vue'
 
 const {
   sources,
