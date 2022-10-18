@@ -7,10 +7,11 @@
   <v-container fluid>
     <v-form
       ref="form"
+      @input="onFiltersInput"
     >
       <v-row>
         <v-text-field
-          v-model="filtersDebounced.search"
+          v-model="filters.search"
           label="Search"
         ></v-text-field>
       </v-row>
@@ -19,9 +20,8 @@
 
   <progress-container
     :fluid="true"
-    :is-loading="pageisLoading"
+    :is-loading="pageIsLoading"
   >
-
     <v-table fixed-header>
       <thead>
       <tr>
@@ -118,15 +118,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import useSources from '@/composables/useSources'
-import { useRouter, useRoute, LocationQuery } from 'vue-router'
-import { scrollToTop } from '@/utils/pageNavigation'
 import { debounce } from '@/utils/debounce'
+import usePagination from '@/composables/usePagination'
+import useURL from '@/composables/useURL'
 import ProgressContainer from '@/components/core/ProgressContainer.vue'
-
-const router = useRouter()
-const route = useRoute()
 
 const {
   sources,
@@ -134,23 +131,28 @@ const {
   deleteSource
 } = useSources()
 
+const fetchSources = async () => {
+  pageIsLoading.value = true
+  await getSources(filters.search, pagination.page, pagination.pageSize)
+  pageIsLoading.value = false
+}
+
+const { pagination } = usePagination(fetchSources)
+const { setQueryToURL, getParamsFromURL } = useURL()
+
 const buttonsLoading = reactive({} as {[key: string]: boolean})
 const deleteDialog = reactive({} as {[key: string]: boolean})
-const pageisLoading = ref(true)
+const pageIsLoading = ref(true)
 
-const pagination = reactive({
-  page: 1,
-  pageSize: 25
-})
-const filtersDebounced = reactive({
+const filters = reactive({
   search: ''
 })
 
-const fetchSources = async () => {
-  pageisLoading.value = true
-  await getSources(filtersDebounced.search, pagination.page, pagination.pageSize)
-  pageisLoading.value = false
-}
+const onFiltersInput = debounce(async () => {
+  pagination.page = 1
+  setQueryToURL(filters)
+  await fetchSources()
+})
 
 const deleteSourceAndRefreshList = async (id: string) => {
   buttonsLoading[id] = true
@@ -160,74 +162,15 @@ const deleteSourceAndRefreshList = async (id: string) => {
   await fetchSources()
 }
 
-const setQueryToURL = (params: object) => {
-  router.replace({
-    query: removeEmptyValues({
-      ...route.query,
-      ...params
-    }, Object.keys(params))
-  })
-}
-
-const getParamsFromURL = (): LocationQuery => {
-  return route.query
-}
-
-const removeEmptyValues = (obj: any, keys: string[] = []) => {
-  for (const propName in obj) {
-    if ((propName.length && keys.includes(propName)) && !obj[propName]) {
-      delete obj[propName]
-    }
-  }
-  return obj
-}
-
 const parseFiltersFromURL = () => {
   const params = getParamsFromURL()
   if (params.search) {
-    filtersDebounced.search = params.search as string
-  }
-  if (params.pageSize) {
-    pagination.pageSize = parseInt(params.pageSize as string)
-  }
-  if (params.page) {
-    pagination.page = parseInt(params.page as string)
+    filters.search = params.search as string
   }
 }
-
-let initialized = false
-watch(
-  () => pagination,
-  async () => {
-    if (initialized) {
-      setQueryToURL(pagination)
-      await fetchSources()
-    }
-  },
-  { deep: true }
-)
-watch(
-  () => filtersDebounced,
-  debounce(async () => {
-    if (initialized) {
-      pagination.page = 1
-      setQueryToURL({ ...pagination, ...filtersDebounced })
-      await fetchSources()
-    }
-  }),
-  { deep: true }
-)
-
-watch(
-  () => pagination.page,
-  async () => {
-    scrollToTop()
-  }
-)
 
 onMounted(async () => {
   parseFiltersFromURL()
   await fetchSources()
-  initialized = true
 })
 </script>
