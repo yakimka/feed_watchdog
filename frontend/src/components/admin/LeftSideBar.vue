@@ -29,6 +29,16 @@
           ></v-btn>
         </template>
       </v-list-item>
+      <v-list-item prepend-icon="mdi-broadcast" title="Streams" :to="{name: 'streams'}">
+        <template v-slot:append>
+          <v-btn
+            icon="mdi-plus"
+            variant="text"
+            title="Add Stream"
+            :to="{name: 'create-stream'}"
+          ></v-btn>
+        </template>
+      </v-list-item>
     </v-list>
     </v-card>
   </v-navigation-drawer>

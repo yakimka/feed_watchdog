@@ -6,6 +6,9 @@ import ListSourceForm from '@/components/source/ListSourceForm.vue'
 import CreateReceiverForm from '@/components/receiver/CreateReceiverForm.vue'
 import UpdateReceiverForm from '@/components/receiver/UpdateReceiverForm.vue'
 import ListReceiverForm from '@/components/receiver/ListReceiverForm.vue'
+import CreateStreamForm from '@/components/stream/CreateStreamForm.vue'
+import UpdateStreamForm from '@/components/stream/UpdateStreamForm.vue'
+import ListStreamForm from '@/components/stream/ListStreamForm.vue'
 import Form404 from '@/components/admin/Form404.vue'
 
 export interface Breadcrumb {
@@ -155,6 +158,66 @@ const routes: Array<RouteRecordRaw> = [
       ]
     },
     component: UpdateReceiverForm
+  },
+  {
+    path: '/streams',
+    name: 'streams',
+    meta: {
+      title: 'Streams',
+      breadcrumbs: [
+        {
+          text: 'Home',
+          to: { name: 'home' }
+        },
+        {
+          text: 'Streams'
+        }
+      ]
+    },
+    component: ListStreamForm
+  },
+  {
+    path: '/streams/create',
+    name: 'create-stream',
+    meta: {
+      title: 'Create Stream',
+      breadcrumbs: [
+        {
+          text: 'Home',
+          to: { name: 'home' }
+        },
+        {
+          text: 'Streams',
+          to: { name: 'streams' }
+        },
+        {
+          text: 'Create'
+        }
+      ]
+    },
+    component: CreateStreamForm
+  },
+  {
+    path: '/streams/:id/edit',
+    name: 'edit-stream',
+    props: true,
+    meta: {
+      title: 'Edit Stream',
+      breadcrumbs: [
+        {
+          text: 'Home',
+          to: { name: 'home' }
+        },
+        {
+          text: 'Streams',
+          to: { name: 'streams' }
+        },
+        {
+          text: 'Edit'
+        }
+      ]
+    },
+    component: UpdateStreamForm
   },
   {
     path: '/:pathMatch(.*)*',
