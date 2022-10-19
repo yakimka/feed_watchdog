@@ -1,26 +1,11 @@
 <template>
-  <v-container>
-      <div class="text-h2 mb-5">
-        Create new Source
-      </div>
-  </v-container>
-  <progress-container
+  <admin-model-edit
+    :model-name="source.name || 'Source'"
     :is-loading="formIsLoading"
+    :error="formErrors.nonFieldError"
+    @submit="submit"
   >
-    <v-form
-        ref="form"
-        lazy-validation
-        @submit.prevent="submit($event)"
-    >
-      <v-alert v-if="formErrors.nonFieldError"
-        class="mb-5"
-        icon="mdi-fire"
-        title="Error"
-        variant="outlined"
-        type="error"
-      >
-        {{ formErrors.nonFieldError }}
-      </v-alert>
+    <template v-slot:formContent>
       <v-text-field
           v-model="source.name"
           :error-messages="formErrors.name"
@@ -81,15 +66,9 @@
         multiple
         chips
       ></v-combobox>
+    </template>
 
-      <v-btn
-          id="save"
-          class="mr-4"
-          color="primary"
-          type="submit"
-      >
-        Save
-      </v-btn>
+    <template v-slot:appendButton>
       <v-btn
           id="save-and-create-stream"
           class="mr-4"
@@ -98,8 +77,8 @@
       >
         Save and create stream
       </v-btn>
-    </v-form>
-  </progress-container>
+    </template>
+  </admin-model-edit>
 </template>
 
 <script setup lang="ts">
@@ -109,7 +88,7 @@ import { required } from '@/validation'
 import useForm from '@/composables/useForm'
 import JsonField from '@/components/core/JsonField.vue'
 import SlugField from '@/components/core/SlugField.vue'
-import ProgressContainer from '@/components/core/ProgressContainer.vue'
+import AdminModelEdit from '@/components/core/AdminModelEdit.vue'
 
 const {
   errors,
@@ -126,7 +105,6 @@ const {
 } = useSources()
 
 const {
-  form,
   formErrors,
   formIsLoading,
   submit
