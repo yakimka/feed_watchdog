@@ -2,7 +2,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import DuplicateKeyError
 
 from api.exceptions import ValueExistsError
-from domain.interfaces import IStreamRepository
+from domain.interfaces import IStreamRepository, StreamQuery
 from domain.models import Stream
 
 
@@ -10,14 +10,26 @@ class MongoStreamRepository(IStreamRepository):
     def __init__(self, db: AsyncIOMotorClient) -> None:
         self.db = db
 
-    async def find(self) -> list[Stream]:
-        cursor = self.db.streams.find({}).sort("name")
+    async def find(self, query: StreamQuery = StreamQuery()) -> list[Stream]:
+        cursor = (
+            self.db.streams.find(self._make_find_query(query))
+            .sort(query.sort_by)
+            .skip((query.page - 1) * query.page_size)
+            .limit(query.page_size)
+        )
         return [
-            Stream.parse_obj(item) for item in await cursor.to_list(length=100)
+            Stream.parse_obj(item)
+            for item in await cursor.to_list(query.page_size)
         ]
 
-    async def get_count(self) -> int:
-        return await self.db.streams.count_documents({})
+    @staticmethod
+    def _make_find_query(query: StreamQuery) -> dict:
+        return {"$text": {"$search": query.search}} if query.search else {}
+
+    async def get_count(self, query: StreamQuery = StreamQuery()) -> int:
+        return await self.db.streams.count_documents(
+            self._make_find_query(query)
+        )
 
     async def add(self, stream: Stream) -> str:
         try:

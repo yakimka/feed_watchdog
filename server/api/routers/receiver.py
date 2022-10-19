@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel
 
-from api.deps.pagination import get_pagination_params, Pagination
+from api.deps.pagination import Pagination, get_pagination_params
 from api.deps.receiver import get_by_slug, get_receiver_repo
 from api.routers.core import ListResponse
 from domain.interfaces import IReceiverRepository, ReceiverQuery
@@ -15,6 +15,7 @@ class Receiver(BaseModel):
     slug: str
     type: str
     options: dict
+    options_allowed_to_override: list[str] = []
 
     def to_domain(self) -> ReceiverModel:
         return ReceiverModel.parse_obj(self.dict())

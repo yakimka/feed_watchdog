@@ -21,6 +21,7 @@ class Receiver(BaseModel):
     slug: str
     type: str
     options: dict
+    options_allowed_to_override: list[str]
 
 
 class Modifier(BaseModel):
@@ -29,6 +30,7 @@ class Modifier(BaseModel):
 
 
 class Stream(BaseModel):
+    name: str
     source: Source
     receiver: Receiver
     slug: str

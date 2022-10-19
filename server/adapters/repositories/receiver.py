@@ -10,7 +10,9 @@ class MongoReceiverRepository(IReceiverRepository):
     def __init__(self, db: AsyncIOMotorClient) -> None:
         self.db = db
 
-    async def find(self, query: ReceiverQuery = ReceiverQuery()) -> list[Receiver]:
+    async def find(
+        self, query: ReceiverQuery = ReceiverQuery()
+    ) -> list[Receiver]:
         cursor = (
             self.db.receivers.find(self._make_find_query(query))
             .sort(query.sort_by)

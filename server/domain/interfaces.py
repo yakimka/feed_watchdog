@@ -21,6 +21,11 @@ class ReceiverQuery(PaginationQuery):
     sort_by: str = "name"
 
 
+class StreamQuery(PaginationQuery):
+    search: str = ""
+    sort_by: str = "name"
+
+
 class ISourceRepository(abc.ABC):
     @abstractmethod
     async def find(self, query: SourceQuery = SourceQuery()) -> list[Source]:
@@ -49,7 +54,9 @@ class ISourceRepository(abc.ABC):
 
 class IReceiverRepository(abc.ABC):
     @abstractmethod
-    async def find(self, query: ReceiverQuery = ReceiverQuery()) -> list[Receiver]:
+    async def find(
+        self, query: ReceiverQuery = ReceiverQuery()
+    ) -> list[Receiver]:
         pass
 
     @abstractmethod
@@ -75,11 +82,11 @@ class IReceiverRepository(abc.ABC):
 
 class IStreamRepository(abc.ABC):
     @abstractmethod
-    async def find(self) -> list[Stream]:
+    async def find(self, query: StreamQuery = StreamQuery()) -> list[Stream]:
         pass
 
     @abstractmethod
-    async def get_count(self) -> int:
+    async def get_count(self, query: StreamQuery = StreamQuery()) -> int:
         pass
 
     @abstractmethod

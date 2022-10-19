@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel
 
+from api.deps.pagination import Pagination, get_pagination_params
 from api.deps.stream import get_by_slug, get_stream_repo
 from api.routers.core import ListResponse
-from domain.interfaces import IStreamRepository
+from domain.interfaces import IStreamRepository, StreamQuery
 from domain.models import Stream as StreamModel
 
 router = APIRouter()
@@ -14,24 +15,32 @@ class Modifier(BaseModel):
     options: dict
 
 
-class Source(BaseModel):
+class SourceInStream(BaseModel):
     name: str
     slug: str
 
 
-class Receiver(BaseModel):
+class ReceiverInStream(BaseModel):
     name: str
     slug: str
 
 
-class Stream(BaseModel):
-    stream: Source
-    receiver: Receiver
+class StreamForCreate(BaseModel):
+    source: SourceInStream
+    receiver: ReceiverInStream
     slug: str
     squash: bool
-    receiver_options_override: dict
+    receiver_options_override: dict = {}
     message_template: str
     modifiers: list[Modifier] = []
+
+    def to_domain(self) -> StreamModel:
+        name = f"{self.source.name} -> {self.receiver.name}"
+        return StreamModel.parse_obj(self.dict() | {"name": name})
+
+
+class Stream(StreamForCreate):
+    name: str
 
     def to_domain(self) -> StreamModel:
         return StreamModel.parse_obj(self.dict())
@@ -44,17 +53,25 @@ class Streams(ListResponse):
 @router.get("/streams", response_model=Streams)
 async def find(
     streams: IStreamRepository = Depends(get_stream_repo),
+    q: str = "",
+    pagination: Pagination = Depends(get_pagination_params),
 ) -> ListResponse:
+    query = StreamQuery(
+        search=q,
+        page=pagination.page,
+        page_size=pagination.page_size,
+    )
     return ListResponse(
-        count=await streams.get_count(),
+        count=await streams.get_count(query),
         page=1,
-        results=await streams.find(),
+        results=await streams.find(query),
+        page_size=pagination.page_size,
     )
 
 
 @router.post("/streams", response_model=Stream, status_code=201)
 async def add(
-    stream: Stream = Body(),
+    stream: StreamForCreate = Body(),
     streams: IStreamRepository = Depends(get_stream_repo),
 ) -> StreamModel:
     await streams.add(stream.to_domain())
@@ -67,7 +84,7 @@ async def add(
 @router.put("/streams/{slug}", response_model=Stream, status_code=201)
 async def update(
     slug: str,
-    stream: Stream = Body(),
+    stream: StreamForCreate = Body(),
     streams: IStreamRepository = Depends(get_stream_repo),
 ) -> StreamModel:
     updated = await streams.update(slug, stream.to_domain())
