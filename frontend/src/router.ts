@@ -3,6 +3,9 @@ import Home from '@/views/Home.vue'
 import CreateSourceForm from '@/components/source/CreateSourceForm.vue'
 import UpdateSourceForm from '@/components/source/UpdateSourceForm.vue'
 import ListSourceForm from '@/components/source/ListSourceForm.vue'
+import CreateReceiverForm from '@/components/receiver/CreateReceiverForm.vue'
+import UpdateReceiverForm from '@/components/receiver/UpdateReceiverForm.vue'
+import ListReceiverForm from '@/components/receiver/ListReceiverForm.vue'
 import Form404 from '@/components/admin/Form404.vue'
 
 export interface Breadcrumb {
@@ -92,6 +95,66 @@ const routes: Array<RouteRecordRaw> = [
       ]
     },
     component: UpdateSourceForm
+  },
+  {
+    path: '/receivers',
+    name: 'receivers',
+    meta: {
+      title: 'Receivers',
+      breadcrumbs: [
+        {
+          text: 'Home',
+          to: { name: 'home' }
+        },
+        {
+          text: 'Receivers'
+        }
+      ]
+    },
+    component: ListReceiverForm
+  },
+  {
+    path: '/receivers/create',
+    name: 'create-receiver',
+    meta: {
+      title: 'Create Receiver',
+      breadcrumbs: [
+        {
+          text: 'Home',
+          to: { name: 'home' }
+        },
+        {
+          text: 'Receivers',
+          to: { name: 'receivers' }
+        },
+        {
+          text: 'Create'
+        }
+      ]
+    },
+    component: CreateReceiverForm
+  },
+  {
+    path: '/receivers/:id/edit',
+    name: 'edit-receiver',
+    props: true,
+    meta: {
+      title: 'Edit Receiver',
+      breadcrumbs: [
+        {
+          text: 'Home',
+          to: { name: 'home' }
+        },
+        {
+          text: 'Receivers',
+          to: { name: 'receivers' }
+        },
+        {
+          text: 'Edit'
+        }
+      ]
+    },
+    component: UpdateReceiverForm
   },
   {
     path: '/:pathMatch(.*)*',

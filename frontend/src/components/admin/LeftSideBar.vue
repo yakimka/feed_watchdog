@@ -14,8 +14,18 @@
           <v-btn
             icon="mdi-plus"
             variant="text"
-            title="Add source"
+            title="Add Source"
             :to="{name: 'create-source'}"
+          ></v-btn>
+        </template>
+      </v-list-item>
+      <v-list-item prepend-icon="mdi-send" title="Receivers" :to="{name: 'receivers'}">
+        <template v-slot:append>
+          <v-btn
+            icon="mdi-plus"
+            variant="text"
+            title="Add Receiver"
+            :to="{name: 'create-receiver'}"
           ></v-btn>
         </template>
       </v-list-item>
@@ -26,29 +36,4 @@
 
 <script lang="ts" setup>
 import { navigation } from '@/stores/navigation'
-</script>
-
-<script lang="ts">
-export default {
-  data: () => ({
-    items: [
-      {
-        title: 'Foo',
-        value: 'foo'
-      },
-      {
-        title: 'Bar',
-        value: 'bar'
-      },
-      {
-        title: 'Fizz',
-        value: 'fizz'
-      },
-      {
-        title: 'Buzz',
-        value: 'buzz'
-      }
-    ]
-  })
-}
 </script>

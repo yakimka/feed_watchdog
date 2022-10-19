@@ -1,3 +1,5 @@
+import { ListResource } from '@/types/ListResource'
+
 export interface Source {
   name: string
   slug: string
@@ -9,10 +11,6 @@ export interface Source {
   tags: string[]
 }
 
-export interface SourceList {
-  count: number
-  page: number
-  pageSize: number
-  pages: number
+export interface SourceList extends ListResource{
   results: Source[]
 }
