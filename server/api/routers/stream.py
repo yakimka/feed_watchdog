@@ -26,17 +26,16 @@ class ReceiverInStream(BaseModel):
 
 
 class StreamForCreate(BaseModel):
-    source: SourceInStream
-    receiver: ReceiverInStream
     slug: str
+    source_slug: str
+    receiver_slug: str
     squash: bool
     receiver_options_override: dict = {}
     message_template: str
     modifiers: list[Modifier] = []
 
     def to_domain(self) -> StreamModel:
-        name = f"{self.source.name} -> {self.receiver.name}"
-        return StreamModel.parse_obj(self.dict() | {"name": name})
+        return StreamModel.parse_obj(self.dict())
 
 
 class Stream(StreamForCreate):

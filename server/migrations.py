@@ -12,7 +12,6 @@ collections = {
     ],
     "streams": [
         mongodex.Index({"slug": ASCENDING}, unique=True),
-        mongodex.Index({"name": TEXT}, weights={}),
     ],
 }
 
