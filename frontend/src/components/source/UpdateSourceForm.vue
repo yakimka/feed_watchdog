@@ -1,26 +1,13 @@
 <template>
-  <v-container>
-      <div class="text-h2 mb-5">
-        Edit {{ source.name || 'Source' }}
-      </div>
-  </v-container>
-  <progress-container
+  <admin-model-edit
+    :model-name="source.name || 'Source'"
     :is-loading="formIsLoading"
+    :has-delete="true"
+    :error="formErrors.nonFieldError"
+    @submit="submit"
+    @delete="deleteSourceAndRedirect"
   >
-    <v-form
-        ref="form"
-        lazy-validation
-        @submit.prevent="submit($event)"
-    >
-      <v-alert v-if="formErrors.nonFieldError"
-        class="mb-5"
-        icon="mdi-fire"
-        title="Error"
-        variant="outlined"
-        type="error"
-      >
-        {{ formErrors.nonFieldError }}
-      </v-alert>
+    <template v-slot:formContent>
       <v-text-field
           v-model="source.name"
           :error-messages="formErrors.name"
@@ -80,15 +67,8 @@
         multiple
         chips
       ></v-combobox>
-
-      <v-btn
-          id="save"
-          class="mr-4"
-          color="primary"
-          type="submit"
-      >
-        Save
-      </v-btn>
+    </template>
+    <template v-slot:appendButton>
       <v-btn
           id="save-and-create-stream"
           class="mr-4"
@@ -97,38 +77,8 @@
       >
         Save and create stream
       </v-btn>
-      <v-dialog
-        v-model="deleteDialog"
-        max-width="290"
-      >
-        <template v-slot:activator="{ props }">
-          <v-btn
-              class="float-right"
-              color="red"
-              v-bind="props"
-          >
-            Delete
-          </v-btn>
-        </template>
-        <v-card>
-          <v-card-title class="text-h5">
-            Are you sure?
-          </v-card-title>
-          <v-card-text>Delete {{ source.name }}? </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="deleteSourceAndRedirect()"
-            >
-              Yes
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-form>
-  </progress-container>
+    </template>
+  </admin-model-edit>
 </template>
 
 <script setup lang="ts">
@@ -138,7 +88,7 @@ import useForm from '@/composables/useForm'
 import { required } from '@/validation'
 import { useRouter } from 'vue-router'
 import JsonField from '@/components/core/JsonField.vue'
-import ProgressContainer from '@/components/core/ProgressContainer.vue'
+import AdminModelEdit from '@/components/core/AdminModelEdit.vue'
 
 const props = defineProps({
   id: {
@@ -164,7 +114,6 @@ const {
 } = useSources()
 
 const {
-  form,
   formErrors,
   formIsLoading,
   submit
@@ -173,7 +122,6 @@ const {
   updateSavedOptions()
 })
 
-const deleteDialog = ref(false)
 const savedFetcherOptions = ref('')
 const savedParserOptions = ref('')
 
@@ -186,7 +134,6 @@ const updateSavedOptions = () => {
 
 const deleteSourceAndRedirect = async () => {
   formIsLoading.value = true
-  deleteDialog.value = false
   await deleteSource(source.value.slug)
   await router.push({ name: 'sources' })
 }

@@ -4,7 +4,6 @@ import Error from '@/types/error'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export default function useForm (errors: Ref<Error[]>, onSubmit: (event: any) => Promise<void> = async () => {}) {
-  const form = ref(null as any)
   const formIsLoading = ref(true)
 
   const formErrors = computed(() => {
@@ -19,30 +18,29 @@ export default function useForm (errors: Ref<Error[]>, onSubmit: (event: any) =>
     return result
   })
 
-  const submit = async (event: any) => {
-    if (!await isValid()) {
+  const submit = async (event: any, formRef: any) => {
+    if (!await isValid(formRef)) {
       scrollToTop()
       return
     }
 
     formIsLoading.value = true
     errors.value = []
-    await form.value.resetValidation()
+    await formRef.value.resetValidation()
     await onSubmit(event)
     formIsLoading.value = false
     scrollToTop()
   }
 
-  const isValid = async () => {
-    if (form.value) {
-      const result = await form.value.validate()
+  const isValid = async (formRef: any) => {
+    if (formRef.value) {
+      const result = await formRef.value.validate()
       return result.valid
     }
     return false
   }
 
   return {
-    form,
     formErrors,
     formIsLoading,
     submit
