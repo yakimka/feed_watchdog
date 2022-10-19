@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel
 
+from api.deps.pagination import get_pagination_params, Pagination
 from api.deps.receiver import get_by_slug, get_receiver_repo
 from api.routers.core import ListResponse
-from domain.interfaces import IReceiverRepository
+from domain.interfaces import IReceiverRepository, ReceiverQuery
 from domain.models import Receiver as ReceiverModel
 
 router = APIRouter()
@@ -26,11 +27,19 @@ class Receivers(ListResponse):
 @router.get("/receivers", response_model=Receivers)
 async def find(
     receivers: IReceiverRepository = Depends(get_receiver_repo),
+    q: str = "",
+    pagination: Pagination = Depends(get_pagination_params),
 ) -> ListResponse:
+    query = ReceiverQuery(
+        search=q,
+        page=pagination.page,
+        page_size=pagination.page_size,
+    )
     return ListResponse(
-        count=await receivers.get_count(),
+        count=await receivers.get_count(query),
         page=1,
-        results=await receivers.find(),
+        results=await receivers.find(query),
+        page_size=pagination.page_size,
     )
 
 

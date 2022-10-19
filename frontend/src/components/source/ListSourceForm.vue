@@ -48,7 +48,7 @@
             {{ tag }}
           </v-chip>
         </td>
-        <td>
+        <td class="text-right">
           <v-btn
             :loading="buttonsLoading[source.slug]"
             :disabled="buttonsLoading[source.slug]"

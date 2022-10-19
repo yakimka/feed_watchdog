@@ -2,7 +2,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import DuplicateKeyError
 
 from api.exceptions import ValueExistsError
-from domain.interfaces import IReceiverRepository
+from domain.interfaces import IReceiverRepository, ReceiverQuery
 from domain.models import Receiver
 
 
@@ -10,15 +10,26 @@ class MongoReceiverRepository(IReceiverRepository):
     def __init__(self, db: AsyncIOMotorClient) -> None:
         self.db = db
 
-    async def find(self) -> list[Receiver]:
-        cursor = self.db.receivers.find({}).sort("name")
+    async def find(self, query: ReceiverQuery = ReceiverQuery()) -> list[Receiver]:
+        cursor = (
+            self.db.receivers.find(self._make_find_query(query))
+            .sort(query.sort_by)
+            .skip((query.page - 1) * query.page_size)
+            .limit(query.page_size)
+        )
         return [
             Receiver.parse_obj(item)
-            for item in await cursor.to_list(length=100)
+            for item in await cursor.to_list(query.page_size)
         ]
 
-    async def get_count(self) -> int:
-        return await self.db.receivers.count_documents({})
+    @staticmethod
+    def _make_find_query(query: ReceiverQuery) -> dict:
+        return {"$text": {"$search": query.search}} if query.search else {}
+
+    async def get_count(self, query: ReceiverQuery = ReceiverQuery()) -> int:
+        return await self.db.receivers.count_documents(
+            self._make_find_query(query)
+        )
 
     async def add(self, receiver: Receiver) -> str:
         try:

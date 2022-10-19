@@ -6,10 +6,18 @@ from pydantic import BaseModel
 from domain.models import Receiver, Source, Stream
 
 
-class SourceQuery(BaseModel):
-    search: str = ""
+class PaginationQuery(BaseModel):
     page: int = 1
     page_size: int = 100
+
+
+class SourceQuery(PaginationQuery):
+    search: str = ""
+    sort_by: str = "name"
+
+
+class ReceiverQuery(PaginationQuery):
+    search: str = ""
     sort_by: str = "name"
 
 
@@ -41,11 +49,11 @@ class ISourceRepository(abc.ABC):
 
 class IReceiverRepository(abc.ABC):
     @abstractmethod
-    async def find(self) -> list[Receiver]:
+    async def find(self, query: ReceiverQuery = ReceiverQuery()) -> list[Receiver]:
         pass
 
     @abstractmethod
-    async def get_count(self) -> int:
+    async def get_count(self, query: ReceiverQuery = ReceiverQuery()) -> int:
         pass
 
     @abstractmethod

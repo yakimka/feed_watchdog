@@ -23,7 +23,8 @@ class MongoSourceRepository(ISourceRepository):
             for item in await cursor.to_list(query.page_size)
         ]
 
-    def _make_find_query(self, query: SourceQuery) -> dict:
+    @staticmethod
+    def _make_find_query(query: SourceQuery) -> dict:
         return {"$text": {"$search": query.search}} if query.search else {}
 
     async def get_count(self, query: SourceQuery = SourceQuery()) -> int:

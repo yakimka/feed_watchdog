@@ -6,6 +6,10 @@ collections = {
         mongodex.Index({"slug": ASCENDING}, unique=True),
         mongodex.Index({"name": TEXT}, weights={}),
     ],
+    "receivers": [
+        mongodex.Index({"slug": ASCENDING}, unique=True),
+        mongodex.Index({"name": TEXT}, weights={}),
+    ],
 }
 
 

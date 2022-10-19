@@ -106,7 +106,7 @@ export default function useReceivers () {
   }
 
   const getReceiverOptionsSchema = async () => {
-    const response = await axios.get('/processors/config/fetchers')
+    const response = await axios.get('/processors/config/receivers')
     receiverOptionsSchema.value = response.data
 
     receiverTypes.value = []
