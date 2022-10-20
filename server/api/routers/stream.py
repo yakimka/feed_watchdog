@@ -39,8 +39,6 @@ class StreamForCreate(BaseModel):
 
 
 class Stream(StreamForCreate):
-    name: str
-
     def to_domain(self) -> StreamModel:
         return StreamModel.parse_obj(self.dict())
 
