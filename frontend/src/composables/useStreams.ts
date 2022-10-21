@@ -1,9 +1,13 @@
-import { ref } from 'vue'
+import {reactive, ref, watch} from 'vue'
 import { StreamList, Stream } from '@/types/stream'
 import Error from '@/types/error'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { parseResponseErrors, handle404 } from '@/errors'
+import {Source} from "@/types/source";
+import {Receiver} from "@/types/receiver";
+import useSources from "@/composables/useSources";
+import {debounce} from "@/utils/debounce";
 
 export default function useStreams () {
   const errors = ref<Error[]>([])
@@ -17,6 +21,22 @@ export default function useStreams () {
   const stream = ref<Stream>({} as Stream)
   const streamTypes = ref<string[]>([])
   const modifierOptionsSchema = ref<object>({})
+
+  const sourceSlugData = reactive({
+    search: '',
+    items: [] as Source[],
+    isLoading: false,
+    cache: {} as Record<string, Source[]>,
+    focused: false
+  })
+  const receiverSlugData = reactive({
+    search: '',
+    items: [] as Receiver[],
+    isLoading: false,
+    cache: {} as Record<string, Receiver[]>,
+    focused: false
+  })
+  const { sources, getSources } = useSources()
 
   const router = useRouter()
 
@@ -127,17 +147,82 @@ export default function useStreams () {
     }
   }
 
+  const search = async (type: string, value = '') => {
+    let data
+    if (type === 'source') {
+      data = sourceSlugData
+    } else {
+      data = receiverSlugData
+    }
+    if (value in sourceSlugData.cache) {
+      data.items = data.cache[value]
+      console.log(456)
+      return
+    }
+
+    data.isLoading = true
+    await getSources(value, 1, 10)
+    data.items = sources.value.results
+    data.cache[value] = sources.value.results
+    data.isLoading = false
+  }
+
+  const searchSource = async (value = '') => {
+    await search('source', value)
+  }
+
+  const searchReceiver = async (value = '') => {
+    await search('receiver', value)
+  }
+
+  const setFocus = async (type: string, value: boolean) => {
+    let data
+    if (type === 'source') {
+      data = sourceSlugData
+    } else {
+      data = receiverSlugData
+    }
+    data.focused = value
+  }
+
+  watch(
+    () => sourceSlugData.search,
+    debounce(async (value: string) => {
+      // this fucking autocomplete component is so fucking stupid
+      // it set the value of search to empty string when it loses focus,
+      // so we need to check if it's focused before sending the request
+      if (value === '' && !sourceSlugData.focused) {
+        return
+      }
+      await searchSource(value)
+    })
+  )
+  watch(
+    () => receiverSlugData.search,
+    debounce(async (value: string) => {
+      if (value === '' && !receiverSlugData.focused) {
+        return
+      }
+      await searchSource(value)
+    })
+  )
+
   return {
     errors,
     streams,
     stream,
     streamTypes,
     modifierOptionsSchema,
+    sourceSlugData,
+    receiverSlugData,
     getStream,
     getStreams,
     storeStream,
     updateStream,
     deleteStream,
-    getModifierOptionsSchema
+    getModifierOptionsSchema,
+    searchSource,
+    searchReceiver,
+    setFocus
   }
 }
