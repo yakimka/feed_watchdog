@@ -19,7 +19,15 @@ export default function useStreams () {
     pages: 0,
     results: []
   })
-  const stream = ref<Stream>({} as Stream)
+  const stream = ref<Stream>({
+    slug: '',
+    sourceSlug: '',
+    receiverSlug: '',
+    squash: false,
+    receiverOptionsOverride: '',
+    messageTemplate: '',
+    modifiers: []
+  })
   const streamTypes = ref<string[]>([])
   const modifierOptionsSchema = ref<object>({})
 

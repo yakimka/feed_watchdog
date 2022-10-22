@@ -14,7 +14,16 @@ export default function useSources () {
     pages: 0,
     results: []
   })
-  const source = ref<Source>({} as Source)
+  const source = ref<Source>({
+    name: '',
+    slug: '',
+    fetcherType: '',
+    fetcherOptions: '',
+    parserType: '',
+    parserOptions: '',
+    description: '',
+    tags: []
+  })
   const fetcherTypes = ref<string[]>([])
   const fetcherOptionsSchema = ref<object>({})
   const parserTypes = ref<string[]>([])
