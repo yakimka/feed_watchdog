@@ -1,13 +1,14 @@
-import {reactive, ref, watch} from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { StreamList, Stream } from '@/types/stream'
 import Error from '@/types/error'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { parseResponseErrors, handle404 } from '@/errors'
-import {Source} from "@/types/source";
-import {Receiver} from "@/types/receiver";
-import useSources from "@/composables/useSources";
-import {debounce} from "@/utils/debounce";
+import { Source } from '@/types/source'
+import { Receiver } from '@/types/receiver'
+import useSources from '@/composables/useSources'
+import useReceivers from '@/composables/useReceivers'
+import { debounce } from '@/utils/debounce'
 
 export default function useStreams () {
   const errors = ref<Error[]>([])
@@ -37,6 +38,7 @@ export default function useStreams () {
     focused: false
   })
   const { sources, getSources } = useSources()
+  const { receivers, getReceivers } = useReceivers()
 
   const router = useRouter()
 
@@ -148,22 +150,25 @@ export default function useStreams () {
   }
 
   const search = async (type: string, value = '') => {
-    let data
+    let data, items, func
     if (type === 'source') {
       data = sourceSlugData
+      items = sources
+      func = getSources
     } else {
       data = receiverSlugData
-    }
-    if (value in sourceSlugData.cache) {
-      data.items = data.cache[value]
-      console.log(456)
-      return
+      items = receivers
+      func = getReceivers
     }
 
+    if (value in data.cache) {
+      data.items = data.cache[value]
+      return
+    }
     data.isLoading = true
-    await getSources(value, 1, 10)
-    data.items = sources.value.results
-    data.cache[value] = sources.value.results
+    await func(value, 1, 10)
+    data.items = items.value.results
+    data.cache[value] = items.value.results
     data.isLoading = false
   }
 
@@ -203,7 +208,7 @@ export default function useStreams () {
       if (value === '' && !receiverSlugData.focused) {
         return
       }
-      await searchSource(value)
+      await searchReceiver(value)
     })
   )
 
