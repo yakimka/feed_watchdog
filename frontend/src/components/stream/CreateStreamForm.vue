@@ -63,6 +63,8 @@
         v-model="stream.messageTemplate"
         :error-messages="formErrors.messageTemplate"
       ></v-textarea>
+      <modifiers-field
+      ></modifiers-field>
     </template>
   </admin-model-edit>
 </template>
@@ -75,6 +77,7 @@ import useForm from '@/composables/useForm'
 import JsonField from '@/components/core/JsonField.vue'
 import SlugField from '@/components/core/SlugField.vue'
 import AdminModelEdit from '@/components/core/AdminModelEdit.vue'
+import ModifiersField from '@/components/stream/ModifiersField.vue'
 
 const {
   errors,
@@ -98,11 +101,9 @@ const {
 })
 
 const savedReceiverOptionsOverride = ref('')
-const savedParserOptions = ref('')
 
 const updateSavedOptions = () => {
   savedReceiverOptionsOverride.value = stream.value.receiverOptionsOverride
-  savedParserOptions.value = stream.value.parserOptions
 }
 
 const fieldForSlugFollowing = computed(() => {

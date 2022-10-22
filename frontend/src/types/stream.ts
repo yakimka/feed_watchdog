@@ -2,7 +2,7 @@ import { ListResource } from '@/types/ListResource'
 
 export interface Modifier {
   type: string
-  options: object
+  options: string
 }
 
 export interface Stream {
