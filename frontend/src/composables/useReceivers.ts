@@ -14,7 +14,13 @@ export default function useReceivers () {
     pages: 0,
     results: []
   })
-  const receiver = ref<Receiver>({} as Receiver)
+  const receiver = ref<Receiver>({
+    name: '',
+    slug: '',
+    type: '',
+    options: '',
+    optionsAllowedToOverride: []
+  })
   const receiverTypes = ref<string[]>([])
   const receiverOptionsSchema = ref<object>({})
 
@@ -42,7 +48,8 @@ export default function useReceivers () {
         name: item.name,
         slug: item.slug,
         type: item.type,
-        options: JSON.stringify(item.options)
+        options: JSON.stringify(item.options),
+        optionsAllowedToOverride: item.options_allowed_to_override
       })
     }
     receivers.value = receiverListResult
@@ -55,7 +62,8 @@ export default function useReceivers () {
         name: response.data.name,
         slug: response.data.slug,
         type: response.data.type,
-        options: JSON.stringify(response.data.options)
+        options: JSON.stringify(response.data.options),
+        optionsAllowedToOverride: response.data.options_allowed_to_override
       }
     } catch (error: any) {
       await handle404(error, router, history)
@@ -73,7 +81,8 @@ export default function useReceivers () {
         name: receiver.value.name,
         slug: receiver.value.slug,
         type: receiver.value.type,
-        options: JSON.parse(receiver.value.options)
+        options: JSON.parse(receiver.value.options),
+        options_allowed_to_override: receiver.value.optionsAllowedToOverride
       })
     } catch (error: any) {
       errors.value = parseResponseErrors(error)
@@ -88,7 +97,8 @@ export default function useReceivers () {
         name: receiver.value.name,
         slug: receiver.value.slug,
         type: receiver.value.type,
-        options: JSON.parse(receiver.value.options)
+        options: JSON.parse(receiver.value.options),
+        options_allowed_to_override: receiver.value.optionsAllowedToOverride
       })
     } catch (error: any) {
       errors.value = parseResponseErrors(error)

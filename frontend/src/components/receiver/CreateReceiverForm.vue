@@ -35,6 +35,12 @@
           :follow-value="receiver.type"
           :json-schema-mapping="receiverOptionsSchema"
       ></json-field>
+      <allowed-to-override-field
+        v-model="receiver.optionsAllowedToOverride"
+        :error-messages="formErrors.options"
+        :schema="receiverOptionsSchema"
+        :follow-value="receiver.type || ''"
+      ></allowed-to-override-field>
     </template>
   </admin-model-edit>
 </template>
@@ -47,6 +53,7 @@ import useForm from '@/composables/useForm'
 import JsonField from '@/components/core/JsonField.vue'
 import SlugField from '@/components/core/SlugField.vue'
 import AdminModelEdit from '@/components/core/AdminModelEdit.vue'
+import AllowedToOverrideField from '@/components/receiver/AllowedToOverrideField.vue'
 
 const {
   errors,

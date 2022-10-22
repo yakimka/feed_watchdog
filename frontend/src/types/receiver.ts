@@ -5,6 +5,7 @@ export interface Receiver {
   slug: string
   type: string
   options: string
+  optionsAllowedToOverride: string[]
 }
 
 export interface ReceiverList extends ListResource{
