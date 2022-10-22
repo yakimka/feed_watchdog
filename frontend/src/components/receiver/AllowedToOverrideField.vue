@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {})
 
 const emit = defineEmits(['update:modelValue'])
 
-const values = reactive({} as Record<string, string[]>)
+const values = reactive<Record<string, string[]>>({})
 
 interface Item {
   text: string

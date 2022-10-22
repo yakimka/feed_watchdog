@@ -118,8 +118,8 @@ const fetchSources = async () => {
 const { pagination } = usePagination(fetchSources)
 const { setQueryToURL, getParamsFromURL } = useURL()
 
-const buttonsLoading = reactive({} as {[key: string]: boolean})
-const deleteDialog = reactive({} as {[key: string]: boolean})
+const buttonsLoading = reactive<{[key: string]: boolean}>({})
+const deleteDialog = reactive<{[key: string]: boolean}>({})
 const pageIsLoading = ref(true)
 
 const filters = reactive({
