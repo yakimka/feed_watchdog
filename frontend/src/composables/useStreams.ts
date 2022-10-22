@@ -1,4 +1,4 @@
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, onMounted, computed } from 'vue'
 import { StreamList, Stream } from '@/types/stream'
 import Error from '@/types/error'
 import { useRouter } from 'vue-router'
@@ -46,7 +46,7 @@ export default function useStreams () {
     focused: false
   })
   const { sources, getSources } = useSources()
-  const { receivers, getReceivers } = useReceivers()
+  const { receivers, receiverOptionsSchema, getReceivers, getReceiverOptionsSchema } = useReceivers()
 
   const router = useRouter()
 
@@ -148,7 +148,7 @@ export default function useStreams () {
   }
 
   const getModifierOptionsSchema = async () => {
-    const response = await axios.get('/processors/config/streams')
+    const response = await axios.get('/processors/config/modifiers')
     modifierOptionsSchema.value = response.data
 
     streamTypes.value = []
@@ -156,6 +156,36 @@ export default function useStreams () {
       streamTypes.value.push(key)
     }
   }
+
+  const overrideOptionsSchema = computed(() => {
+    let receiver = null
+    for (const item of receivers.value.results) {
+      if (item.slug === stream.value.receiverSlug) {
+        receiver = item
+        break
+      }
+    }
+    if (receiver === null) {
+      return {}
+    }
+
+    const result = { '': {} }
+    for (const [key, value] of Object.entries(receiverOptionsSchema.value)) {
+      if (key === receiver.type) {
+        const schema = JSON.parse(JSON.stringify(value))
+        for (const item in schema.properties) {
+          if (receiver.optionsAllowedToOverride.includes(item)) {
+            schema.properties[item].default = JSON.parse(receiver.options)[item]
+          } else {
+            delete schema.properties[item]
+          }
+        }
+        result[''] = schema
+        break
+      }
+    }
+    return result
+  })
 
   const search = async (type: string, value = '') => {
     let data, items, func
@@ -220,6 +250,10 @@ export default function useStreams () {
     })
   )
 
+  onMounted(async () => {
+    await getReceiverOptionsSchema()
+  })
+
   return {
     errors,
     streams,
@@ -228,6 +262,7 @@ export default function useStreams () {
     modifierOptionsSchema,
     sourceSlugData,
     receiverSlugData,
+    overrideOptionsSchema,
     getStream,
     getStreams,
     storeStream,

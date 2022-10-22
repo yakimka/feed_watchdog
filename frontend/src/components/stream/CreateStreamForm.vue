@@ -53,6 +53,7 @@
         v-model="stream.receiverOptionsOverride"
         :saved-value="savedReceiverOptionsOverride"
         :error-messages="formErrors.receiverOptionsOverride"
+        :json-schema-mapping="overrideOptionsSchema"
         name="Override Receiver Options"
       ></json-field>
       <v-textarea
@@ -62,17 +63,6 @@
         v-model="stream.messageTemplate"
         :error-messages="formErrors.messageTemplate"
       ></v-textarea>
-    </template>
-
-    <template v-slot:appendButton>
-      <v-btn
-          id="save-and-create-stream"
-          class="mr-4"
-          color="primary"
-          type="submit"
-      >
-        Save and create stream
-      </v-btn>
     </template>
   </admin-model-edit>
 </template>
@@ -91,6 +81,7 @@ const {
   stream,
   sourceSlugData,
   receiverSlugData,
+  overrideOptionsSchema,
   storeStream,
   searchSource,
   searchReceiver,
