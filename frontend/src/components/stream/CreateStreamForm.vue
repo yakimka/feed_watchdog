@@ -63,13 +63,14 @@
         :error-messages="formErrors.messageTemplate"
       ></v-textarea>
       <modifiers-field
+        v-model="stream.modifiers"
       ></modifiers-field>
     </template>
   </admin-model-edit>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import useStreams from '@/composables/useStreams'
 import { required } from '@/validation'
 import useForm from '@/composables/useForm'

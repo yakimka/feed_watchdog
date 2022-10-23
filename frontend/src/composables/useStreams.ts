@@ -1,5 +1,5 @@
 import { reactive, ref, watch, onMounted, computed } from 'vue'
-import { StreamList, Stream } from '@/types/stream'
+import { StreamList, Stream, Modifier } from '@/types/stream'
 import Error from '@/types/error'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
@@ -29,8 +29,9 @@ export default function useStreams () {
     modifiers: []
   })
   const streamTypes = ref<string[]>([])
-  const modifierOptionsSchema = ref<object>({})
+  const modifierOptionsSchema = ref({})
   const savedReceiverOptionsOverride = ref('')
+  const savedModifiers = ref<Modifier[]>([])
 
   const sourceSlugData = reactive({
     search: '',
@@ -53,6 +54,7 @@ export default function useStreams () {
 
   const updateSavedOptions = () => {
     savedReceiverOptionsOverride.value = stream.value.receiverOptionsOverride
+    savedModifiers.value = JSON.parse(JSON.stringify(stream.value.modifiers))
   }
 
   const getStreams = async (q: string, page: number, pageSize: number) => {
@@ -80,7 +82,7 @@ export default function useStreams () {
         squash: item.squash,
         receiverOptionsOverride: JSON.stringify(item.receiver_options_override),
         messageTemplate: item.message_template,
-        modifiers: item.modifiers
+        modifiers: item.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.stringify(o.options) } })
       })
     }
     streams.value = streamListResult
@@ -96,7 +98,7 @@ export default function useStreams () {
         squash: response.data.squash,
         receiverOptionsOverride: JSON.stringify(response.data.receiver_options_override),
         messageTemplate: response.data.message_template,
-        modifiers: response.data.modifiers
+        modifiers: response.data.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.stringify(o.options) } })
       }
     } catch (error: any) {
       await handle404(error, router, history)
@@ -117,7 +119,7 @@ export default function useStreams () {
         squash: stream.value.squash,
         receiver_options_override: JSON.parse(stream.value.receiverOptionsOverride),
         message_template: stream.value.messageTemplate,
-        modifiers: stream.value.modifiers
+        modifiers: stream.value.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.parse(o.options) } })
       })
     } catch (error: any) {
       errors.value = parseResponseErrors(error)
@@ -135,7 +137,7 @@ export default function useStreams () {
         squash: stream.value.squash,
         receiver_options_override: JSON.parse(stream.value.receiverOptionsOverride),
         message_template: stream.value.messageTemplate,
-        modifiers: stream.value.modifiers
+        modifiers: stream.value.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.parse(o.options) } })
       })
       updateSavedOptions()
     } catch (error: any) {
@@ -158,7 +160,7 @@ export default function useStreams () {
     modifierOptionsSchema.value = response.data
 
     streamTypes.value = []
-    for (const key in response.data) {
+    for (const key in modifierOptionsSchema.value) {
       streamTypes.value.push(key)
     }
   }
@@ -270,6 +272,7 @@ export default function useStreams () {
     receiverSlugData,
     overrideOptionsSchema,
     savedReceiverOptionsOverride,
+    savedModifiers,
     getStream,
     getStreams,
     storeStream,

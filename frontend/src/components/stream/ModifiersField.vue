@@ -24,7 +24,8 @@
           compact
           v-model="field.options"
           :follow-value="field.type"
-          :json-schema-mapping="modifierOptionsSchema"
+          :json-schema-mapping="JSON.parse(JSON.stringify(modifierOptionsSchema))"
+          :saved-value="savedValue[index]?.options || ''"
           name="Modifier options"
         ></json-field>
       </v-card-text>
@@ -42,13 +43,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, defineProps, withDefaults, defineEmits, watch } from 'vue'
 import { required } from '@/validation'
 import useStreams from '@/composables/useStreams'
 import JsonField from '@/components/core/JsonField.vue'
 import Modifier from '@/types/stream'
 
-const values = ref<Modifier[]>([])
+interface Props {
+  modelValue: Modifier[]
+  savedValue?: Modifier[]
+}
+
+const props = withDefaults(defineProps<Props>(), {})
+const emit = defineEmits(['update:modelValue'])
+
+const {
+  modifierOptionsSchema,
+  getModifierOptionsSchema
+} = useStreams()
+
+const values = ref<Modifier[]>(props.modelValue)
 
 const addField = () => {
   values.value.push({ type: '', options: '{}' })
@@ -66,13 +80,21 @@ const types = computed(() => {
   return result
 })
 
+watch(() => props.modelValue,
+  (value) => {
+    values.value = value
+  },
+  { deep: true }
+)
+watch(() => values.value,
+  (value) => {
+    emit('update:modelValue', value)
+  },
+  { deep: true }
+)
+
 onMounted(async () => {
   await getModifierOptionsSchema()
 })
-
-const {
-  modifierOptionsSchema,
-  getModifierOptionsSchema
-} = useStreams()
 
 </script>
