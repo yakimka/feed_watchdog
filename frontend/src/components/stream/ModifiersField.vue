@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-divider class="mb-5"></v-divider>
-    <v-card class="mb-5" v-for="(field, index) in values" :key="index">
+    <v-card class="mb-5" v-for="(field, index) in values">
       <v-toolbar density="compact">
         <v-toolbar-title>Modifier {{ index + 1 }}</v-toolbar-title>
         <template v-slot:append>
@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+/* eslint vue/valid-v-for: 0 */
 import { computed, ref, onMounted, defineProps, withDefaults, defineEmits, watch } from 'vue'
 import { required } from '@/validation'
 import useStreams from '@/composables/useStreams'

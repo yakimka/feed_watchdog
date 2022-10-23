@@ -111,9 +111,9 @@ const {
 })
 
 onMounted(async () => {
-  await getStream(props.id)
-  await searchReceiver()
   await searchSource()
+  await searchReceiver()
+  await getStream(props.id)
 
   updateSavedOptions()
   formIsLoading.value = false
