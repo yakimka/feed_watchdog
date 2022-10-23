@@ -129,11 +129,12 @@ const {
 })
 
 onMounted(async () => {
-  await searchSource()
-  await searchReceiver()
-  await getIntervalTypes()
   await getStream(props.id)
-
+  await searchSource(stream.value.sourceSlug)
+  await searchReceiver(stream.value.receiverSlug)
+  await getIntervalTypes()
+  // FIXME: This is a hack to get the saved values to show up in the JSON field
+  await getStream(props.id)
   updateSavedOptions()
   formIsLoading.value = false
 })
