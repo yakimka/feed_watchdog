@@ -29,8 +29,15 @@ export default function useSources () {
   const parserTypes = ref<string[]>([])
   const parserOptionsSchema = ref<object>({})
   const availableTags = ref<string[]>([])
+  const savedFetcherOptions = ref('')
+  const savedParserOptions = ref('')
 
   const router = useRouter()
+
+  const updateSavedOptions = () => {
+    savedFetcherOptions.value = source.value.fetcherOptions
+    savedParserOptions.value = source.value.parserOptions
+  }
 
   const getSources = async (q: string, page: number, pageSize: number) => {
     const response = await axios.get('/sources', {
@@ -121,6 +128,7 @@ export default function useSources () {
         description: source.value.description,
         tags: source.value.tags
       })
+      updateSavedOptions()
     } catch (error: any) {
       errors.value = parseResponseErrors(error)
     }
@@ -169,6 +177,8 @@ export default function useSources () {
     parserTypes,
     parserOptionsSchema,
     availableTags,
+    savedFetcherOptions,
+    savedParserOptions,
     getSource,
     getSources,
     storeSource,
@@ -176,6 +186,7 @@ export default function useSources () {
     deleteSource,
     getFetcherOptionsSchema,
     getParserOptionsSchema,
-    getAvailableTags
+    getAvailableTags,
+    updateSavedOptions
   }
 }

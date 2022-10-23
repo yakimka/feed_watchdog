@@ -23,8 +23,13 @@ export default function useReceivers () {
   })
   const receiverTypes = ref<string[]>([])
   const receiverOptionsSchema = ref<object>({})
+  const savedReceiverOptions = ref('')
 
   const router = useRouter()
+
+  const updateSavedOptions = () => {
+    savedReceiverOptions.value = receiver.value.options
+  }
 
   const getReceivers = async (q: string, page: number, pageSize: number) => {
     const response = await axios.get('/receivers', {
@@ -100,6 +105,7 @@ export default function useReceivers () {
         options: JSON.parse(receiver.value.options),
         options_allowed_to_override: receiver.value.optionsAllowedToOverride
       })
+      updateSavedOptions()
     } catch (error: any) {
       errors.value = parseResponseErrors(error)
     }
@@ -131,11 +137,13 @@ export default function useReceivers () {
     receiver,
     receiverTypes,
     receiverOptionsSchema,
+    savedReceiverOptions,
     getReceiver,
     getReceivers,
     storeReceiver,
     updateReceiver,
     deleteReceiver,
-    getReceiverOptionsSchema
+    getReceiverOptionsSchema,
+    updateSavedOptions
   }
 }

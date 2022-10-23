@@ -29,7 +29,6 @@
       <json-field
           compact
           v-model="source.fetcherOptions"
-          :saved-value="savedFetcherOptions"
           :error-messages="formErrors.fetcherOptions"
           name="Fetcher options"
           :follow-value="source.fetcherType"
@@ -45,7 +44,6 @@
       <json-field
           compact
           v-model="source.parserOptions"
-          :saved-value="savedParserOptions"
           :error-messages="formErrors.parserOptions"
           name="Parser options"
           :follow-value="source.parserType"
@@ -82,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import useSources from '@/composables/useSources'
 import { required } from '@/validation'
 import useForm from '@/composables/useForm'
@@ -110,23 +108,13 @@ const {
   submit
 } = useForm(errors, async (event) => {
   await storeSource(event.submitter.id)
-  updateSavedOptions()
 })
-
-const savedFetcherOptions = ref('')
-const savedParserOptions = ref('')
-
-const updateSavedOptions = () => {
-  savedFetcherOptions.value = source.value.fetcherOptions
-  savedParserOptions.value = source.value.parserOptions
-}
 
 onMounted(async () => {
   await getFetcherOptionsSchema()
   await getParserOptionsSchema()
   await getAvailableTags()
 
-  updateSavedOptions()
   formIsLoading.value = false
 })
 </script>

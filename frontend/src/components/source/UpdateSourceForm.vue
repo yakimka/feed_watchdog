@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from 'vue'
+import { defineProps, onMounted } from 'vue'
 import useSources from '@/composables/useSources'
 import useForm from '@/composables/useForm'
 import { required } from '@/validation'
@@ -105,12 +105,15 @@ const {
   parserTypes,
   parserOptionsSchema,
   availableTags,
+  savedFetcherOptions,
+  savedParserOptions,
   getSource,
   updateSource,
   deleteSource,
   getFetcherOptionsSchema,
   getParserOptionsSchema,
-  getAvailableTags
+  getAvailableTags,
+  updateSavedOptions
 } = useSources()
 
 const {
@@ -119,18 +122,9 @@ const {
   submit
 } = useForm(errors, async (event) => {
   await updateSource(event.submitter.id)
-  updateSavedOptions()
 })
 
-const savedFetcherOptions = ref('')
-const savedParserOptions = ref('')
-
 const router = useRouter()
-
-const updateSavedOptions = () => {
-  savedFetcherOptions.value = source.value.fetcherOptions
-  savedParserOptions.value = source.value.parserOptions
-}
 
 const deleteSourceAndRedirect = async () => {
   formIsLoading.value = true

@@ -51,7 +51,6 @@
       <json-field
         compact
         v-model="stream.receiverOptionsOverride"
-        :saved-value="savedReceiverOptionsOverride"
         :error-messages="formErrors.receiverOptionsOverride"
         :json-schema-mapping="overrideOptionsSchema"
         name="Override Receiver Options"
@@ -97,14 +96,7 @@ const {
   submit
 } = useForm(errors, async (event) => {
   await storeStream(event.submitter.id)
-  updateSavedOptions()
 })
-
-const savedReceiverOptionsOverride = ref('')
-
-const updateSavedOptions = () => {
-  savedReceiverOptionsOverride.value = stream.value.receiverOptionsOverride
-}
 
 const fieldForSlugFollowing = computed(() => {
   if (!stream.value.sourceSlug && !stream.value.receiverSlug) {
@@ -114,7 +106,6 @@ const fieldForSlugFollowing = computed(() => {
 })
 
 onMounted(async () => {
-  updateSavedOptions()
   formIsLoading.value = false
 
   await searchSource()

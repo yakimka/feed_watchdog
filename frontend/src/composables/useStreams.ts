@@ -30,6 +30,7 @@ export default function useStreams () {
   })
   const streamTypes = ref<string[]>([])
   const modifierOptionsSchema = ref<object>({})
+  const savedReceiverOptionsOverride = ref('')
 
   const sourceSlugData = reactive({
     search: '',
@@ -49,6 +50,10 @@ export default function useStreams () {
   const { receivers, receiverOptionsSchema, getReceivers, getReceiverOptionsSchema } = useReceivers()
 
   const router = useRouter()
+
+  const updateSavedOptions = () => {
+    savedReceiverOptionsOverride.value = stream.value.receiverOptionsOverride
+  }
 
   const getStreams = async (q: string, page: number, pageSize: number) => {
     const response = await axios.get('/streams', {
@@ -132,6 +137,7 @@ export default function useStreams () {
         message_template: stream.value.messageTemplate,
         modifiers: stream.value.modifiers
       })
+      updateSavedOptions()
     } catch (error: any) {
       errors.value = parseResponseErrors(error)
     }
@@ -263,6 +269,7 @@ export default function useStreams () {
     sourceSlugData,
     receiverSlugData,
     overrideOptionsSchema,
+    savedReceiverOptionsOverride,
     getStream,
     getStreams,
     storeStream,
@@ -271,6 +278,7 @@ export default function useStreams () {
     getModifierOptionsSchema,
     searchSource,
     searchReceiver,
-    setFocus
+    setFocus,
+    updateSavedOptions
   }
 }

@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from 'vue'
+import { defineProps, onMounted } from 'vue'
 import useReceivers from '@/composables/useReceivers'
 import useForm from '@/composables/useForm'
 import { required } from '@/validation'
@@ -68,10 +68,12 @@ const {
   receiver,
   receiverTypes,
   receiverOptionsSchema,
+  savedReceiverOptions,
   getReceiver,
   updateReceiver,
   deleteReceiver,
-  getReceiverOptionsSchema
+  getReceiverOptionsSchema,
+  updateSavedOptions
 } = useReceivers()
 
 const {
@@ -80,16 +82,9 @@ const {
   submit
 } = useForm(errors, async (event) => {
   await updateReceiver(event.submitter.id)
-  updateSavedOptions()
 })
 
-const savedReceiverOptions = ref('')
-
 const router = useRouter()
-
-const updateSavedOptions = () => {
-  savedReceiverOptions.value = receiver.value.options
-}
 
 const deleteReceiverAndRedirect = async () => {
   formIsLoading.value = true

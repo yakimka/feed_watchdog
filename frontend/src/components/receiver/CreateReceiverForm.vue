@@ -29,7 +29,6 @@
       <json-field
           compact
           v-model="receiver.options"
-          :saved-value="savedReceiverOptions"
           :error-messages="formErrors.options"
           name="Receiver options"
           :follow-value="receiver.type"
@@ -46,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import useReceivers from '@/composables/useReceivers'
 import { required } from '@/validation'
 import useForm from '@/composables/useForm'
@@ -70,18 +69,10 @@ const {
   submit
 } = useForm(errors, async (event) => {
   await storeReceiver(event.submitter.id)
-  updateSavedOptions()
 })
-
-const savedReceiverOptions = ref('')
-
-const updateSavedOptions = () => {
-  savedReceiverOptions.value = receiver.value.options
-}
 
 onMounted(async () => {
   await getReceiverOptionsSchema()
-  updateSavedOptions()
   formIsLoading.value = false
 })
 </script>
