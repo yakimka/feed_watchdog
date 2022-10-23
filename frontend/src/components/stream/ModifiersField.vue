@@ -55,7 +55,7 @@ interface Props {
   savedValue?: Modifier[]
 }
 
-const props = withDefaults(defineProps<Props>(), {})
+const props = withDefaults(defineProps<Props>(), { savedValue: () => [] })
 const emit = defineEmits(['update:modelValue'])
 
 const {

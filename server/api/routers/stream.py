@@ -29,10 +29,12 @@ class StreamForCreate(BaseModel):
     slug: str
     source_slug: str
     receiver_slug: str
+    intervals: list[str]
     squash: bool
     receiver_options_override: dict = {}
     message_template: str
     modifiers: list[Modifier] = []
+    active: bool
 
     def to_domain(self) -> StreamModel:
         return StreamModel.parse_obj(self.dict())

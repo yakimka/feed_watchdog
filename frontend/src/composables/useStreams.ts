@@ -23,12 +23,20 @@ export default function useStreams () {
     slug: '',
     sourceSlug: '',
     receiverSlug: '',
+    intervals: [],
     squash: false,
     receiverOptionsOverride: '',
     messageTemplate: '',
-    modifiers: []
+    modifiers: [],
+    active: true
   })
+
+  interface Interval {
+    text: string
+    value: string
+  }
   const streamTypes = ref<string[]>([])
+  const intervalTypes = ref<Interval[]>([])
   const modifierOptionsSchema = ref({})
   const savedReceiverOptionsOverride = ref('')
   const savedModifiers = ref<Modifier[]>([])
@@ -79,10 +87,12 @@ export default function useStreams () {
         slug: item.slug,
         sourceSlug: item.source_slug,
         receiverSlug: item.receiver_slug,
+        intervals: item.intervals,
         squash: item.squash,
         receiverOptionsOverride: JSON.stringify(item.receiver_options_override),
         messageTemplate: item.message_template,
-        modifiers: item.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.stringify(o.options) } })
+        modifiers: item.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.stringify(o.options) } }),
+        active: item.active
       })
     }
     streams.value = streamListResult
@@ -95,10 +105,12 @@ export default function useStreams () {
         slug: response.data.slug,
         sourceSlug: response.data.source_slug,
         receiverSlug: response.data.receiver_slug,
+        intervals: response.data.intervals,
         squash: response.data.squash,
         receiverOptionsOverride: JSON.stringify(response.data.receiver_options_override),
         messageTemplate: response.data.message_template,
-        modifiers: response.data.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.stringify(o.options) } })
+        modifiers: response.data.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.stringify(o.options) } }),
+        active: response.data.active
       }
     } catch (error: any) {
       await handle404(error, router, history)
@@ -116,10 +128,12 @@ export default function useStreams () {
         slug: stream.value.slug,
         source_slug: stream.value.sourceSlug,
         receiver_slug: stream.value.receiverSlug,
+        intervals: stream.value.intervals,
         squash: stream.value.squash,
         receiver_options_override: JSON.parse(stream.value.receiverOptionsOverride),
         message_template: stream.value.messageTemplate,
-        modifiers: stream.value.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.parse(o.options) } })
+        modifiers: stream.value.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.parse(o.options) } }),
+        active: stream.value.active
       })
     } catch (error: any) {
       errors.value = parseResponseErrors(error)
@@ -134,10 +148,12 @@ export default function useStreams () {
         slug: stream.value.slug,
         source_slug: stream.value.sourceSlug,
         receiver_slug: stream.value.receiverSlug,
+        intervals: stream.value.intervals,
         squash: stream.value.squash,
         receiver_options_override: JSON.parse(stream.value.receiverOptionsOverride),
         message_template: stream.value.messageTemplate,
-        modifiers: stream.value.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.parse(o.options) } })
+        modifiers: stream.value.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.parse(o.options) } }),
+        active: stream.value.active
       })
       updateSavedOptions()
     } catch (error: any) {
@@ -194,6 +210,15 @@ export default function useStreams () {
     }
     return result
   })
+
+  const getIntervalTypes = async () => {
+    intervalTypes.value = [
+      { text: 'At 6 AM', value: '0 6 * * *' },
+      { text: 'At 6 PM', value: '0 18 * * *' },
+      { text: 'Every 10 minutes', value: '*/10 * * * *' },
+      { text: 'Every 30 minutes', value: '*/30 * * * *' }
+    ]
+  }
 
   const search = async (type: string, value = '') => {
     let data, items, func
@@ -273,6 +298,7 @@ export default function useStreams () {
     overrideOptionsSchema,
     savedReceiverOptionsOverride,
     savedModifiers,
+    intervalTypes,
     getStream,
     getStreams,
     storeStream,
@@ -282,6 +308,7 @@ export default function useStreams () {
     searchSource,
     searchReceiver,
     setFocus,
-    updateSavedOptions
+    updateSavedOptions,
+    getIntervalTypes
   }
 }

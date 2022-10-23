@@ -43,6 +43,16 @@
         label="Slug"
         :rules="[required()]"
       ></slug-field>
+      <v-select
+        multiple
+        v-model="stream.intervals"
+        :error-messages="formErrors.intervals"
+        :items="intervalTypes"
+        item-title="text"
+        item-value="value"
+        label="Intervals"
+        :rules="[required()]"
+      ></v-select>
       <v-checkbox
         v-model="stream.squash"
         :error-messages="formErrors.squash"
@@ -62,6 +72,11 @@
         v-model="stream.messageTemplate"
         :error-messages="formErrors.messageTemplate"
       ></v-textarea>
+      <v-checkbox
+        v-model="stream.active"
+        :error-messages="formErrors.active"
+        label="Active"
+      ></v-checkbox>
       <modifiers-field
         v-model="stream.modifiers"
       ></modifiers-field>
@@ -85,10 +100,12 @@ const {
   sourceSlugData,
   receiverSlugData,
   overrideOptionsSchema,
+  intervalTypes,
   storeStream,
   searchSource,
   searchReceiver,
-  setFocus
+  setFocus,
+  getIntervalTypes
 } = useStreams()
 
 const {
@@ -109,6 +126,7 @@ const fieldForSlugFollowing = computed(() => {
 onMounted(async () => {
   formIsLoading.value = false
 
+  await getIntervalTypes()
   await searchSource()
   await searchReceiver()
 })

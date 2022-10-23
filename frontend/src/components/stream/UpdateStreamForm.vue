@@ -1,6 +1,7 @@
 <template>
   <admin-model-edit
-    :model-name="stream.name || 'Stream'"
+    model-name="Stream"
+    :has-delete="true"
     :is-loading="formIsLoading"
     :error="formErrors.nonFieldError"
     @submit="submit"
@@ -42,6 +43,16 @@
         label="Slug"
         :rules="[required()]"
       ></v-text-field>
+      <v-select
+        multiple
+        v-model="stream.intervals"
+        :error-messages="formErrors.intervals"
+        :items="intervalTypes"
+        item-title="text"
+        item-value="value"
+        label="Intervals"
+        :rules="[required()]"
+      ></v-select>
       <v-checkbox
         v-model="stream.squash"
         :error-messages="formErrors.squash"
@@ -62,6 +73,11 @@
         v-model="stream.messageTemplate"
         :error-messages="formErrors.messageTemplate"
       ></v-textarea>
+      <v-checkbox
+        v-model="stream.active"
+        :error-messages="formErrors.active"
+        label="Active"
+      ></v-checkbox>
       <modifiers-field
         v-model="stream.modifiers"
         :saved-value="savedModifiers"
@@ -94,12 +110,14 @@ const {
   overrideOptionsSchema,
   savedReceiverOptionsOverride,
   savedModifiers,
+  intervalTypes,
   getStream,
   updateStream,
   searchSource,
   searchReceiver,
   setFocus,
-  updateSavedOptions
+  updateSavedOptions,
+  getIntervalTypes
 } = useStreams()
 
 const {
@@ -113,6 +131,7 @@ const {
 onMounted(async () => {
   await searchSource()
   await searchReceiver()
+  await getIntervalTypes()
   await getStream(props.id)
 
   updateSavedOptions()
