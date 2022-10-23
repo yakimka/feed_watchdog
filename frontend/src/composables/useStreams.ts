@@ -1,5 +1,5 @@
 import { reactive, ref, watch, onMounted, computed } from 'vue'
-import { StreamList, Stream, Modifier } from '@/types/stream'
+import { StreamList, Stream, Modifier, StreamInList } from '@/types/stream'
 import Error from '@/types/error'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
@@ -79,19 +79,15 @@ export default function useStreams () {
       page: response.data.page,
       pageSize: response.data.page_size,
       pages: response.data.pages,
-      results: [] as Stream[]
+      results: [] as StreamInList[]
     }
 
     for (const item of response.data.results) {
       streamListResult.results.push({
         slug: item.slug,
-        sourceSlug: item.source_slug,
-        receiverSlug: item.receiver_slug,
+        source: item.source,
+        receiver: item.receiver,
         intervals: item.intervals,
-        squash: item.squash,
-        receiverOptionsOverride: JSON.stringify(item.receiver_options_override),
-        messageTemplate: item.message_template,
-        modifiers: item.modifiers.map((o: Modifier) => { return { type: o.type, options: JSON.stringify(o.options) } }),
         active: item.active
       })
     }

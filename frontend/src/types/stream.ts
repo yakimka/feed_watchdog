@@ -17,6 +17,19 @@ export interface Stream {
   active: boolean
 }
 
+interface SlugWithName {
+  name: string
+  slug: string
+}
+
+export interface StreamInList {
+  slug: string
+  source: SlugWithName
+  receiver: SlugWithName
+  intervals: string[]
+  active: boolean
+}
+
 export interface StreamList extends ListResource{
-  results: Stream[]
+  results: StreamInList[]
 }

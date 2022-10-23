@@ -24,7 +24,8 @@
       <tr>
         <th class="text-left">Name</th>
         <th class="text-left">Slug</th>
-        <th class="text-left">Type</th>
+        <th class="text-left">Intervals</th>
+        <th class="text-left">Active</th>
         <th class="text-left">Actions</th>
       </tr>
       </thead>
@@ -33,11 +34,21 @@
           :key="stream.slug"
       >
         <td>
-          <v-tooltip activator="parent" v-if="stream.description">{{ stream.description }}</v-tooltip>
-          <router-link class="text-decoration-none font-weight-bold" :to="{name: 'edit-stream', params: {id: stream.slug}}">{{stream.name}}</router-link>
+          <router-link class="text-decoration-none font-weight-bold" :to="{name: 'edit-stream', params: {id: stream.slug}}">{{stream.source.name}} to {{stream.receiver.name}}</router-link>
         </td>
         <td>{{stream.slug}}</td>
-        <td>{{ stream.type }}</td>
+        <td>
+          <v-chip
+            v-for="interval in stream.intervals"
+            :key="interval"
+          >
+            {{ interval }}
+          </v-chip>
+        </td>
+        <td>
+          <v-icon icon="mdi-check" v-if="stream.active"></v-icon>
+          <v-icon icon="mdi-close-octagon" v-else></v-icon>
+        </td>
         <td class="text-right">
           <v-btn
             :loading="buttonsLoading[stream.slug]"

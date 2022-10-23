@@ -1,3 +1,5 @@
+import re
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import DuplicateKeyError
 
@@ -26,7 +28,18 @@ class MongoReceiverRepository(IReceiverRepository):
 
     @staticmethod
     def _make_find_query(query: ReceiverQuery) -> dict:
-        return {"$text": {"$search": query.search}} if query.search else {}
+        if not query.search:
+            return {}
+        return {
+            "$or": [
+                {"name": {"$regex": re.compile(query.search, re.IGNORECASE)}},
+                {
+                    "slug": {
+                        "$regex": re.compile(f"^{query.search}$", re.IGNORECASE)
+                    }
+                },
+            ]
+        }
 
     async def get_count(self, query: ReceiverQuery = ReceiverQuery()) -> int:
         return await self.db.receivers.count_documents(

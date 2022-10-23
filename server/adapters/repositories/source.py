@@ -1,3 +1,5 @@
+import re
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from pymongo.errors import DuplicateKeyError
@@ -25,7 +27,18 @@ class MongoSourceRepository(ISourceRepository):
 
     @staticmethod
     def _make_find_query(query: SourceQuery) -> dict:
-        return {"$text": {"$search": query.search}} if query.search else {}
+        if not query.search:
+            return {}
+        return {
+            "$or": [
+                {"name": {"$regex": re.compile(query.search, re.IGNORECASE)}},
+                {
+                    "slug": {
+                        "$regex": re.compile(f"^{query.search}$", re.IGNORECASE)
+                    }
+                },
+            ]
+        }
 
     async def get_count(self, query: SourceQuery = SourceQuery()) -> int:
         return await self.db.sources.count_documents(

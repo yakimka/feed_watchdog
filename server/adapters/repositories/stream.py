@@ -1,3 +1,5 @@
+import re
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import DuplicateKeyError
 
@@ -24,7 +26,11 @@ class MongoStreamRepository(IStreamRepository):
 
     @staticmethod
     def _make_find_query(query: StreamQuery) -> dict:
-        return {"$text": {"$search": query.search}} if query.search else {}
+        if not query.search:
+            return {}
+        return {
+            "slug": {"$regex": re.compile(f"^{query.search}$", re.IGNORECASE)}
+        }
 
     async def get_count(self, query: StreamQuery = StreamQuery()) -> int:
         return await self.db.streams.count_documents(
