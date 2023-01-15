@@ -1,7 +1,7 @@
 SHELL:=/usr/bin/env bash
 
 POETRY_RUN=docker compose run --rm devtools poetry
-SRC_DIR=server
+SRC_DIR=.
 
 .PHONY: lint
 lint:

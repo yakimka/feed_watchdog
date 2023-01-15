@@ -3,11 +3,12 @@ from pydantic import BaseModel
 
 from api.deps.pagination import Pagination, get_pagination_params
 from api.deps.receiver import get_by_slug, get_receiver_repo
+from api.deps.user import get_current_user
 from api.routers.core import ListResponse
 from domain.interfaces import IReceiverRepository, ReceiverQuery
 from domain.models import Receiver as ReceiverModel
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 class Receiver(BaseModel):

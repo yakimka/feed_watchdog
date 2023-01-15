@@ -8,11 +8,12 @@ from api.deps.stream import (
     get_stream_fetcher,
     get_stream_repo,
 )
+from api.deps.user import get_current_user
 from api.routers.core import ListResponse
 from domain.interfaces import IStreamRepository, StreamQuery
 from domain.models import Stream as StreamModel
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 class Modifier(BaseModel):

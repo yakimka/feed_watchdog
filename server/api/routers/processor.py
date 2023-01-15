@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends
 
 from api.deps.processor import get_processors_conf_repo
+from api.deps.user import get_current_user
 from domain.interfaces import IProcessorsConfigurationRepository
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 @router.get("/processors/config/{handler}")

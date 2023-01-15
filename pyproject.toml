@@ -50,6 +50,9 @@ fastapi = "^0.81.0"
 uvicorn = {extras = ["standart"], version = "^0.18.3"}
 motor = "^3.0.0"
 mongodex = "^0.0.1"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.5"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"

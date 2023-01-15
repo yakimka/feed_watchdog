@@ -81,7 +81,10 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 RUN poetry install
 
 # will become mountpoint of our code
-WORKDIR /app
+WORKDIR /app/server
+
+# for installing deps without rebuild image
+ENV PATH="/app/.venv/bin:$PATH"
 
 USER app
 

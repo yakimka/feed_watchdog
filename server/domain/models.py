@@ -5,6 +5,15 @@ class BaseModel(PydanticBaseModel):
     pass
 
 
+class User(BaseModel):
+    id: str
+    email: str
+
+
+class UserInDB(User):
+    password: str
+
+
 class Source(BaseModel):
     name: str
     slug: str

@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 from pydantic import BaseModel
 
-from domain.models import Receiver, Source, Stream
+from domain.models import Receiver, Source, Stream, UserInDB
 
 
 class PaginationQuery(BaseModel):
@@ -109,4 +109,18 @@ class IStreamRepository(abc.ABC):
 class IProcessorsConfigurationRepository(abc.ABC):
     @abstractmethod
     def get_config(self, handler: str) -> dict:
+        pass
+
+
+class IUserRepository(abc.ABC):
+    @abstractmethod
+    async def get_user_by_id(self, id: str) -> UserInDB | None:
+        pass
+
+    @abstractmethod
+    async def get_user_by_email(self, email: str) -> UserInDB | None:
+        pass
+
+    @abstractmethod
+    async def create_user(self, user: UserInDB) -> None:
         pass

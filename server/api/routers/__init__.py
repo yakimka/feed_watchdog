@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 
-from api.routers import processor, receiver, source, stream
+from api.routers import processor, receiver, source, stream, user
 
 router = APIRouter()
 
 api_router = APIRouter(prefix="/api")
+api_router.include_router(user.router, tags=["User"])
 api_router.include_router(source.router, tags=["Source"])
 api_router.include_router(receiver.router, tags=["Receiver"])
 api_router.include_router(stream.router, tags=["Stream"])
