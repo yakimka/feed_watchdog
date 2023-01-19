@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '@/views/Home.vue'
+import Login from '@/components/admin/Login.vue'
 import CreateSourceForm from '@/components/source/CreateSourceForm.vue'
 import UpdateSourceForm from '@/components/source/UpdateSourceForm.vue'
 import ListSourceForm from '@/components/source/ListSourceForm.vue'
@@ -26,6 +27,16 @@ declare module 'vue-router' {
 }
 
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/login',
+    name: 'login',
+    meta: {
+      layout: 'empty',
+      title: 'Log in',
+      breadcrumbs: []
+    },
+    component: Login
+  },
   {
     path: '/',
     name: 'home',
