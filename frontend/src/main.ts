@@ -9,6 +9,11 @@ import { dialog } from '@/stores/dialog'
 
 axios.defaults.baseURL = 'http://localhost:8000/api'
 // TODO 404 and move to error.ts
+const cleanupAndGoToLogin = () => {
+  localStorage.removeItem('accesst')
+  localStorage.removeItem('refresht')
+  router.push({ name: 'login' })
+}
 axios.interceptors.response.use(function (response) {
   return response
 }, function (error) {
@@ -27,8 +32,10 @@ axios.interceptors.response.use(function (response) {
         config.headers.Authorization = `Bearer ${r.data.access_toke}`
         return axios.request(config)
       }).catch(() => {
-        return Promise.reject(error)
+        cleanupAndGoToLogin()
       })
+    } else {
+      cleanupAndGoToLogin()
     }
   }
 

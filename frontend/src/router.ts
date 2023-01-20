@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 import Home from '@/views/Home.vue'
 import Login from '@/components/admin/Login.vue'
 import CreateSourceForm from '@/components/source/CreateSourceForm.vue'
@@ -244,6 +244,21 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+const guardAuth = function (to: RouteLocationNormalized) {
+  if (to.name === 'login') {
+    return
+  }
+
+  const token = localStorage.getItem('accesst')
+  if (!token) {
+    router.push({ name: 'login' })
+  }
+}
+
+router.beforeEach(async (to) => {
+  guardAuth(to)
 })
 
 export default router
