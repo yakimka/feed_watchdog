@@ -50,7 +50,6 @@ const noAuthPaths = [
   '/user/refresh_token'
 ]
 axios.interceptors.request.use(function (config: any) {
-  console.log(config)
   const path = config.url.replace(/\/$/, '')
   if (noAuthPaths.includes(path)) {
     return config
