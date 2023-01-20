@@ -6,14 +6,10 @@ import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 import axios from 'axios'
 import { dialog } from '@/stores/dialog'
+import { logout } from '@/auth'
 
 axios.defaults.baseURL = 'http://localhost:8000/api'
 // TODO 404 and move to error.ts
-const cleanupAndGoToLogin = () => {
-  localStorage.removeItem('accesst')
-  localStorage.removeItem('refresht')
-  router.push({ name: 'login' })
-}
 axios.interceptors.response.use(function (response) {
   return response
 }, function (error) {
@@ -32,10 +28,10 @@ axios.interceptors.response.use(function (response) {
         config.headers.Authorization = `Bearer ${r.data.access_toke}`
         return axios.request(config)
       }).catch(() => {
-        cleanupAndGoToLogin()
+        logout()
       })
     } else {
-      cleanupAndGoToLogin()
+      logout()
     }
   }
 
