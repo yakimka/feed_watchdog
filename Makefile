@@ -22,6 +22,9 @@ unit:
 package:
 	$(POETRY_RUN) check
 	#$(POETRY_RUN) run pip check
+
+.PHONY: safety
+safety:
 	$(POETRY_RUN) run safety check --full-report
 
 .PHONY: test
