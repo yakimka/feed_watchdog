@@ -23,6 +23,7 @@ class ReceiverQuery(PaginationQuery):
 
 class StreamQuery(PaginationQuery):
     search: str = ""
+    interval: str | None = None
     sort_by: str = "name"
 
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from api.deps.pagination import Pagination, get_pagination_params
@@ -79,11 +79,13 @@ class StreamListResp(ListResponse):
 @router.get("/streams", response_model=StreamListResp)
 async def find(
     fetcher: StreamFetcher = Depends(get_stream_fetcher),
-    q: str = "",
     pagination: Pagination = Depends(get_pagination_params),
+    q: str = "",
+    interval: str | None = Query(None),
 ) -> ListResponse:
     query = StreamQuery(
         search=q,
+        interval=interval,
         page=pagination.page,
         page_size=pagination.page_size,
     )
