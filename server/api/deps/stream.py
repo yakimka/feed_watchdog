@@ -3,7 +3,7 @@ from typing import Protocol
 from fastapi import Depends, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from adapters.fetchers import MongoStreamFetcher, StreamInList
+from adapters.fetchers import MongoStreamFetcher, StreamWithRelations
 from adapters.repositories.stream import MongoStreamRepository
 from api.deps.mongo import get_db
 from domain.interfaces import IStreamRepository, StreamQuery
@@ -28,7 +28,7 @@ async def get_by_slug(
 class StreamFetcher(Protocol):
     async def search(
         self, query: StreamQuery = StreamQuery()
-    ) -> list[StreamInList]:
+    ) -> list[StreamWithRelations]:
         pass
 
     async def get_count(self, query: StreamQuery = StreamQuery()) -> int:

@@ -38,13 +38,21 @@ class Modifier(BaseModel):
     options: dict
 
 
-class Stream(BaseModel):
+class BaseStream(BaseModel):
     slug: str
-    source_slug: str
-    receiver_slug: str
     intervals: list[str]
     squash: bool
     receiver_options_override: dict
     message_template: str
     modifiers: list[Modifier] = []
     active: bool
+
+
+class Stream(BaseStream):
+    source_slug: str
+    receiver_slug: str
+
+
+class StreamWithRelations(Stream):
+    source: Source
+    receiver: Receiver

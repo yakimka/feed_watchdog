@@ -11,54 +11,72 @@ from api.deps.stream import (
 from api.deps.user import get_current_user
 from api.routers.core import ListResponse
 from domain.interfaces import IStreamRepository, StreamQuery
-from domain.models import Stream as StreamModel
+from domain.models import Stream, StreamWithRelations
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
-class Modifier(BaseModel):
+class ModifierResp(BaseModel):
     type: str
     options: dict
 
 
-class Stream(BaseModel):
+class BaseStream(BaseModel):
     slug: str
-    source_slug: str
-    receiver_slug: str
     intervals: list[str]
     squash: bool
-    receiver_options_override: dict = {}
+    receiver_options_override: dict
     message_template: str
-    modifiers: list[Modifier] = []
-    active: bool
-
-    def to_domain(self) -> StreamModel:
-        return StreamModel.parse_obj(self.dict())
-
-
-class SourceInStream(BaseModel):
-    name: str
-    slug: str
-
-
-class ReceiverInStream(BaseModel):
-    name: str
-    slug: str
-
-
-class StreamInList(BaseModel):
-    slug: str
-    source: SourceInStream
-    receiver: ReceiverInStream
-    intervals: list[str]
+    modifiers: list[ModifierResp]
     active: bool
 
 
-class Streams(ListResponse):
-    results: list[StreamInList]
+class StreamBody(BaseStream):
+    source_slug: str
+    receiver_slug: str
+
+    def to_internal(self) -> Stream:
+        return Stream.parse_obj(self.dict())
 
 
-@router.get("/streams", response_model=Streams)
+class StreamResp(BaseStream):
+    source_slug: str
+    receiver_slug: str
+
+
+class SourceResp(BaseModel):
+    name: str
+    slug: str
+    fetcher_type: str
+    fetcher_options: dict
+    parser_type: str
+    parser_options: dict
+    description: str
+    tags: list
+
+
+class ReceiverResp(BaseModel):
+    name: str
+    slug: str
+    type: str
+    options: dict
+    options_allowed_to_override: list[str]
+
+
+class StreamExtendedResp(BaseStream):
+    source: SourceResp
+    receiver: ReceiverResp
+
+    @classmethod
+    def from_domain(cls, stream: StreamWithRelations):
+        return cls.parse_obj(stream.dict())
+
+
+class StreamListResp(ListResponse):
+    results: list[StreamExtendedResp]
+
+
+@router.get("/streams", response_model=StreamListResp)
 async def find(
     fetcher: StreamFetcher = Depends(get_stream_fetcher),
     q: str = "",
@@ -72,43 +90,46 @@ async def find(
     return ListResponse(
         count=await fetcher.get_count(query),
         page=1,
-        results=await fetcher.search(query),
+        results=[
+            StreamExtendedResp.from_domain(item)
+            for item in await fetcher.search(query)
+        ],
         page_size=pagination.page_size,
     )
 
 
-@router.post("/streams", response_model=Stream, status_code=201)
+@router.post("/streams", response_model=StreamResp, status_code=201)
 async def add(
-    stream: Stream = Body(),
+    stream: StreamBody = Body(),
     streams: IStreamRepository = Depends(get_stream_repo),
-) -> StreamModel:
-    await streams.add(stream.to_domain())
+) -> Stream:
+    await streams.add(stream.to_internal())
     result = await streams.get_by_slug(stream.slug)
     # TODO https://stackoverflow.com/a/68552742
-    assert isinstance(result, StreamModel)  # noqa S101
+    assert isinstance(result, Stream)  # noqa S101
     return result
 
 
-@router.put("/streams/{slug}", response_model=Stream, status_code=201)
+@router.put("/streams/{slug}", response_model=StreamResp, status_code=201)
 async def update(
     slug: str,
-    stream: Stream = Body(),
+    stream: StreamBody = Body(),
     streams: IStreamRepository = Depends(get_stream_repo),
-) -> StreamModel:
-    updated = await streams.update(slug, stream.to_domain())
+) -> Stream:
+    updated = await streams.update(slug, stream.to_internal())
     if not updated:
         raise HTTPException(status_code=404, detail="Stream not found")
 
     result = await streams.get_by_slug(stream.slug)
     # TODO https://stackoverflow.com/a/68552742
-    assert isinstance(result, StreamModel)  # noqa S101
+    assert isinstance(result, Stream)  # noqa S101
     return result
 
 
-@router.get("/streams/{slug}", response_model=Stream)
+@router.get("/streams/{slug}", response_model=StreamResp)
 async def detail(
-    stream: StreamModel = Depends(get_by_slug),
-) -> StreamModel:
+    stream: Stream = Depends(get_by_slug),
+) -> Stream:
     return stream
 
 

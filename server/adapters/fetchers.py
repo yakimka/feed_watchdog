@@ -1,27 +1,9 @@
 import re
 
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel
 
 from domain.interfaces import StreamQuery
-
-
-class SourceInStreamList(BaseModel):
-    name: str
-    slug: str
-
-
-class ReceiverInStreamList(BaseModel):
-    name: str
-    slug: str
-
-
-class StreamInList(BaseModel):
-    slug: str
-    source: SourceInStreamList
-    receiver: ReceiverInStreamList
-    intervals: list[str]
-    active: bool
+from domain.models import Receiver, Source, StreamWithRelations
 
 
 class MongoStreamFetcher:
@@ -30,7 +12,7 @@ class MongoStreamFetcher:
 
     async def search(
         self, query: StreamQuery = StreamQuery()
-    ) -> list[StreamInList]:
+    ) -> list[StreamWithRelations]:
         cursor = (
             self.db.streams.find(self._make_find_query(query))
             .sort(query.sort_by)
@@ -44,12 +26,12 @@ class MongoStreamFetcher:
             [s["receiver_slug"] for s in streams]
         )
         return [
-            StreamInList(
-                slug=s["slug"],
-                source=sources[s["source_slug"]],
-                receiver=receivers[s["receiver_slug"]],
-                intervals=s["intervals"],
-                active=s["active"],
+            StreamWithRelations.parse_obj(
+                {
+                    **s,
+                    "source": sources[s["source_slug"]],
+                    "receiver": receivers[s["receiver_slug"]],
+                }
             )
             for s in streams
         ]
@@ -59,20 +41,16 @@ class MongoStreamFetcher:
             self._make_find_query(query)
         )
 
-    async def _fetch_sources(
-        self, slugs: list[str]
-    ) -> dict[str, SourceInStreamList]:
+    async def _fetch_sources(self, slugs: list[str]) -> dict[str, Source]:
         result = {}
         async for item in self.db.sources.find({"slug": {"$in": slugs}}):
-            result[item["slug"]] = SourceInStreamList.parse_obj(item)
+            result[item["slug"]] = Source.parse_obj(item)
         return result
 
-    async def _fetch_receivers(
-        self, slugs: list[str]
-    ) -> dict[str, ReceiverInStreamList]:
+    async def _fetch_receivers(self, slugs: list[str]) -> dict[str, Receiver]:
         result = {}
         async for item in self.db.receivers.find({"slug": {"$in": slugs}}):
-            result[item["slug"]] = ReceiverInStreamList.parse_obj(item)
+            result[item["slug"]] = Receiver.parse_obj(item)
         return result
 
     @staticmethod
