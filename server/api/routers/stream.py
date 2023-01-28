@@ -100,6 +100,17 @@ async def find(
     )
 
 
+# TODO: move to config
+@router.get("/streams/intervals")
+async def get_intervals() -> list[dict]:
+    return [
+        {"text": "At 6 AM", "value": "0 6 * * *"},
+        {"text": "At 6 PM", "value": "0 18 * * *"},
+        {"text": "Every 10 minutes", "value": "*/10 * * * *"},
+        {"text": "Every 30 minutes", "value": "*/30 * * * *"},
+    ]
+
+
 @router.post("/streams", response_model=StreamResp, status_code=201)
 async def add(
     stream: StreamBody = Body(),

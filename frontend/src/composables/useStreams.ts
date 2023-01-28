@@ -208,12 +208,8 @@ export default function useStreams () {
   })
 
   const getIntervalTypes = async () => {
-    intervalTypes.value = [
-      { text: 'At 6 AM', value: '0 6 * * *' },
-      { text: 'At 6 PM', value: '0 18 * * *' },
-      { text: 'Every 10 minutes', value: '*/10 * * * *' },
-      { text: 'Every 30 minutes', value: '*/30 * * * *' }
-    ]
+    const response = await axios.get('/streams/intervals')
+    intervalTypes.value = response.data
   }
 
   const search = async (type: string, value = '') => {

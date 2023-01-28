@@ -57,7 +57,9 @@ class MongoStreamFetcher:
     def _make_find_query(query: StreamQuery) -> dict:
         filters = {}
         if query.search:
-            filters["slug"] = {"$regex": re.compile(query.search, re.IGNORECASE)}
+            filters["slug"] = {
+                "$regex": re.compile(query.search, re.IGNORECASE)
+            }
         if query.interval:
             filters["intervals"] = query.interval
         return filters
