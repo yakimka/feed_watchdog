@@ -1,4 +1,5 @@
 import asyncio
+import getpass
 from uuid import uuid4
 
 from pydantic import BaseModel
@@ -28,6 +29,9 @@ async def create_user(data: User):
 
 
 if __name__ == "__main__":
+    email = input("Email: ")
+    password = getpass.getpass("Password: ")
+
     asyncio.run(
-        create_user(User(email="ss.yakim@gmail.com", password="12345678"))
+        create_user(User(email=email, password=password))
     )
