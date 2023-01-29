@@ -82,10 +82,12 @@ async def find(
     pagination: Pagination = Depends(get_pagination_params),
     q: str = "",
     interval: str | None = Query(None),
+    only_active: bool = False,
 ) -> ListResponse:
     query = StreamQuery(
         search=q,
         interval=interval,
+        only_active=only_active,
         page=pagination.page,
         page_size=pagination.page_size,
     )

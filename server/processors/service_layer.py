@@ -20,20 +20,20 @@ async def process_stream(
 ) -> None:
     fetcher = get_handler_by_name(
         type=HandlerType.fetchers.value,
-        name=event.source_fetcher_type,
-        options=event.source_fetcher_options,
+        name=event.source.fetcher_type,
+        options=event.source.fetcher_options,
     )
     text = await fetcher()
     if not text:
         return None
     parser = get_handler_by_name(
-        name=event.source_parser_type,
+        name=event.source.parser_type,
         type=HandlerType.parsers.value,
-        options=event.source_parser_options,
+        options=event.source.parser_options,
     )
     posts = await parser(text)
     if not posts:
-        write_warn_message(f"Can't find posts for {event.uid}", logger=logger)
+        write_warn_message(f"Can't find posts for {event.slug}", logger=logger)
     mutate_posts_with_stream_data(event, posts)
     posts = await apply_modifiers(event.modifiers, posts)
 
@@ -59,27 +59,27 @@ async def send_new_posts_to_receiver(
     storage: Storage,
 ) -> None:
     is_init = (
-        await storage.sent_posts_count(event.uid, event.receiver_type) == 0
+        await storage.sent_posts_count(event.slug, event.receiver.type) == 0
     )
     if is_init:
         write_warn_message(
-            f"Empty database for {event.uid} {event.receiver_type}",
+            f"Empty database for {event.slug} {event.receiver.type}",
             logger=logger,
         )
         for post in posts:
             await storage.save_post_sent_flag(
-                post.post_id, event.uid, event.receiver_type
+                post.post_id, event.slug, event.receiver.type
             )
     else:
         receiver = get_handler_by_name(
-            name=event.receiver_type,
+            name=event.receiver.type,
             type=HandlerType.receivers.value,
-            options=event.receiver_options,
+            options=event.receiver.options,
         )
 
         async def callback(post: models.Post):
             await storage.save_post_sent_flag(
-                post.post_id, event.uid, event.receiver_type
+                post.post_id, event.slug, event.receiver.type
             )
 
         new_posts = await _get_new_posts(posts, event=event, storage=storage)
@@ -92,8 +92,8 @@ async def send_new_posts_to_receiver(
         logger.info(
             "%s new posts sent to %s (%s)",
             len(new_posts),
-            event.receiver_type,
-            event.uid,
+            event.receiver.type,
+            event.slug,
         )
 
 
@@ -106,7 +106,7 @@ async def _get_new_posts(
     new_posts = []
     for post in posts:
         if not await storage.post_was_sent(
-            post.post_id, event.uid, event.receiver_type
+            post.post_id, event.slug, event.receiver.type
         ):
             new_posts.append(post)
 

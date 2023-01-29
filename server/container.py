@@ -3,7 +3,6 @@ from dependency_injector import containers, providers
 
 import app_settings
 from adapters.publisher import Publisher
-from adapters.streams import StreamRepository
 
 
 class Container(containers.DeclarativeContainer):
@@ -17,7 +16,6 @@ class Container(containers.DeclarativeContainer):
         Publisher,
         redis_client=redis_client,
     )
-    streams = providers.Factory(StreamRepository)
 
 
 container = Container()

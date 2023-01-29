@@ -62,4 +62,6 @@ class MongoStreamFetcher:
             }
         if query.interval:
             filters["intervals"] = query.interval
+        if query.only_active:
+            filters["active"] = True
         return filters

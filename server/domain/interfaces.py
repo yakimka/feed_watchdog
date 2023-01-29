@@ -24,6 +24,7 @@ class ReceiverQuery(PaginationQuery):
 class StreamQuery(PaginationQuery):
     search: str = ""
     interval: str | None = None
+    only_active: bool = False
     sort_by: str = "name"
 
 

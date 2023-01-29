@@ -18,7 +18,7 @@ services:
       - ./public:/var/www/public
 
   fw_scheduler:
-    command: python manage.py run_scheduler
+    command: python -m workers.scheduler
     container_name: fw_scheduler
     env_file: server/.env
     hostname: fw_scheduler

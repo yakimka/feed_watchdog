@@ -14,7 +14,7 @@ def mutate_posts_with_stream_data(
 ) -> None:
     for post in posts:
         post.post_id = _generate_post_id(post.post_id)
-        post.source_tags = stream.source_tags
+        post.source_tags = stream.source.tags
 
 
 def _generate_post_id(post_id: str) -> str:
