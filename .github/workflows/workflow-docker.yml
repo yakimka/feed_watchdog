@@ -63,7 +63,8 @@ jobs:
           echo "Login into Docker registry"
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
           docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:dev"
-          docker push "${IMAGE_FULL_NAME}:dev"
+          docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:${GITHUB_SHA::7}"
+          docker push "${IMAGE_FULL_NAME}" --all-tags
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
