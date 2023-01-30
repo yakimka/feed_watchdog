@@ -26,6 +26,6 @@ jobs:
           echo "SHA is: ${REF:-${GITHUB_SHA::7}}"
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} \
             "cd projects/feed_watchdog && \
-            FW_VERSION=${REF:-${GITHUB_SHA::7}} docker-compose up -d"
+            FW_VERSION=${REF:-${GITHUB_SHA::7}} docker compose up -d"
       - name: cleanup
         run: rm -rf ~/.ssh
