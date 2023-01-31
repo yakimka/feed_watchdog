@@ -1,7 +1,13 @@
 SHELL:=/usr/bin/env bash
 
-POETRY_RUN=docker compose run --rm devtools poetry
+DOCKER_VERSION := $(shell docker --version 2>/dev/null)
+ifdef DOCKER_VERSION
+    POETRY_RUN=docker compose run --workdir=/app --rm devtools poetry
+else
+    POETRY_RUN=poetry
+endif
 SRC_DIR=.
+
 
 .PHONY: lint
 lint:
