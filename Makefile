@@ -6,7 +6,7 @@ ifdef DOCKER_VERSION
 else
     POETRY_RUN=poetry
 endif
-SRC_DIR=.
+SRC_DIR=server
 
 
 .PHONY: lint
