@@ -1,7 +1,8 @@
 from enum import Enum
 
-from domain.models import BaseModel
 from pydantic import BaseSettings
+
+from domain.models import BaseModel
 
 
 class AuthSettings(BaseSettings):

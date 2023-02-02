@@ -32,6 +32,4 @@ if __name__ == "__main__":
     email = input("Email: ")
     password = getpass.getpass("Password: ")
 
-    asyncio.run(
-        create_user(User(email=email, password=password))
-    )
+    asyncio.run(create_user(User(email=email, password=password)))
