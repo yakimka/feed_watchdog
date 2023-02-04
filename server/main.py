@@ -6,6 +6,9 @@ from starlette.responses import JSONResponse
 from api.errors import ErrorResponse, FieldError
 from api.exceptions import ValueExistsError
 from api.routers import router
+from container import wire_modules
+
+wire_modules()
 
 app = FastAPI()
 app.include_router(router)

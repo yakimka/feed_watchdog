@@ -5,9 +5,9 @@ from pydantic import BaseSettings
 from domain.models import BaseModel
 
 
-class AuthSettings(BaseSettings):
-    auth_on: bool = True
+class AuthSettings(BaseModel):
     algorithm: str = "HS256"
+    decode_algorithms: list[str] = [algorithm]
     access_token_expire_minutes: int = 30
     refresh_token_expire_minutes: int = 60 * 24 * 31  # 31 days
     jwt_secret_key: str
@@ -15,11 +15,11 @@ class AuthSettings(BaseSettings):
 
 
 class RedisSettings(BaseModel):
-    PUB_SUB_URL: str = "redis://localhost:6379"
+    pub_sub_url: str = "redis://localhost:6379"
 
 
 class MongoSettings(BaseModel):
-    URL: str = "mongodb://mongo:27017/feed_watchdog"
+    url: str = "mongodb://mongo:27017/feed_watchdog"
 
 
 class Interval(BaseModel):
@@ -38,9 +38,17 @@ class AppSettings(BaseModel):
 
 class Settings(BaseSettings):
     app: AppSettings = AppSettings()
-    auth: AuthSettings = AuthSettings()
+    auth: AuthSettings
     redis: RedisSettings = RedisSettings()
     mongo: MongoSettings = MongoSettings()
+
+    class Config:
+        env_prefix = "FW_"
+        env_nested_delimiter = "__"
+
+
+def get_settings() -> Settings:
+    return Settings()
 
 
 class Topic(Enum):

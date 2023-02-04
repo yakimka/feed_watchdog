@@ -1,6 +1,8 @@
 import mongodex
 from pymongo import ASCENDING, TEXT
 
+from container import container
+
 collections = {
     "sources": [
         mongodex.Index({"slug": ASCENDING}, unique=True),
@@ -17,5 +19,4 @@ collections = {
 
 
 if __name__ == "__main__":
-    # TODO from settings
-    mongodex.migrate("mongodb://mongo:27017/feed_watchdog", collections)
+    mongodex.migrate(container.settings.mongo.url, collections)

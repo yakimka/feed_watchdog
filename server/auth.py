@@ -1,42 +1,64 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Union
 
+from dependency_injector.wiring import Provide, inject
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import BaseModel, ValidationError
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
-REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 31  # 31 days
-ALGORITHM = "HS256"
-JWT_SECRET_KEY = "some-secret-key"
-JWT_REFRESH_SECRET_KEY = "some-secret-key"
-
+from container import Container
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api/user/login", scheme_name="JWT"
 )
 
 
-def _create_token(subject: Union[str, Any], expires_minutes: int) -> str:
+def _create_token(
+    subject: Union[str, Any],
+    expires_minutes: int,
+    secret: str,
+    algorithm: str,
+) -> str:
     expires_delta = datetime.now(timezone.utc) + timedelta(
         minutes=expires_minutes
     )
 
     to_encode = {"exp": expires_delta, "sub": str(subject)}
-    return jwt.encode(to_encode, JWT_SECRET_KEY, ALGORITHM)
+    return jwt.encode(to_encode, secret, algorithm)
 
 
+@inject
 def create_access_token(
-    subject: Union[str, Any], expires_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES
+    subject: Union[str, Any],
+    expires_minutes: int = Provide[
+        Container.config.auth.access_token_expire_minutes
+    ],
+    secret: str = Provide[Container.config.auth.jwt_secret_key],
+    algorithm: str = Provide[Container.config.auth.algorithm],
 ) -> str:
-    return _create_token(subject, expires_minutes)
+    return _create_token(
+        subject,
+        expires_minutes=expires_minutes,
+        secret=secret,
+        algorithm=algorithm,
+    )
 
 
+@inject
 def create_refresh_token(
     subject: Union[str, Any],
-    expires_minutes: int = REFRESH_TOKEN_EXPIRE_MINUTES,
+    expires_minutes: int = Provide[
+        Container.config.auth.refresh_token_expire_minutes
+    ],
+    secret: str = Provide[Container.config.auth.jwt_refresh_secret_key],
+    algorithm: str = Provide[Container.config.auth.algorithm],
 ) -> str:
-    return _create_token(subject, expires_minutes)
+    return _create_token(
+        subject,
+        expires_minutes=expires_minutes,
+        secret=secret,
+        algorithm=algorithm,
+    )
 
 
 class TokenPayload(BaseModel):
@@ -48,9 +70,15 @@ class InvalidTokenError(Exception):
     pass
 
 
-def decode_token(token: str) -> TokenPayload:
+@inject
+def decode_token(
+    token: str,
+    *,
+    secret: str = Provide[Container.config.auth.jwt_secret_key],
+    algorithms: list[str] = Provide[Container.config.auth.decode_algorithms]
+) -> TokenPayload:
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, secret, algorithms=algorithms)
         return TokenPayload.parse_obj(payload)
     except (jwt.JWTError, ValidationError) as e:
         raise InvalidTokenError from e

@@ -1,16 +1,12 @@
-from functools import lru_cache
-
+from dependency_injector.wiring import Provide, inject
 from fastapi.params import Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from adapters.mongo import get_client as get_mongo_client
+from container import Container
 
 
-@lru_cache(maxsize=1)
-def get_client() -> AsyncIOMotorClient:
-    return get_mongo_client()
-
-
-@lru_cache(maxsize=1)
-def get_db(client: AsyncIOMotorClient = Depends(get_client)):
-    return client.feed_watchdog
+@inject
+def get_db(
+    client: AsyncIOMotorClient = Depends(Provide[Container.mongo_client]),
+):
+    return client.get_database()

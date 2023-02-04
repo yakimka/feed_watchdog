@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def get_client() -> httpx.AsyncClient:
     transport = httpx.AsyncHTTPTransport(retries=2)
-    token = os.environ["API_TOKEN"]
+    token = os.environ["SCHEDULER_FW_API_TOKEN"]
     headers = {"Authorization": f"Bearer {token}"}
     return httpx.AsyncClient(headers=headers, transport=transport)
 

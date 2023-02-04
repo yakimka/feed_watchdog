@@ -1,3 +1,4 @@
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from pydantic import BaseModel
 
@@ -10,6 +11,7 @@ from api.deps.stream import (
 )
 from api.deps.user import get_current_user
 from api.routers.core import ListResponse
+from container import Container
 from domain.interfaces import IStreamRepository, StreamQuery
 from domain.models import Stream, StreamWithRelations
 
@@ -102,15 +104,12 @@ async def find(
     )
 
 
-# TODO: move to config
 @router.get("/streams/intervals")
-async def get_intervals() -> list[dict]:
-    return [
-        {"text": "At 6 AM", "value": "0 6 * * *"},
-        {"text": "At 6 PM", "value": "0 18 * * *"},
-        {"text": "Every 10 minutes", "value": "*/10 * * * *"},
-        {"text": "Every 30 minutes", "value": "*/30 * * * *"},
-    ]
+@inject
+async def get_intervals(
+    intervals=Depends(Provide[Container.config.app.intervals]),
+) -> list[dict]:
+    return intervals
 
 
 @router.post("/streams", response_model=StreamResp, status_code=201)
