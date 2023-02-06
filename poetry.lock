@@ -1,6 +1,6 @@
 [[package]]
 name = "aiogram"
-version = "2.24"
+version = "2.25.1"
 description = "Is a pretty simple and fully asynchronous framework for Telegram Bot API"
 category = "main"
 optional = false
@@ -315,7 +315,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "coverage"
-version = "7.0.4"
+version = "7.1.0"
 description = "Code coverage measurement for Python"
 category = "dev"
 optional = false
@@ -345,6 +345,17 @@ pep8test = ["black", "flake8", "flake8-import-order", "pep8-naming"]
 sdist = ["setuptools-rust (>=0.11.4)"]
 ssh = ["bcrypt (>=3.1.5)"]
 test = ["pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-subtests", "pytest-xdist", "pretend", "iso8601", "pytz", "hypothesis (>=1.11.4,!=3.79.2)"]
+
+[[package]]
+name = "dacite"
+version = "1.8.0"
+description = "Simple creation of data classes from dictionaries."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.extras]
+dev = ["pytest (>=5)", "pytest-benchmark", "pytest-cov", "coveralls", "black", "mypy", "pylint", "pre-commit"]
 
 [[package]]
 name = "darglint"
@@ -2042,7 +2053,7 @@ docs = ["sphinx", "sphinx-autodoc-typehints", "m2r2", "tomlkit"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "f6f95ea3dfa1c75f5576bb5897e78246f8c2095ae3f657f90a06377e856b33e5"
+content-hash = "8d38ffe5af9cde2235f914697522a91f147e3ca71b573e7ef1fb71329fa9d2fc"
 
 [metadata.files]
 aiogram = []
@@ -2071,6 +2082,7 @@ click = []
 colorama = []
 coverage = []
 cryptography = []
+dacite = []
 darglint = []
 dependency-injector = []
 deprecated = []

@@ -18,13 +18,17 @@ class User(BaseModel):
 
 class CreateUserCommand(BaseCommand):
     async def run(self, data: User):
-        user_repo = await get_user_repo(db=container.mongo_client().get_database())
+        user_repo = await get_user_repo(
+            db=container.mongo_client().get_database()
+        )
         user = await user_repo.get_user_by_email(data.email)
         if user is not None:
             raise RuntimeError("User already exists")
 
         new_user = UserInDB(
-            id=str(uuid4()), email=data.email, password=hash_password(data.password)
+            id=str(uuid4()),
+            email=data.email,
+            password=hash_password(data.password),
         )
         await user_repo.create_user(new_user)
         return new_user

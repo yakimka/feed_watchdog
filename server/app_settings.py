@@ -22,12 +22,17 @@ class MongoSettings(BaseModel):
     url: str = "mongodb://mongo:27017/feed_watchdog"
 
 
+class SentrySettings(BaseModel):
+    dsn: str = ""
+
+
 class Interval(BaseModel):
     text: str
     value: str
 
 
 class AppSettings(BaseModel):
+    handlers_config_path: str = "/app/handlers.json"
     intervals: list[Interval] = [
         Interval(text="At 6 AM", value="0 6 * * *"),
         Interval(text="At 6 PM", value="0 18 * * *"),
@@ -41,6 +46,7 @@ class Settings(BaseSettings):
     auth: AuthSettings
     redis: RedisSettings = RedisSettings()
     mongo: MongoSettings = MongoSettings()
+    sentry: SentrySettings = SentrySettings()
 
     class Config:
         env_prefix = "FW_"

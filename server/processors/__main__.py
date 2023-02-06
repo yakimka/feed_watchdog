@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from functools import partial
 from typing import Callable, Coroutine
 
 import aioredis
@@ -12,6 +11,8 @@ from processors.adapters import lock
 from processors.adapters.pubsub import Subscriber
 from processors.service_layer import process_stream, write_configuration
 from processors.storage import Storage
+
+logger = logging.getLogger(__name__)
 
 
 async def run(topics: list[str], handler: Callable, subscriber: Subscriber):
@@ -38,7 +39,14 @@ def main() -> Coroutine:
 
     topics = [settings.Topic.STREAMS.value]
     storage = Storage(redis)
-    handler = partial(process_stream, storage=storage)
+
+    async def handler(event):
+        try:
+            return await process_stream(event, storage=storage)
+        except Exception as e:
+            logger.exception(e)
+
+    logger.info("Starting processing")
     return run(topics=topics, handler=handler, subscriber=subscriber)
 
 

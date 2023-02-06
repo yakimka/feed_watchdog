@@ -14,7 +14,7 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 
 from adapters.publisher import Publisher
 from app_settings import Topic
-from container import Container
+from container import Container, container, wire_modules
 from domain.events import ProcessStreamEvent
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ def get_client() -> httpx.AsyncClient:
     transport = httpx.AsyncHTTPTransport(retries=2)
     token = os.environ["SCHEDULER_FW_API_TOKEN"]
     headers = {"Authorization": f"Bearer {token}"}
-    return httpx.AsyncClient(headers=headers, transport=transport)
+    return httpx.AsyncClient(headers=headers, transport=transport, timeout=30)
 
 
 class SourceResp(BaseModel):
@@ -162,13 +162,11 @@ async def add_interval_jobs(
         )
 
 
-@inject
-async def send_events(
-    events: Iterable[ProcessStreamEvent],
-    publisher: Publisher = Provide[Container.publisher],
-):
-    for event in events:
+async def send_events(events: Iterable[ProcessStreamEvent]):
+    i, publisher = 0, container.publisher()
+    for i, event in enumerate(events, start=1):
         await publisher.publish(Topic.STREAMS.value, event)
+    logger.info("Sent %s events", i)
 
 
 async def collect_and_publish_streams(

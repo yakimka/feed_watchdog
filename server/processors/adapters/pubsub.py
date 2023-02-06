@@ -6,6 +6,7 @@ from typing import Any, Callable, Optional, Protocol, TypedDict
 
 import aioredis
 import async_timeout
+from dacite import from_dict
 
 from processors.domain import events
 
@@ -56,4 +57,4 @@ class Message(TypedDict):
 def _parse_event(message: Message) -> Event:
     data = json.loads(message["data"].decode("utf-8"))
     event_class = getattr(events, data.pop("__event_name__"))
-    return event_class(**data)
+    return from_dict(data_class=event_class, data=data)

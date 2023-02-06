@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 async def process_stream(
     event: events.ProcessStreamEvent, storage: Storage
 ) -> None:
+    logger.info("Processing stream %s", event.slug)
     fetcher = get_handler_by_name(
         type=HandlerType.fetchers.value,
         name=event.source.fetcher_type,
@@ -25,6 +26,7 @@ async def process_stream(
     )
     text = await fetcher()
     if not text:
+        write_warn_message(f"Can't fetch text for {event.slug}", logger=logger)
         return None
     parser = get_handler_by_name(
         name=event.source.parser_type,
