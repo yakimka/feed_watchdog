@@ -14,8 +14,6 @@ services:
     restart: "no"
     depends_on:
       - mongo
-    volumes:
-      - ./public:/var/www/public
 
   fw_scheduler:
     command: python -m workers.scheduler

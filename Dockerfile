@@ -93,11 +93,23 @@ EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--reload"]
 
 
+# build frontend
+FROM node:16.13.0-buster-slim as frontend-builder
+
+WORKDIR /app/frontend
+
+COPY ./frontend/package.json ./frontend/package-lock.json ./
+
+RUN npm install
+COPY ./frontend .
+RUN npm run build
+
 # `production` image used for runtime
 FROM python-base as production
 ENV ENVIRONMENT=production \
     WEB_CONCURRENCY=4
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+COPY --from=frontend-builder /app/frontend/dist /var/www/frontend
 COPY --chown=app:app server /app/server
 WORKDIR /app/server
 
