@@ -3,9 +3,8 @@ import logging
 from typing import Callable, Coroutine
 
 import aioredis
-import sentry_sdk
-from sentry_sdk.integrations.logging import LoggingIntegration
 
+from adapters import sentry
 from processors import settings
 from processors.adapters import lock
 from processors.adapters.pubsub import Subscriber
@@ -26,11 +25,7 @@ def main() -> Coroutine:
     with open(settings.SHARED_CONFIG_PATH, "w") as f:
         write_configuration(f)
 
-    if settings.SENTRY_DSN:
-        sentry_logging = LoggingIntegration(
-            level=logging.INFO, event_level=logging.ERROR
-        )
-        sentry_sdk.init(dsn=settings.SENTRY_DSN, integrations=[sentry_logging])
+    sentry.setup_logging(settings.SENTRY_DSN)
 
     redis = aioredis.from_url(settings.REDIS_URL)  # type: ignore
     lock.init(redis)  # TODO DI

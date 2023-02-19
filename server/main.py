@@ -3,12 +3,15 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
+from adapters import sentry
 from api.errors import ErrorResponse, FieldError
 from api.exceptions import ValueExistsError
 from api.routers import router
-from container import wire_modules
+from container import container, wire_modules
 
 wire_modules()
+
+sentry.setup_fastapi(container.settings().sentry.dsn)
 
 app = FastAPI()
 app.include_router(router)

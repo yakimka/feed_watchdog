@@ -5,16 +5,13 @@ from functools import partial
 from typing import Iterable
 
 import httpx
-import sentry_sdk
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from dependency_injector.wiring import Provide, inject
 from pydantic import BaseModel
-from sentry_sdk.integrations.logging import LoggingIntegration
 
-from adapters.publisher import Publisher
+from adapters import sentry
 from app_settings import Topic
-from container import Container, container, wire_modules
+from container import container
 from domain.events import ProcessStreamEvent
 
 logger = logging.getLogger(__name__)
@@ -182,11 +179,7 @@ async def collect_and_publish_streams(
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    if sentry_dsn := os.environ.get("SENTRY_DSN"):
-        sentry_logging = LoggingIntegration(
-            level=logging.INFO, event_level=logging.ERROR
-        )
-        sentry_sdk.init(dsn=sentry_dsn, integrations=[sentry_logging])
+    sentry.setup_logging(os.environ.get("SENTRY_DSN"))
 
     httpx_client = get_client()
     stream_client = HTTPXStreamClient(
