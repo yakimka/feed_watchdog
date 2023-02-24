@@ -68,7 +68,7 @@ def _handler(text: str) -> list[Post]:
             id_field = entry.keymap["guid"]
             posts.append(
                 Post(
-                    post_id=entry.get(id_field),
+                    post_id=entry.get(id_field) or entry.link,
                     title=entry.title,
                     url=entry.get("link"),
                     post_tags=get_tags(entry),

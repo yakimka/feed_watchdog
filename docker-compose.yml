@@ -21,6 +21,8 @@ services:
     env_file: server/.env
     hostname: fw_scheduler
     image: feed_watchdog:dev
+    depends_on:
+      - redis
     restart: "no"
 
   fw_processor:
@@ -29,6 +31,8 @@ services:
     env_file: server/.env
     hostname: fw_processor
     image: feed_watchdog:dev
+    depends_on:
+      - redis
     restart: "no"
 
   redis:

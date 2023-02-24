@@ -7,6 +7,8 @@ from aioredis import Redis
 from aioredis.exceptions import LockNotOwnedError
 from aioredis.lock import Lock
 
+from processors.adapters.error_tracking import write_warn_message
+
 logger = logging.getLogger(__name__)
 
 _redis: Redis
@@ -37,7 +39,7 @@ def async_lock(
                     await sleep(wait_time)
                     return res
             except LockNotOwnedError:
-                logger.debug("Lock %s is not owned", lock_key)
+                write_warn_message(f"Lock {lock_key} is not owned", logger=logger)
 
         return wrapped
 

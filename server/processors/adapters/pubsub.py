@@ -35,6 +35,7 @@ class Subscriber:
         self, topics, on_message: Callable[[Any], Coroutine[Any, Any, None]]
     ):
         await self.pubsub.subscribe(*topics)
+        tasks = []
         while True:
             with suppress(asyncio.TimeoutError):
                 async with async_timeout.timeout(1):
@@ -43,7 +44,11 @@ class Subscriber:
                     )
                     if message is not None:
                         event = _parse_event(message)
-                        asyncio.create_task(on_message(event))
+                        task = asyncio.create_task(on_message(event))
+                        tasks.append(task)
+                        if len(tasks) >= 100:
+                            await asyncio.gather(*tasks)
+                            tasks = []
                     await asyncio.sleep(0.01)
 
 

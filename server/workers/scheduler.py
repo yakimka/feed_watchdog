@@ -116,17 +116,18 @@ class Command:
         logger.info("Starting scheduler")
         scheduler = AsyncIOScheduler()
         await add_interval_jobs(scheduler, stream_client=stream_client)
-        scheduler.add_job(
-            update_jobs,
-            "interval",
-            [scheduler, stream_client, get_context()],
-            seconds=60,
-        )
+        # scheduler.add_job(
+        #     update_jobs,
+        #     "interval",
+        #     [scheduler, stream_client, get_context()],
+        #     seconds=60,
+        # )
         scheduler.start()
 
 
 def get_context() -> dict:
     return {
+        "always_need_update": object(),
         "streams_count": None,
         "updated_at": None,
     }
@@ -179,7 +180,7 @@ async def collect_and_publish_streams(
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    sentry.setup_logging(os.environ.get("SENTRY_DSN"))
+    sentry.setup_logging(os.environ.get("FW_SENTRY__DSN"))
 
     httpx_client = get_client()
     stream_client = HTTPXStreamClient(

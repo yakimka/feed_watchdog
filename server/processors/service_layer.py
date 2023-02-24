@@ -47,9 +47,9 @@ async def apply_modifiers(
 ) -> Iterable[models.Post]:
     for modifier in modifiers:
         modifier_func = get_handler_by_name(
-            name=modifier["type"],
+            name=modifier.type,
             type=HandlerType.modifiers.value,
-            options=modifier["options"],
+            options=modifier.options,
         )
         posts = await modifier_func(posts)
     return posts
