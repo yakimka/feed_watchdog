@@ -112,22 +112,21 @@ class HTTPXStreamClient:
 class Command:
     help = "Runs the scheduler"
 
-    async def handle(self, stream_client: HTTPXStreamClient):
+    async def handle(self, stream_client: HTTPXStreamClient):  # noqa: E800
         logger.info("Starting scheduler")
         scheduler = AsyncIOScheduler()
         await add_interval_jobs(scheduler, stream_client=stream_client)
-        # scheduler.add_job(
-        #     update_jobs,
-        #     "interval",
-        #     [scheduler, stream_client, get_context()],
-        #     seconds=60,
-        # )
+        scheduler.add_job(
+            update_jobs,
+            "interval",
+            [scheduler, stream_client, get_context()],
+            seconds=60,
+        )
         scheduler.start()
 
 
 def get_context() -> dict:
     return {
-        "always_need_update": object(),
         "streams_count": None,
         "updated_at": None,
     }
@@ -162,7 +161,7 @@ async def add_interval_jobs(
 
 async def send_events(events: Iterable[ProcessStreamEvent]):
     i, publisher = 0, container.publisher()
-    for i, event in enumerate(events, start=1):
+    for i, event in enumerate(events, start=1):  # noqa: B007
         await publisher.publish(Topic.STREAMS.value, event)
     logger.info("Sent %s events", i)
 
@@ -183,12 +182,12 @@ if __name__ == "__main__":
     sentry.setup_logging(os.environ.get("FW_SENTRY__DSN"))
 
     httpx_client = get_client()
-    stream_client = HTTPXStreamClient(
+    httpx_stream_client = HTTPXStreamClient(
         httpx_client, "http://feed_watchdog:8000/api"
     )
 
     loop = asyncio.get_event_loop()
-    loop.create_task(Command().handle(stream_client=stream_client))
+    loop.create_task(Command().handle(stream_client=httpx_stream_client))
     try:
         loop.run_forever()
     finally:

@@ -1,5 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from adapters.repositories.processor import FileProcessorsConfigRepo
-from domain.interfaces import IProcessorsConfigurationRepository
+
+if TYPE_CHECKING:
+    from domain.interfaces import IProcessorsConfigurationRepository
 
 
 def get_processors_conf_repo() -> IProcessorsConfigurationRepository:

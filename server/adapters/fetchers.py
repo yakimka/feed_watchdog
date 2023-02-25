@@ -11,8 +11,10 @@ class MongoStreamFetcher:
         self.db = db
 
     async def search(
-        self, query: StreamQuery = StreamQuery()
+        self, query: StreamQuery | None = None
     ) -> list[StreamWithRelations]:
+        if query is None:
+            query = StreamQuery()
         cursor = (
             self.db.streams.find(self._make_find_query(query))
             .sort(query.sort_by)
@@ -36,7 +38,9 @@ class MongoStreamFetcher:
             for s in streams
         ]
 
-    async def get_count(self, query: StreamQuery = StreamQuery()) -> int:
+    async def get_count(self, query: StreamQuery | None = None) -> int:
+        if query is None:
+            query = StreamQuery()
         return await self.db.streams.count_documents(
             self._make_find_query(query)
         )

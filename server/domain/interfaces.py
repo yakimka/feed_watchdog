@@ -30,11 +30,11 @@ class StreamQuery(PaginationQuery):
 
 class ISourceRepository(abc.ABC):
     @abstractmethod
-    async def find(self, query: SourceQuery = SourceQuery()) -> list[Source]:
+    async def find(self, query: SourceQuery) -> list[Source]:
         pass
 
     @abstractmethod
-    async def get_count(self, query: SourceQuery = SourceQuery()) -> int:
+    async def get_count(self, query: SourceQuery) -> int:
         pass
 
     @abstractmethod
@@ -56,13 +56,11 @@ class ISourceRepository(abc.ABC):
 
 class IReceiverRepository(abc.ABC):
     @abstractmethod
-    async def find(
-        self, query: ReceiverQuery = ReceiverQuery()
-    ) -> list[Receiver]:
+    async def find(self, query: ReceiverQuery) -> list[Receiver]:
         pass
 
     @abstractmethod
-    async def get_count(self, query: ReceiverQuery = ReceiverQuery()) -> int:
+    async def get_count(self, query: ReceiverQuery) -> int:
         pass
 
     @abstractmethod
@@ -84,11 +82,11 @@ class IReceiverRepository(abc.ABC):
 
 class IStreamRepository(abc.ABC):
     @abstractmethod
-    async def find(self, query: StreamQuery = StreamQuery()) -> list[Stream]:
+    async def find(self, query: StreamQuery) -> list[Stream]:
         pass
 
     @abstractmethod
-    async def get_count(self, query: StreamQuery = StreamQuery()) -> int:
+    async def get_count(self, query: StreamQuery) -> int:
         pass
 
     @abstractmethod
@@ -116,7 +114,7 @@ class IProcessorsConfigurationRepository(abc.ABC):
 
 class IUserRepository(abc.ABC):
     @abstractmethod
-    async def get_user_by_id(self, id: str) -> UserInDB | None:
+    async def get_user_by_id(self, id: str) -> UserInDB | None:  # noqa: PLW0622
         pass
 
     @abstractmethod

@@ -17,6 +17,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--sub", required=True)
     parser.add_argument("--expires_minutes", type=int, default=30)
-    args = parser.parse_args()
 
-    CreateAccessTokenCommand().run(args)
+    CreateAccessTokenCommand().run(parser.parse_args())

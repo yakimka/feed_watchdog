@@ -12,9 +12,9 @@ class MongoReceiverRepository(IReceiverRepository):
     def __init__(self, db: AsyncIOMotorClient) -> None:
         self.db = db
 
-    async def find(
-        self, query: ReceiverQuery = ReceiverQuery()
-    ) -> list[Receiver]:
+    async def find(self, query: ReceiverQuery | None = None) -> list[Receiver]:
+        if query is None:
+            query = ReceiverQuery()
         cursor = (
             self.db.receivers.find(self._make_find_query(query))
             .sort(query.sort_by)
@@ -41,7 +41,9 @@ class MongoReceiverRepository(IReceiverRepository):
             ]
         }
 
-    async def get_count(self, query: ReceiverQuery = ReceiverQuery()) -> int:
+    async def get_count(self, query: ReceiverQuery | None = None) -> int:
+        if query is None:
+            query = ReceiverQuery()
         return await self.db.receivers.count_documents(
             self._make_find_query(query)
         )

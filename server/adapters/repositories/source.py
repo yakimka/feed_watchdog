@@ -1,7 +1,6 @@
 import re
 
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel
 from pymongo.errors import DuplicateKeyError
 
 from api.exceptions import ValueExistsError
@@ -13,7 +12,9 @@ class MongoSourceRepository(ISourceRepository):
     def __init__(self, db: AsyncIOMotorClient) -> None:
         self.db = db
 
-    async def find(self, query: SourceQuery = SourceQuery()) -> list[Source]:
+    async def find(self, query: SourceQuery | None = None) -> list[Source]:
+        if query is None:
+            query = SourceQuery()
         cursor = (
             self.db.sources.find(self._make_find_query(query))
             .sort(query.sort_by)
@@ -40,7 +41,9 @@ class MongoSourceRepository(ISourceRepository):
             ]
         }
 
-    async def get_count(self, query: SourceQuery = SourceQuery()) -> int:
+    async def get_count(self, query: SourceQuery | None = None) -> int:
+        if query is None:
+            query = SourceQuery()
         return await self.db.sources.count_documents(
             self._make_find_query(query)
         )

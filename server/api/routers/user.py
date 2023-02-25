@@ -1,15 +1,9 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
 from api.deps.user import get_current_user, get_user_repo
-from auth import (
-    InvalidTokenError,
-    create_access_token,
-    create_refresh_token,
-    decode_token,
-    oauth2_scheme,
-)
+from auth import create_access_token, create_refresh_token, oauth2_scheme
 from domain.interfaces import IUserRepository
 from domain.models import User
 from utils.security import verify_password

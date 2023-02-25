@@ -12,7 +12,10 @@ class MongoStreamRepository(IStreamRepository):
     def __init__(self, db: AsyncIOMotorClient) -> None:
         self.db = db
 
-    async def find(self, query: StreamQuery = StreamQuery()) -> list[Stream]:
+    async def find(self, query: StreamQuery | None = None) -> list[Stream]:
+        if query is None:
+            query = StreamQuery()
+
         cursor = (
             self.db.streams.find(self._make_find_query(query))
             .sort(query.sort_by)
@@ -32,7 +35,9 @@ class MongoStreamRepository(IStreamRepository):
             "slug": {"$regex": re.compile(f"^{query.search}$", re.IGNORECASE)}
         }
 
-    async def get_count(self, query: StreamQuery = StreamQuery()) -> int:
+    async def get_count(self, query: StreamQuery | None = None) -> int:
+        if query is None:
+            query = StreamQuery()
         return await self.db.streams.count_documents(
             self._make_find_query(query)
         )

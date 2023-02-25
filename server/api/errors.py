@@ -19,13 +19,13 @@ class ErrorResponse(BaseModel):
         response = cls(
             type=first_error["type"], message=first_error["msg"], details=[]
         )
-        for error in errors:
-            if error["type"] != response.type:
+        for error_ in errors:
+            if error_["type"] != response.type:
                 continue
 
             response.details.append(
                 FieldError(
-                    field=".".join(error["loc"][1:]), message=error["msg"]
+                    field=".".join(error_["loc"][1:]), message=error_["msg"]
                 )
             )
         return response

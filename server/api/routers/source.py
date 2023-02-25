@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 from adapters.repositories.source import SourceQuery
 from api.deps.pagination import Pagination, get_pagination_params
