@@ -1,4 +1,6 @@
-from typing import Protocol
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Protocol
 
 from fastapi import Depends, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -7,7 +9,9 @@ from adapters.fetchers import MongoStreamFetcher
 from adapters.repositories.stream import MongoStreamRepository
 from api.deps.mongo import get_db
 from domain.interfaces import IStreamRepository, StreamQuery
-from domain.models import StreamWithRelations
+
+if TYPE_CHECKING:
+    from domain.models import StreamWithRelations
 
 
 def get_stream_repo(
