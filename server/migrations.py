@@ -19,4 +19,4 @@ collections = {
 
 
 if __name__ == "__main__":
-    mongodex.migrate(container.settings.mongo.url, collections)
+    mongodex.migrate(container.settings().mongo.url, collections)

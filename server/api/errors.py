@@ -25,10 +25,11 @@ class ErrorResponse(BaseModel):
 
             response.details.append(
                 FieldError(
-                    field=".".join(error_["loc"][1:]), message=error_["msg"]
+                    field=".".join(map(str, error_["loc"][1:])),
+                    message=error_["msg"],
                 )
             )
         return response
 
-    def to_response(self):
+    def to_response(self) -> dict:
         return {"error": self.dict()}

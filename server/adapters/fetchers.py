@@ -59,7 +59,7 @@ class MongoStreamFetcher:
 
     @staticmethod
     def _make_find_query(query: StreamQuery) -> dict:
-        filters = {}
+        filters: dict = {}
         if query.search:
             filters["slug"] = {
                 "$regex": re.compile(query.search, re.IGNORECASE)

@@ -68,7 +68,7 @@ class IReceiverRepository(abc.ABC):
         pass
 
     @abstractmethod
-    async def update(self, slug: str, receiver: Receiver) -> None:
+    async def update(self, slug: str, receiver: Receiver) -> bool:
         pass
 
     @abstractmethod
@@ -76,7 +76,7 @@ class IReceiverRepository(abc.ABC):
         pass
 
     @abstractmethod
-    async def delete_by_slug(self, slug: str) -> None:
+    async def delete_by_slug(self, slug: str) -> bool:
         pass
 
 
@@ -94,7 +94,7 @@ class IStreamRepository(abc.ABC):
         pass
 
     @abstractmethod
-    async def update(self, slug: str, stream: Stream) -> None:
+    async def update(self, slug: str, stream: Stream) -> bool:
         pass
 
     @abstractmethod
@@ -102,7 +102,7 @@ class IStreamRepository(abc.ABC):
         pass
 
     @abstractmethod
-    async def delete_by_slug(self, slug: str) -> None:
+    async def delete_by_slug(self, slug: str) -> bool:
         pass
 
 
@@ -122,5 +122,5 @@ class IUserRepository(abc.ABC):
         pass
 
     @abstractmethod
-    async def create_user(self, user: UserInDB) -> None:
+    async def create_user(self, user: UserInDB) -> str:
         pass

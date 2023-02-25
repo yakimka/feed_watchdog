@@ -8,7 +8,7 @@ from container import container
 from domain.models import Receiver, Source, Stream
 
 
-async def main():  # noqa: C901
+async def main() -> None:  # noqa: C901
     with open("streams.json") as f:
         streams_data = json.load(f)
 

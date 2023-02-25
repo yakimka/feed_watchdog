@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from adapters.repositories.source import SourceQuery
 from api.deps.pagination import Pagination, get_pagination_params
 from api.deps.source import get_by_slug, get_source_repo
 from api.deps.user import get_current_user
 from api.routers.core import ListResponse
-from domain.interfaces import ISourceRepository
+from domain.interfaces import ISourceRepository, SourceQuery
 from domain.models import Source as SourceModel
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
