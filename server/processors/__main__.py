@@ -38,7 +38,7 @@ def main() -> Coroutine:
     async def handler(event):
         try:
             return await process_stream(event, storage=storage)
-        except Exception as e:  # noqa: PLW0703
+        except Exception as e:  # noqa: PLW0703, PLW0718
             logger.exception(e)
 
     logger.info("Starting processing")

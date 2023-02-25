@@ -74,7 +74,7 @@ def _handler(text: str) -> list[Post]:
                     post_tags=get_tags(entry),
                 ),
             )
-        except Exception:  # noqa: PLW0703, PIE786
+        except Exception:  # noqa: PLW0703, PLW0718
             entry = json.dumps(entry, sort_keys=True, indent=4)
             logger.exception("Failed to parse entry: %s", entry)
 
