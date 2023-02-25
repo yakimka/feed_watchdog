@@ -39,7 +39,9 @@ def async_lock(
                     await sleep(wait_time)
                     return res
             except LockNotOwnedError:
-                write_warn_message(f"Lock {lock_key} is not owned", logger=logger)
+                write_warn_message(
+                    f"Lock {lock_key} is not owned", logger=logger
+                )
 
         return wrapped
 

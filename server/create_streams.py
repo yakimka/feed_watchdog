@@ -37,7 +37,8 @@ async def main():
             intervals=["*/10 * * * *"],
             squash=stream["squash"],
             receiver_options_override=stream["receiver_options_override"],
-            message_template=stream["message_template"] or stream["receiver"]["message_template"],
+            message_template=stream["message_template"]
+            or stream["receiver"]["message_template"],
             modifiers=stream["modifiers"],
             active=True,
             source_slug=source.slug,
