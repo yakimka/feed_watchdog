@@ -41,6 +41,8 @@ apt-get install --no-install-recommends -y  \
     libpq5 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /var/www/frontend \
+    && chown -R 1000:1000 /var/www/frontend
 
 # `builder-base` stage is used to build deps + create our virtual environment
 FROM python-base as builder-base
@@ -63,9 +65,6 @@ COPY poetry.lock pyproject.toml ./
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
 RUN poetry install --no-dev
 
-RUN mkdir -p /var/www/public/{media,static} \
-    && chown -R 1000:1000 /var/www/public
-
 
 # `development` image is used during development / testing
 FROM python-base as development
@@ -83,18 +82,33 @@ RUN poetry install
 # will become mountpoint of our code
 WORKDIR /app/server
 
+# for installing deps without rebuild image
+ENV PATH="/app/.venv/bin:$PATH"
+
 USER app
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--reload"]
 
+
+# build frontend
+FROM node:16.13.0-buster-slim as frontend-builder
+
+WORKDIR /app/frontend
+
+COPY ./frontend/package.json ./frontend/package-lock.json ./
+
+RUN npm install
+COPY ./frontend .
+RUN npm run build
 
 # `production` image used for runtime
 FROM python-base as production
 ENV ENVIRONMENT=production \
     WEB_CONCURRENCY=4
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+COPY --from=frontend-builder /app/frontend/dist /app/frontend
 COPY --chown=app:app server /app/server
 WORKDIR /app/server
 

@@ -18,12 +18,14 @@ jobs:
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-      - name: deploy
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} -p  > ~/.ssh/known_hosts
+      - name: connect and update
+        env:
+          REF: ${{ github.event.inputs.git-ref }}
         run: |
-          echo "123"
-          echo github.event.inputs.git-ref
-      #    - name: connect and update
-      #      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && exit"
+          echo "SHA is: ${REF:-${GITHUB_SHA::7}}"
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} \
+            "cd projects/feed_watchdog && \
+            FW_VERSION=${REF:-${GITHUB_SHA::7}} docker compose up -d"
       - name: cleanup
         run: rm -rf ~/.ssh

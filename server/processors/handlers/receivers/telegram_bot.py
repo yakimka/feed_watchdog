@@ -1,17 +1,13 @@
-from __future__ import annotations
-
 import dataclasses
 import logging
-from typing import TYPE_CHECKING, Awaitable, Callable, Iterable
+from typing import Awaitable, Callable, Iterable
 
 from aiogram import Bot
 
 from processors.adapters.lock import async_lock
 from processors.domain.logic import make_message_from_template
+from processors.domain.models import Post
 from processors.handlers import HandlerOptions, HandlerType, register_handler
-
-if TYPE_CHECKING:
-    from processors.domain.models import Post
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +48,7 @@ class TelegramBot:
         template: str,
         squash: bool = False,
         options: TelegramBotOptions,
-        callback: Callable[[Post], Awaitable] = None,
+        callback: Callable[[Post], Awaitable] | None = None,
     ) -> None:
         if squash:
             await self._send_squashed_message(
@@ -75,7 +71,7 @@ class TelegramBot:
         *,
         template: str,
         options: TelegramBotOptions,
-        callback: Callable[[Post], Awaitable] = None,
+        callback: Callable[[Post], Awaitable] | None = None,
     ) -> None:
         for post in posts:
             message = make_message_from_template(
@@ -95,12 +91,12 @@ class TelegramBot:
         *,
         template: str,
         options: TelegramBotOptions,
-        callback: Callable[[Post], Awaitable] = None,
+        callback: Callable[[Post], Awaitable] | None = None,
     ) -> None:
         posts = list(posts)
         if not posts:
             return
-        parts = []
+        parts: list[str] = []
         delimiter = "\n-----\n"
         for post in posts:
             message = make_message_from_template(

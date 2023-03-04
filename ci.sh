@@ -27,6 +27,7 @@ run_ci () {
 
   # Testing filesystem and permissions:
   touch .perm && rm -f .perm
+  touch /var/www/frontend/.perm && rm -f /var/www/frontend/.perm
 
   # Run checks
   make test

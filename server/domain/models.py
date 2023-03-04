@@ -1,8 +1,20 @@
-import dataclasses
+from pydantic import BaseModel as PydanticBaseModel
 
 
-@dataclasses.dataclass()
-class Source:
+class BaseModel(PydanticBaseModel):
+    pass
+
+
+class User(BaseModel):
+    id: str
+    email: str
+
+
+class UserInDB(User):
+    password: str
+
+
+class Source(BaseModel):
     name: str
     slug: str
     fetcher_type: str
@@ -10,30 +22,37 @@ class Source:
     parser_type: str
     parser_options: dict
     description: str = ""
-    tags: tuple | list = ()
+    tags: list = []
 
 
-@dataclasses.dataclass()
-class Receiver:
+class Receiver(BaseModel):
     name: str
     slug: str
     type: str
     options: dict
-    message_template: str
+    options_allowed_to_override: list[str] = []
 
 
-@dataclasses.dataclass()
-class Modifier:
+class Modifier(BaseModel):
     type: str
     options: dict
 
 
-@dataclasses.dataclass()
-class Stream:
-    uid: str
-    source: Source
-    receiver: Receiver
+class BaseStream(BaseModel):
+    slug: str
+    intervals: list[str]
     squash: bool
     receiver_options_override: dict
-    message_template: str = ""
-    modifiers: list[Modifier] = dataclasses.field(default_factory=list)
+    message_template: str
+    modifiers: list[Modifier] = []
+    active: bool
+
+
+class Stream(BaseStream):
+    source_slug: str
+    receiver_slug: str
+
+
+class StreamWithRelations(Stream):
+    source: Source
+    receiver: Receiver

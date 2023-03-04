@@ -1,10 +1,7 @@
-from __future__ import annotations
-
 import json
-from typing import TYPE_CHECKING, Protocol
+from typing import Protocol
 
-if TYPE_CHECKING:
-    from aioredis import Redis
+from aioredis import Redis
 
 
 class Event(Protocol):

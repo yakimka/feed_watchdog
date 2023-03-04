@@ -31,7 +31,7 @@ class Post:
         }
 
     @classmethod
-    def fields_schema(cls):
+    def fields_schema(cls) -> dict:
         return {
             "post_id": {"type": "string"},
             "title": {"type": "string"},
@@ -57,7 +57,7 @@ def _handler(text: str) -> list[Post]:
     if not text:
         return posts
 
-    def get_tags(entry):
+    def get_tags(entry: dict) -> tuple[str, ...]:
         return tuple(tag.term for tag in entry.get("tags", []))
 
     feed = feedparser.parse(
@@ -68,13 +68,13 @@ def _handler(text: str) -> list[Post]:
             id_field = entry.keymap["guid"]
             posts.append(
                 Post(
-                    post_id=entry.get(id_field),
+                    post_id=entry.get(id_field) or entry.link,
                     title=entry.title,
                     url=entry.get("link"),
                     post_tags=get_tags(entry),
                 ),
             )
-        except Exception:  # noqa: PLW0703, PIE786
+        except Exception:  # noqa: PLW0703, PLW0718
             entry = json.dumps(entry, sort_keys=True, indent=4)
             logger.exception("Failed to parse entry: %s", entry)
 

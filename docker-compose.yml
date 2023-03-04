@@ -12,15 +12,17 @@ services:
     hostname: feed_watchdog
     image: feed_watchdog:dev
     restart: "no"
-    volumes:
-      - ./public:/var/www/public
+    depends_on:
+      - mongo4
 
   fw_scheduler:
-    command: python manage.py run_scheduler
+    command: python -m workers.scheduler
     container_name: fw_scheduler
     env_file: server/.env
     hostname: fw_scheduler
     image: feed_watchdog:dev
+    depends_on:
+      - redis
     restart: "no"
 
   fw_processor:
@@ -29,6 +31,8 @@ services:
     env_file: server/.env
     hostname: fw_processor
     image: feed_watchdog:dev
+    depends_on:
+      - redis
     restart: "no"
 
   redis:
@@ -36,3 +40,21 @@ services:
     hostname: redis
     image: redis:7
     restart: "no"
+
+  mongo4:
+    container_name: mongo4
+    hostname: mongo4
+    image: mongo:4
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    restart: "no"
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./createUser.js:/docker-entrypoint-initdb.d/createUser.js
+      - mongo4:/data/db
+
+volumes:
+  mongo4: {}

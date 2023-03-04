@@ -1,14 +1,11 @@
-from __future__ import annotations
-
 import re
 import string
 from functools import lru_cache
-from typing import TYPE_CHECKING, Iterable, Sequence
+from typing import Iterable, Sequence
 
 from tldextract import tldextract
 
-if TYPE_CHECKING:
-    from . import events, models
+from . import events, models
 
 
 def mutate_posts_with_stream_data(
@@ -17,7 +14,7 @@ def mutate_posts_with_stream_data(
 ) -> None:
     for post in posts:
         post.post_id = _generate_post_id(post.post_id)
-        post.source_tags = stream.source_tags
+        post.source_tags = stream.source.tags
 
 
 def _generate_post_id(post_id: str) -> str:

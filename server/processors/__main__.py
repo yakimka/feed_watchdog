@@ -1,17 +1,17 @@
 import asyncio
 import logging
-from functools import partial
 from typing import Callable, Coroutine
 
 import aioredis
-import sentry_sdk
-from sentry_sdk.integrations.logging import LoggingIntegration
 
+from adapters import sentry
 from processors import settings
 from processors.adapters import lock
 from processors.adapters.pubsub import Subscriber
 from processors.service_layer import process_stream, write_configuration
 from processors.storage import Storage
+
+logger = logging.getLogger(__name__)
 
 
 async def run(topics: list[str], handler: Callable, subscriber: Subscriber):
@@ -25,11 +25,7 @@ def main() -> Coroutine:
     with open(settings.SHARED_CONFIG_PATH, "w") as f:
         write_configuration(f)
 
-    if settings.SENTRY_DSN:
-        sentry_logging = LoggingIntegration(
-            level=logging.INFO, event_level=logging.ERROR
-        )
-        sentry_sdk.init(dsn=settings.SENTRY_DSN, integrations=[sentry_logging])
+    sentry.setup_logging(settings.SENTRY_DSN)
 
     redis = aioredis.from_url(settings.REDIS_URL)  # type: ignore
     lock.init(redis)  # TODO DI
@@ -38,7 +34,14 @@ def main() -> Coroutine:
 
     topics = [settings.Topic.STREAMS.value]
     storage = Storage(redis)
-    handler = partial(process_stream, storage=storage)
+
+    async def handler(event):
+        try:
+            return await process_stream(event, storage=storage)
+        except Exception as e:  # noqa: PLW0703, PLW0718
+            logger.exception(e)
+
+    logger.info("Starting processing")
     return run(topics=topics, handler=handler, subscriber=subscriber)
 
 

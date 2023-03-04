@@ -1,33 +1,38 @@
 import aioredis
 from dependency_injector import containers, providers
+from motor.motor_asyncio import AsyncIOMotorClient
 
-import app_settings
 from adapters.publisher import Publisher
-from adapters.streams import StreamRepository
+from app_settings import get_settings
 
 
 class Container(containers.DeclarativeContainer):
-    config = providers.Configuration()
+    config = providers.Configuration(strict=True)
+    settings = providers.Singleton(get_settings)
 
     redis_client = providers.Singleton(
         aioredis.from_url,
-        url=config.REDIS_PUB_SUB_URL,
+        url=config.redis.pub_sub_url,
+    )
+    mongo_client = providers.Singleton(  # type: ignore
+        AsyncIOMotorClient,
+        config.mongo.url,
     )
     publisher = providers.Factory(
         Publisher,
         redis_client=redis_client,
     )
-    streams = providers.Factory(StreamRepository)
 
 
 container = Container()
-container.config.from_dict(vars(app_settings))
+container.config.from_pydantic(get_settings(), required=True)
 
 
-def wire_container():
+def wire_modules() -> None:
     container.wire(
         packages=[
-            "adapters",
-            "service_layer",
+            "auth",
+            "api.deps",
+            "api.routers",
         ]
     )

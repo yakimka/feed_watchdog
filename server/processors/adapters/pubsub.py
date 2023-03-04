@@ -1,19 +1,14 @@
-from __future__ import annotations
-
 import asyncio
 import json
+from collections.abc import Coroutine
 from contextlib import suppress
-from typing import TYPE_CHECKING, Protocol, TypedDict
+from typing import Any, Callable, Optional, Protocol, TypedDict
 
+import aioredis
 import async_timeout
+from dacite import from_dict
 
 from processors.domain import events
-
-if TYPE_CHECKING:
-    from collections.abc import Coroutine
-    from typing import Any, Callable, Optional
-
-    import aioredis
 
 
 class Event(Protocol):
@@ -40,6 +35,7 @@ class Subscriber:
         self, topics, on_message: Callable[[Any], Coroutine[Any, Any, None]]
     ):
         await self.pubsub.subscribe(*topics)
+        tasks = []
         while True:
             with suppress(asyncio.TimeoutError):
                 async with async_timeout.timeout(1):
@@ -48,7 +44,11 @@ class Subscriber:
                     )
                     if message is not None:
                         event = _parse_event(message)
-                        asyncio.create_task(on_message(event))
+                        task = asyncio.create_task(on_message(event))
+                        tasks.append(task)
+                        if len(tasks) >= 100:
+                            await asyncio.gather(*tasks)
+                            tasks = []
                     await asyncio.sleep(0.01)
 
 
@@ -62,4 +62,4 @@ class Message(TypedDict):
 def _parse_event(message: Message) -> Event:
     data = json.loads(message["data"].decode("utf-8"))
     event_class = getattr(events, data.pop("__event_name__"))
-    return event_class(**data)
+    return from_dict(data_class=event_class, data=data)

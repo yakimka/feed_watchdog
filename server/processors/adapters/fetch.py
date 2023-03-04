@@ -31,20 +31,20 @@ async def fetch_text_from_url(
                 res.raise_for_status()
             except httpx.HTTPError as e:
                 if retry > 0:
-                    logger.warning(
-                        "Failed to fetch %s with %s and %s retries left."
-                        " Retrying...",
-                        url,
-                        e,
-                        retry,
+                    msg = (
+                        f"Failed to fetch {url} with {e} and {retry} retries"
+                        " left. Retrying..."
                     )
+                    logger.warning(msg)
                     retry -= 1
                     await asyncio.sleep(3.0)
                     continue
 
+                msg = (
+                    f"Error while fetching {url}: error {type(e).__name__}\n{e}"
+                )
                 write_warn_message(
-                    f"Error while fetching {url}: error"
-                    f" {type(e).__name__}\n{e}",
+                    msg,
                     logger=logger,
                 )
                 return None
