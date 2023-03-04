@@ -114,4 +114,4 @@ WORKDIR /app/server
 
 USER app
 
-CMD ["gunicorn", "wsgi", "-b", "0.0.0.0:8000", "--timeout=90", "--log-file=-"]
+CMD ["uvicorn", "--host=0.0.0.0", "--port=8000", "main:app"]
