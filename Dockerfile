@@ -108,7 +108,7 @@ FROM python-base as production
 ENV ENVIRONMENT=production \
     WEB_CONCURRENCY=4
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-COPY --from=frontend-builder /app/frontend/dist /app/frontend
+COPY --from=frontend-builder --chown=app:app  /app/frontend/dist /app/frontend
 COPY --chown=app:app server /app/server
 WORKDIR /app/server
 

@@ -7,8 +7,9 @@ import { loadFonts } from './plugins/webfontloader'
 import axios from 'axios'
 import { dialog } from '@/stores/dialog'
 import { logout } from '@/auth'
+import config from '@/config'
 
-axios.defaults.baseURL = 'http://localhost:8000/api'
+axios.defaults.baseURL = config.VUE_APP_ROOT_API
 // TODO 404 and move to error.ts
 axios.interceptors.response.use(function (response) {
   return response
