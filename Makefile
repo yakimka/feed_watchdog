@@ -48,6 +48,10 @@ verify_format:
 	$(POETRY_RUN) run black --preview --check --diff $(SRC_DIR)
 	$(POETRY_RUN) run isort --check-only --diff --src=$(SRC_DIR) $(SRC_DIR)
 
+.PHONY: collectstatic
+collectstatic:
+	$(POETRY_RUN) run python -m  server.commands.collectstatic
+
 .PHONY: bash
 bash:
 	docker compose run --rm devtools bash

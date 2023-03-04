@@ -41,6 +41,8 @@ apt-get install --no-install-recommends -y  \
     libpq5 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /var/www/frontend \
+    && chown -R 1000:1000 /var/www/frontend
 
 # `builder-base` stage is used to build deps + create our virtual environment
 FROM python-base as builder-base
@@ -62,9 +64,6 @@ COPY poetry.lock pyproject.toml ./
 
 # install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
 RUN poetry install --no-dev
-
-RUN mkdir -p /var/www/public/{media,static} \
-    && chown -R 1000:1000 /var/www/public
 
 
 # `development` image is used during development / testing
@@ -109,7 +108,7 @@ FROM python-base as production
 ENV ENVIRONMENT=production \
     WEB_CONCURRENCY=4
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-COPY --from=frontend-builder /app/frontend/dist /var/www/frontend
+COPY --from=frontend-builder /app/frontend/dist /app/frontend
 COPY --chown=app:app server /app/server
 WORKDIR /app/server
 
