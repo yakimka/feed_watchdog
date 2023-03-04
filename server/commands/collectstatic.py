@@ -2,14 +2,14 @@ import os
 import shutil
 
 
-def collect_frontend():
+def collect_frontend() -> None:
     shutil.copytree("/app/frontend", "/var/www/frontend", dirs_exist_ok=True)
     envs = _get_app_envs()
 
     _prepare_html(envs)
 
 
-def _get_app_envs():
+def _get_app_envs() -> dict[str, str]:
     return {
         key: value
         for key, value in os.environ.items()
@@ -17,7 +17,7 @@ def _get_app_envs():
     }
 
 
-def _prepare_html(data: dict):
+def _prepare_html(data: dict) -> None:
     with open("/app/frontend/index.html", "r") as r, open(
         "/var/www/frontend/index.html", "w"
     ) as w:
@@ -27,9 +27,9 @@ def _prepare_html(data: dict):
             index = index.replace(f"${key}", value)
             metas.append(f'<meta property="{key}" content="{value}">')
 
-        metas = "".join(metas)
+        metas_string = "".join(metas)
         head_index = index.index("<head>") + len("<head>")
-        w.write(f"{index[:head_index]}{metas}{index[head_index:]}")
+        w.write(f"{index[:head_index]}{metas_string}{index[head_index:]}")
 
 
 if __name__ == "__main__":
