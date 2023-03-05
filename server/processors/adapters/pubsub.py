@@ -46,10 +46,11 @@ class Subscriber:
                         event = _parse_event(message)
                         task = asyncio.create_task(on_message(event))
                         tasks.append(task)
-                        if len(tasks) >= 100:
-                            await asyncio.gather(*tasks)
-                            tasks = []
                     await asyncio.sleep(0.01)
+
+            if len(tasks) >= 100:
+                await asyncio.gather(*tasks)
+                tasks = []
 
 
 class Message(TypedDict):
