@@ -58,7 +58,7 @@ dacite = "^1.8.0"
 [tool.poetry.dev-dependencies]
 black = "^23.1.0"
 darglint = "^1.8.1"
-dlint = "^0.13.0"
+dlint = "^0.14.0"
 doc8 = "^1.0.0"
 flake8 = "^4.0.1"
 flake8-aaa = "^0.12.2"
