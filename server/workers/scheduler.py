@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-from functools import partial
+from functools import partial, wraps
 from typing import Iterable
 
 import httpx
@@ -64,6 +64,23 @@ class StreamClientError(Exception):
     pass
 
 
+def infinite_retry(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        counter = 0
+        while True:
+            try:
+                return await func(*args, **kwargs)
+            except httpx.HTTPError:
+                counter += 1
+                if counter == 10:
+                    logger.exception("Too many retries")
+                logger.info("%s retrying in 60 seconds", func.__name__)
+                await asyncio.sleep(60)
+
+    return wrapper
+
+
 class HTTPXStreamClient:
     def __init__(self, client: httpx.AsyncClient, base_url: str):
         self._client = client
@@ -103,6 +120,7 @@ class HTTPXStreamClient:
             StreamResp.parse_obj(stream) for stream in result["results"]
         ]
 
+    @infinite_retry
     async def get_intervals(self) -> list[str]:
         response = await self._client.get(f"{self._base_url}/streams/intervals")
         response.raise_for_status()
@@ -116,35 +134,7 @@ class Command:
         logger.info("Starting scheduler")
         scheduler = AsyncIOScheduler()
         await add_interval_jobs(scheduler, stream_client=stream_client)
-        scheduler.add_job(
-            update_jobs,
-            "interval",
-            [scheduler, stream_client, get_context()],
-            seconds=60,
-        )
         scheduler.start()
-
-
-def get_context() -> dict:
-    return {
-        "streams_count": None,
-        "updated_at": None,
-    }
-
-
-async def update_jobs(
-    scheduler, stream_client: HTTPXStreamClient, context: dict
-):
-    new_context = get_context()
-    if context == new_context:
-        return
-
-    logger.info("Updating jobs")
-    context.update(new_context)
-    for job in scheduler.get_jobs():
-        if job.name != "update_jobs":
-            job.remove()
-    await add_interval_jobs(scheduler, stream_client=stream_client)
 
 
 async def add_interval_jobs(
@@ -186,7 +176,7 @@ if __name__ == "__main__":
         httpx_client, "http://feed_watchdog:8000/api"
     )
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
     loop.create_task(Command().handle(stream_client=httpx_stream_client))
     try:
         loop.run_forever()
