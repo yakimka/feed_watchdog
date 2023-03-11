@@ -7,7 +7,7 @@ from domain.interfaces import IProcessorsConfigurationRepository
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
-@router.get("/processors/config/{handler}")
+@router.get("/processors/config/{handler}/")
 def get_handler_config(
     handler: str,
     processors_conf: IProcessorsConfigurationRepository = Depends(

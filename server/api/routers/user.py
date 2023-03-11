@@ -22,7 +22,7 @@ class LoginData(BaseModel):
     password: str
 
 
-@router.post("/user/login", response_model=TokenResponse)
+@router.post("/user/login/", response_model=TokenResponse)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     user_repo: IUserRepository = Depends(get_user_repo),

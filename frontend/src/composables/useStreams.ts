@@ -66,7 +66,7 @@ export default function useStreams () {
   }
 
   const getStreams = async (q: string, page: number, pageSize: number) => {
-    const response = await axios.get('/streams', {
+    const response = await axios.get('/streams/', {
       params: {
         q: q,
         page: page,
@@ -96,7 +96,7 @@ export default function useStreams () {
 
   const getStream = async (id: string) => {
     try {
-      const response = await axios.get(`/streams/${id}`)
+      const response = await axios.get(`/streams/${id}/`)
       stream.value = {
         slug: response.data.slug,
         sourceSlug: response.data.source_slug,
@@ -120,7 +120,7 @@ export default function useStreams () {
 
   const storeStream = async (type: string) => {
     try {
-      await axios.post('/streams', {
+      await axios.post('/streams/', {
         slug: stream.value.slug,
         source_slug: stream.value.sourceSlug,
         receiver_slug: stream.value.receiverSlug,
@@ -168,7 +168,7 @@ export default function useStreams () {
   }
 
   const getModifierOptionsSchema = async () => {
-    const response = await axios.get('/processors/config/modifiers')
+    const response = await axios.get('/processors/config/modifiers/')
     modifierOptionsSchema.value = response.data
 
     streamTypes.value = []
@@ -208,7 +208,7 @@ export default function useStreams () {
   })
 
   const getIntervalTypes = async () => {
-    const response = await axios.get('/streams/intervals')
+    const response = await axios.get('/streams/intervals/')
     intervalTypes.value = response.data
   }
 

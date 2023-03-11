@@ -72,7 +72,7 @@ const onSubmit = async () => {
   body.append('password', data.password)
 
   try {
-    const res = await axios.post('/user/login', body)
+    const res = await axios.post('/user/login/', body)
     localStorage.setItem('accesst', res.data.access_token)
     localStorage.setItem('refresht', res.data.refresh_token)
 

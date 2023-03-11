@@ -78,7 +78,7 @@ class StreamListResp(ListResponse):
     results: list[StreamExtendedResp]
 
 
-@router.get("/streams", response_model=StreamListResp)
+@router.get("/streams/", response_model=StreamListResp)
 async def find(
     fetcher: StreamFetcher = Depends(get_stream_fetcher),
     pagination: Pagination = Depends(get_pagination_params),
@@ -104,7 +104,7 @@ async def find(
     )
 
 
-@router.get("/streams/intervals")
+@router.get("/streams/intervals/")
 @inject
 async def get_intervals(
     intervals=Depends(Provide[Container.config.app.intervals]),
@@ -112,7 +112,7 @@ async def get_intervals(
     return intervals
 
 
-@router.post("/streams", response_model=StreamResp, status_code=201)
+@router.post("/streams/", response_model=StreamResp, status_code=201)
 async def add(
     stream: StreamBody = Body(),
     streams: IStreamRepository = Depends(get_stream_repo),
@@ -124,7 +124,7 @@ async def add(
     return result
 
 
-@router.put("/streams/{slug}", response_model=StreamResp, status_code=201)
+@router.put("/streams/{slug}/", response_model=StreamResp, status_code=201)
 async def update(
     slug: str,
     stream: StreamBody = Body(),
@@ -140,14 +140,14 @@ async def update(
     return result
 
 
-@router.get("/streams/{slug}", response_model=StreamResp)
+@router.get("/streams/{slug}/", response_model=StreamResp)
 async def detail(
     stream: Stream = Depends(get_by_slug),
 ) -> Stream:
     return stream
 
 
-@router.delete("/streams/{slug}", status_code=204)
+@router.delete("/streams/{slug}/", status_code=204)
 async def delete(
     slug: str,
     streams: IStreamRepository = Depends(get_stream_repo),

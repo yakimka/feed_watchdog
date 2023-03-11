@@ -29,7 +29,7 @@ class Sources(ListResponse):
     results: list[Source]
 
 
-@router.get("/sources", response_model=Sources)
+@router.get("/sources/", response_model=Sources)
 async def find(
     sources: ISourceRepository = Depends(get_source_repo),
     q: str = "",
@@ -48,7 +48,7 @@ async def find(
     )
 
 
-@router.post("/sources", response_model=Source, status_code=201)
+@router.post("/sources/", response_model=Source, status_code=201)
 async def add(
     source: Source = Body(),
     sources: ISourceRepository = Depends(get_source_repo),
@@ -60,7 +60,7 @@ async def add(
     return result
 
 
-@router.put("/sources/{slug}", response_model=Source, status_code=201)
+@router.put("/sources/{slug}/", response_model=Source, status_code=201)
 async def update(
     slug: str,
     source: Source = Body(),
@@ -76,14 +76,14 @@ async def update(
     return result
 
 
-@router.get("/sources/{slug}", response_model=Source)
+@router.get("/sources/{slug}/", response_model=Source)
 async def detail(
     source: SourceModel = Depends(get_by_slug),
 ) -> SourceModel:
     return source
 
 
-@router.delete("/sources/{slug}", status_code=204)
+@router.delete("/sources/{slug}/", status_code=204)
 async def delete(
     slug: str,
     sources: ISourceRepository = Depends(get_source_repo),
