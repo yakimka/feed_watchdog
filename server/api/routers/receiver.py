@@ -26,7 +26,7 @@ class Receivers(ListResponse):
     results: list[Receiver]
 
 
-@router.get("/receivers", response_model=Receivers)
+@router.get("/receivers/", response_model=Receivers)
 async def find(
     receivers: IReceiverRepository = Depends(get_receiver_repo),
     q: str = "",
@@ -45,7 +45,7 @@ async def find(
     )
 
 
-@router.post("/receivers", response_model=Receiver, status_code=201)
+@router.post("/receivers/", response_model=Receiver, status_code=201)
 async def add(
     receiver: Receiver = Body(),
     receivers: IReceiverRepository = Depends(get_receiver_repo),
@@ -57,7 +57,7 @@ async def add(
     return result
 
 
-@router.put("/receivers/{slug}", response_model=Receiver, status_code=201)
+@router.put("/receivers/{slug}/", response_model=Receiver, status_code=201)
 async def update(
     slug: str,
     receiver: Receiver = Body(),
@@ -73,14 +73,14 @@ async def update(
     return result
 
 
-@router.get("/receivers/{slug}", response_model=Receiver)
+@router.get("/receivers/{slug}/", response_model=Receiver)
 async def detail(
     receiver: ReceiverModel = Depends(get_by_slug),
 ) -> ReceiverModel:
     return receiver
 
 
-@router.delete("/receivers/{slug}", status_code=204)
+@router.delete("/receivers/{slug}/", status_code=204)
 async def delete(
     slug: str,
     receivers: IReceiverRepository = Depends(get_receiver_repo),

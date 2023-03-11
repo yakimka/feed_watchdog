@@ -32,7 +32,7 @@ export default function useReceivers () {
   }
 
   const getReceivers = async (q: string, page: number, pageSize: number) => {
-    const response = await axios.get('/receivers', {
+    const response = await axios.get('/receivers/', {
       params: {
         q: q,
         page: page,
@@ -62,7 +62,7 @@ export default function useReceivers () {
 
   const getReceiver = async (id: string) => {
     try {
-      const response = await axios.get(`/receivers/${id}`)
+      const response = await axios.get(`/receivers/${id}/`)
       receiver.value = {
         name: response.data.name,
         slug: response.data.slug,
@@ -82,7 +82,7 @@ export default function useReceivers () {
 
   const storeReceiver = async (type: string) => {
     try {
-      await axios.post('/receivers', {
+      await axios.post('/receivers/', {
         name: receiver.value.name,
         slug: receiver.value.slug,
         type: receiver.value.type,
@@ -122,7 +122,7 @@ export default function useReceivers () {
   }
 
   const getReceiverOptionsSchema = async () => {
-    const response = await axios.get('/processors/config/receivers')
+    const response = await axios.get('/processors/config/receivers/')
     receiverOptionsSchema.value = response.data
 
     receiverTypes.value = []

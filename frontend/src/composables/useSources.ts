@@ -40,7 +40,7 @@ export default function useSources () {
   }
 
   const getSources = async (q: string, page: number, pageSize: number) => {
-    const response = await axios.get('/sources', {
+    const response = await axios.get('/sources/', {
       params: {
         q: q,
         page: page,
@@ -73,7 +73,7 @@ export default function useSources () {
 
   const getSource = async (id: string) => {
     try {
-      const response = await axios.get(`/sources/${id}`)
+      const response = await axios.get(`/sources/${id}/`)
       source.value = {
         name: response.data.name,
         slug: response.data.slug,
@@ -99,7 +99,7 @@ export default function useSources () {
 
   const storeSource = async (type: string) => {
     try {
-      await axios.post('/sources', {
+      await axios.post('/sources/', {
         name: source.value.name,
         slug: source.value.slug,
         fetcher_type: source.value.fetcherType,
@@ -145,7 +145,7 @@ export default function useSources () {
   }
 
   const getFetcherOptionsSchema = async () => {
-    const response = await axios.get('/processors/config/fetchers')
+    const response = await axios.get('/processors/config/fetchers/')
     fetcherOptionsSchema.value = response.data
 
     fetcherTypes.value = []
@@ -155,7 +155,7 @@ export default function useSources () {
   }
 
   const getParserOptionsSchema = async () => {
-    const response = await axios.get('/processors/config/parsers')
+    const response = await axios.get('/processors/config/parsers/')
     parserOptionsSchema.value = response.data
 
     parserTypes.value = []

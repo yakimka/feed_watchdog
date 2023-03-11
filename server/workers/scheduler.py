@@ -105,7 +105,7 @@ class HTTPXStreamClient:
         self, interval: str, page=1, page_size=300
     ) -> tuple[bool, list[StreamResp]]:
         response = await self._client.get(
-            f"{self._base_url}/streams",
+            f"{self._base_url}/streams/",
             params={
                 "active": True,
                 "page": page,
@@ -122,7 +122,9 @@ class HTTPXStreamClient:
 
     @infinite_retry
     async def get_intervals(self) -> list[str]:
-        response = await self._client.get(f"{self._base_url}/streams/intervals")
+        response = await self._client.get(
+            f"{self._base_url}/streams/intervals/"
+        )
         response.raise_for_status()
         return [item["value"] for item in response.json()]
 

@@ -139,7 +139,6 @@ jobs:
       - name: connect and update
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} \
-            "cd ~/projects/feed_watchdog && docker compose pull && docker compose up -d && \
-             cd ~/projects/shared && docker compose restart nginx"
+            "cd ~/projects && ./update_feed_watchdog.sh"
       - name: cleanup
         run: rm -rf ~/.ssh
