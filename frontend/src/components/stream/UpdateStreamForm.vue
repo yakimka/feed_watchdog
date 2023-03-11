@@ -5,6 +5,7 @@
     :is-loading="formIsLoading"
     :error="formErrors.nonFieldError"
     @submit="submit"
+    @delete="deleteStreamAndRedirect"
   >
     <template v-slot:formContent>
       <v-autocomplete
@@ -94,6 +95,7 @@ import useForm from '@/composables/useForm'
 import JsonField from '@/components/core/JsonField.vue'
 import AdminModelEdit from '@/components/core/AdminModelEdit.vue'
 import ModifiersField from '@/components/stream/ModifiersField.vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   id: {
@@ -113,6 +115,7 @@ const {
   intervalTypes,
   getStream,
   updateStream,
+  deleteStream,
   searchSource,
   searchReceiver,
   setFocus,
@@ -127,6 +130,14 @@ const {
 } = useForm(errors, async (event) => {
   await updateStream(event.submitter.id)
 })
+
+const router = useRouter()
+
+const deleteStreamAndRedirect = async () => {
+  formIsLoading.value = true
+  await deleteStream(stream.value.slug)
+  await router.push({ name: 'streams' })
+}
 
 onMounted(async () => {
   await getStream(props.id)
