@@ -8,6 +8,7 @@
     <v-form
       ref="form"
       @input="onFiltersInput"
+      @keydown.enter.prevent="onFiltersInput"
     >
       <slot name="filters"></slot>
     </v-form>
