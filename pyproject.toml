@@ -97,6 +97,9 @@ yamllint = "^1.26.3"
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-autodoc-typehints", "m2r2", "tomlkit"]
 
+[tool.poetry.group.dev.dependencies]
+types-redis = "^4.5.1.5"
+
 [tool.isort]
 # isort configuration:
 # https://github.com/timothycrosley/isort/wiki/isort-Settings

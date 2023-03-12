@@ -27,7 +27,7 @@ def main() -> Coroutine:
 
     sentry.setup_logging(settings.SENTRY_DSN)
 
-    redis = aioredis.from_url(settings.REDIS_URL)  # type: ignore
+    redis = aioredis.from_url(settings.REDIS_URL)
     lock.init(redis)  # TODO DI
     pubsub = redis.pubsub()
     subscriber = Subscriber(pubsub)
