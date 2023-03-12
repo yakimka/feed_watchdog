@@ -22,7 +22,9 @@ async def fetch_text_from_url(
     url: str, *, encoding="", retry=0
 ) -> Optional[str]:
     # TODO don't fetch if content is not changed
-    async with httpx.AsyncClient(follow_redirects=True, verify=False) as client:
+    async with httpx.AsyncClient(
+        follow_redirects=True, verify=False  # noqa: S501
+    ) as client:
         while True:
             try:
                 res = await client.get(

@@ -50,10 +50,9 @@ def async_lock(  # noqa: C901
                         await sleep(wait_time)
                         return res
                 except LockNotOwnedError:
-                    """
-                    If the lock release fails, it might be because of the timeout
-                    and it's been stolen so we don't really care
-                    """
+                    # If the lock release fails, it might be because of the
+                    #   timeout and it's been stolen so we don't really care
+                    pass
                 except LockError as e:
                     retry_count -= 1
                     await sleep(lock_timeout)
