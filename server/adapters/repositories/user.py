@@ -39,17 +39,19 @@ class MongoRefreshTokenRepository(IRefreshTokenRepository):
         self.db = db
 
     async def get_by_user_id(self, user_id: str) -> list[RefreshToken]:
-        result = self.db.users.find({"user_id": user_id})
+        result = self.db.refresh_tokens.find({"user_id": user_id})
         return [RefreshToken.parse_obj(item) async for item in result]
 
     async def create(self, refresh_token: RefreshToken) -> str:
-        new_token = await self.db.users.insert_one(refresh_token.dict())
+        new_token = await self.db.refresh_tokens.insert_one(
+            refresh_token.dict()
+        )
         return str(new_token.inserted_id)
 
     async def delete(self, token: str) -> bool:
-        result = await self.db.users.delete_one({"token": token})
+        result = await self.db.refresh_tokens.delete_one({"token": token})
         return result.deleted_count > 0
 
     async def delete_all(self, user_id: str) -> bool:
-        result = await self.db.users.delete_many({"user_id": user_id})
+        result = await self.db.refresh_tokens.delete_many({"user_id": user_id})
         return result.deleted_count > 0
