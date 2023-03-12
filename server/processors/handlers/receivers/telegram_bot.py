@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+from functools import lru_cache
 from typing import Awaitable, Callable, Iterable
 
 from aiogram import Bot
@@ -23,6 +24,11 @@ class TelegramBotOptions(HandlerOptions):
     disable_link_preview: bool = False
 
 
+@lru_cache(maxsize=128)
+def _get_bot(token: str) -> Bot:
+    return Bot(token=token)
+
+
 @register_handler(
     type=HandlerType.receivers.value,
     name="telegram_bot",
@@ -35,8 +41,7 @@ class TelegramBot:
 
     def __init__(self, name: str, token: str):
         self._name = name
-        self._token = token
-        self.bot = Bot(token=self._token)
+        self.bot = _get_bot(token)
 
     def _lock_key(self, *_, **__):
         return self._name

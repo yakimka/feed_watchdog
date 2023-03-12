@@ -1,7 +1,7 @@
 import json
 from typing import Protocol
 
-from aioredis import Redis
+from redis.asyncio import Redis
 
 
 class Event(Protocol):

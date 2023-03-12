@@ -33,9 +33,8 @@ sphinx = { version = "^5.0",  optional = true }
 sphinx-autodoc-typehints = { version = "^1.18", optional = true }
 m2r2 = { version = "^0.3",  optional = true }
 tomlkit = { version = "^0.11", optional = true }
-redis = "^4.2.2"
+redis = "^4.5.1"
 APScheduler = "^3.9.1"
-aioredis = "^2.0.1"
 dependency-injector = "^4.39.1"
 httpx = {version = "^0.23.0", extras = ["processors"]}
 async-timeout = {version = "^4.0.2", extras = ["processors"]}
@@ -97,6 +96,9 @@ yamllint = "^1.26.3"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-autodoc-typehints", "m2r2", "tomlkit"]
+
+[tool.poetry.group.dev.dependencies]
+types-redis = "^4.5.1.5"
 
 [tool.isort]
 # isort configuration:

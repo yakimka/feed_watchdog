@@ -1,6 +1,6 @@
-import aioredis
 from dependency_injector import containers, providers
 from motor.motor_asyncio import AsyncIOMotorClient
+from redis import asyncio as aioredis
 
 from adapters.publisher import Publisher
 from app_settings import get_settings
