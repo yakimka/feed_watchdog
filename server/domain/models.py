@@ -14,6 +14,11 @@ class UserInDB(User):
     password: str
 
 
+class RefreshToken(BaseModel):
+    token: str
+    user_id: str
+
+
 class Source(BaseModel):
     name: str
     slug: str
