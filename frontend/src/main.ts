@@ -5,36 +5,40 @@ import Admin from './layouts/Admin.vue'
 import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 import axios from 'axios'
+import createAuthRefreshInterceptor from 'axios-auth-refresh'
 import { dialog } from '@/stores/dialog'
 import { logout } from '@/auth'
 import config from '@/config'
 
 axios.defaults.baseURL = config.VUE_APP_ROOT_API
 // TODO 404 and move to error.ts
+const refreshAuthLogic = (failedRequest: any): Promise<any> => {
+  const refreshToken = localStorage.getItem('refresht')
+  if (!refreshToken) {
+    logout()
+    return Promise.resolve()
+  }
+
+  const headersConf = {
+    headers: {
+      Authorization: `Bearer ${refreshToken}`
+    }
+  }
+  return axios.post('/user/refresh_token/', {}, headersConf).then(r => {
+    localStorage.setItem('accesst', r.data.access_token)
+    failedRequest.response.config.headers.Authorization = `Bearer ${r.data.access_token}`
+    console.log('resolve')
+    return Promise.resolve()
+  }).catch(() => {
+    logout()
+  })
+}
+createAuthRefreshInterceptor(axios, refreshAuthLogic, { statusCodes: [401, 403] })
+
 axios.interceptors.response.use(function (response) {
   return response
 }, function (error) {
-  const { config, response: { status } } = error
-
-  if (status === 401) {
-    const refrestToken = localStorage.getItem('refresht')
-    if (refrestToken) {
-      const headersConf = {
-        headers: {
-          Authorization: `Bearer ${refrestToken}`
-        }
-      }
-      axios.post('/user/refresh_token/', {}, headersConf).then(r => {
-        localStorage.setItem('accesst', r.data.access_token)
-        config.headers.Authorization = `Bearer ${r.data.access_toke}`
-        return axios.request(config)
-      }).catch(() => {
-        logout()
-      })
-    } else {
-      logout()
-    }
-  }
+  const { response: { status } } = error
 
   if (status === 0 || status >= 500) {
     dialog.set(error.message, 'Something went wrong')
