@@ -38,6 +38,10 @@ class ISourceRepository(abc.ABC):
         pass
 
     @abstractmethod
+    async def get_all_tags(self) -> list[str]:
+        pass
+
+    @abstractmethod
     async def add(self, source: Source) -> str:
         pass
 

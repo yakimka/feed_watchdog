@@ -27,7 +27,6 @@ const refreshAuthLogic = (failedRequest: any): Promise<any> => {
   return axios.post('/user/refresh_token/', {}, headersConf).then(r => {
     localStorage.setItem('accesst', r.data.access_token)
     failedRequest.response.config.headers.Authorization = `Bearer ${r.data.access_token}`
-    console.log('resolve')
     return Promise.resolve()
   }).catch(() => {
     logout()
