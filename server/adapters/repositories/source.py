@@ -48,6 +48,16 @@ class MongoSourceRepository(ISourceRepository):
             self._make_find_query(query)
         )
 
+    async def get_all_tags(self) -> list[str]:
+        cursor = self.db.sources.aggregate(
+            [
+                {"$unwind": "$tags"},
+                {"$group": {"_id": "$tags"}},
+                {"$project": {"_id": 0, "tag": "$_id"}},
+            ]
+        )
+        return sorted([item["tag"] async for item in cursor])
+
     async def add(self, source: Source) -> str:
         try:
             new_source = await self.db.sources.insert_one(source.dict())

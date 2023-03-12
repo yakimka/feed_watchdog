@@ -48,6 +48,13 @@ async def find(
     )
 
 
+@router.get("/sources/tags/", response_model=list[str])
+async def tags(
+    sources: ISourceRepository = Depends(get_source_repo),
+) -> list[str]:
+    return await sources.get_all_tags()
+
+
 @router.post("/sources/", response_model=Source, status_code=201)
 async def add(
     source: Source = Body(),

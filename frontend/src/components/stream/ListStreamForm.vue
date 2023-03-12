@@ -42,7 +42,7 @@
             v-for="interval in stream.intervals"
             :key="interval"
           >
-            {{ interval }}
+            {{ intervalsMap[interval] || interval }}
           </v-chip>
         </td>
         <td>
@@ -106,12 +106,21 @@ import ListComponent from '@/components/core/AdminList.vue'
 
 const {
   streams,
+  intervalTypes,
   getStreams,
+  getIntervalTypes,
   deleteStream
 } = useStreams()
 
+const intervalsMap: { [key: string ]: string} = {}
 const fetchStreams = async () => {
   pageIsLoading.value = true
+  if (Object.keys(intervalsMap).length === 0) {
+    await getIntervalTypes()
+    for (const item of intervalTypes.value) {
+      intervalsMap[item.value] = item.text
+    }
+  }
   await getStreams(filters.search, pagination.page, pagination.pageSize)
   pageIsLoading.value = false
 }

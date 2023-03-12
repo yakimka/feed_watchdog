@@ -165,7 +165,8 @@ export default function useSources () {
   }
 
   const getAvailableTags = async () => {
-    availableTags.value = ['tag1', 'tag2', 'tag3']
+    const response = await axios.get('/sources/tags/')
+    availableTags.value = response.data
   }
 
   return {
