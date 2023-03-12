@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Callable, Coroutine
 
-import aioredis
+from redis import asyncio as aioredis
 
 from adapters import sentry
 from processors import settings

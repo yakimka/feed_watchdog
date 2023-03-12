@@ -4,9 +4,9 @@ from collections.abc import Coroutine
 from contextlib import suppress
 from typing import Any, Callable, Optional, Protocol, TypedDict
 
-import aioredis
 import async_timeout
 from dacite import from_dict
+from redis import asyncio as aioredis
 
 from processors.domain import events
 
