@@ -74,7 +74,7 @@ class InvalidTokenError(Exception):
 def decode_token(
     token: str,
     *,
-    secret: str = Provide[Container.config.auth.jwt_secret_key],
+    secret: str,
     algorithms: list[str] = Provide[Container.config.auth.decode_algorithms]
 ) -> TokenPayload:
     try:

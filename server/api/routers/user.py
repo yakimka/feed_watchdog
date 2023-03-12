@@ -2,10 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from api.deps.user import get_current_user, get_user_repo
+from api.deps.user import (
+    get_refresh_token_repo,
+    get_user_id_from_refresh_token,
+    get_user_repo,
+)
 from auth import create_access_token, create_refresh_token, oauth2_scheme
-from domain.interfaces import IUserRepository
-from domain.models import User
+from domain.interfaces import IRefreshTokenRepository, IUserRepository
+from domain.models import RefreshToken
 from utils.security import verify_password
 
 router = APIRouter()
@@ -26,6 +30,9 @@ class LoginData(BaseModel):
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     user_repo: IUserRepository = Depends(get_user_repo),
+    refresh_token_repo: IRefreshTokenRepository = Depends(
+        get_refresh_token_repo
+    ),
 ):
     user = await user_repo.get_user_by_email(form_data.username)
     if user is None:
@@ -41,20 +48,25 @@ async def login(
             detail="Incorrect email or password",
         )
 
+    refresh_token = create_refresh_token(user.id)
+    await refresh_token_repo.create(
+        RefreshToken(token=refresh_token, user_id=user.id)
+    )
+
     return {
         "access_token": create_access_token(user.id),
-        "refresh_token": create_refresh_token(user.id),
+        "refresh_token": refresh_token,
         "token_type": "bearer",
     }
 
 
 @router.post("/user/refresh_token/", response_model=TokenResponse)
 async def refresh(
-    token: str = Depends(oauth2_scheme), user: User = Depends(get_current_user)
+    token: str = Depends(oauth2_scheme),
+    user_id: str = Depends(get_user_id_from_refresh_token),
 ):
-    # TODO store refresh token in DB and check if it's valid
     return {
-        "access_token": create_access_token(user.id),
+        "access_token": create_access_token(user_id),
         "refresh_token": token,
         "token_type": "bearer",
     }

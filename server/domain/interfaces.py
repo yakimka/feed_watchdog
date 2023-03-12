@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 from pydantic import BaseModel
 
-from domain.models import Receiver, Source, Stream, UserInDB
+from domain.models import Receiver, RefreshToken, Source, Stream, UserInDB
 
 
 class PaginationQuery(BaseModel):
@@ -123,4 +123,22 @@ class IUserRepository(abc.ABC):
 
     @abstractmethod
     async def create_user(self, user: UserInDB) -> str:
+        pass
+
+
+class IRefreshTokenRepository(abc.ABC):
+    @abstractmethod
+    async def get_by_user_id(self, user_id: str) -> list[RefreshToken]:
+        pass
+
+    @abstractmethod
+    async def create(self, refresh_token: RefreshToken) -> str:
+        pass
+
+    @abstractmethod
+    async def delete(self, token: str) -> bool:
+        pass
+
+    @abstractmethod
+    async def delete_all(self, user_id: str) -> bool:
         pass
