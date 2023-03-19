@@ -7,8 +7,6 @@
   >
     <template v-slot:formContent>
       <ForeignField
-        @blur="setFocus('source', false)"
-        @focus="setFocus('source', true)"
         v-model="stream.sourceSlug"
         v-model:search="sourceSlugData.search"
         :items="sourceSlugData.items"
@@ -20,8 +18,6 @@
         :rules="[required()]"
       ></ForeignField>
       <ForeignField
-        @blur="setFocus('receiver', false)"
-        @focus="setFocus('receiver', true)"
         v-model="stream.receiverSlug"
         v-model:search="receiverSlugData.search"
         :items="receiverSlugData.items"
@@ -101,7 +97,6 @@ const {
   storeStream,
   searchSource,
   searchReceiver,
-  setFocus,
   getIntervalTypes
 } = useStreams()
 
