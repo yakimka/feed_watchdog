@@ -32,7 +32,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'login',
     meta: {
       layout: 'empty',
-      title: 'Log in',
+      title: 'Login',
       breadcrumbs: []
     },
     component: Login
@@ -258,6 +258,7 @@ const guardAuth = function (to: RouteLocationNormalized) {
 }
 
 router.beforeEach(async (to) => {
+  document.title = `${to.meta.title} | Feed Watchdog Admin`
   guardAuth(to)
 })
 
