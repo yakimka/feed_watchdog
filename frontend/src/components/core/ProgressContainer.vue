@@ -7,7 +7,9 @@
   <v-container style="position: relative" :fluid="props.fluid">
     <v-overlay
       :model-value="props.isLoading"
+      transition="slide-x-transition"
       contained
+      eager
       persistent
     ></v-overlay>
 
@@ -30,3 +32,9 @@ const props = defineProps({
   }
 })
 </script>
+
+<style scoped>
+.v-overlay {
+  opacity: 0.1 !important;
+}
+</style>

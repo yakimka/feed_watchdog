@@ -45,15 +45,13 @@ export default function useStreams () {
     search: '',
     items: [] as Source[],
     isLoading: false,
-    cache: {} as Record<string, Source[]>,
-    focused: false
+    cache: {} as Record<string, Source[]>
   })
   const receiverSlugData = reactive({
     search: '',
     items: [] as Receiver[],
     isLoading: false,
-    cache: {} as Record<string, Receiver[]>,
-    focused: false
+    cache: {} as Record<string, Receiver[]>
   })
   const { sources, getSources } = useSources()
   const { receivers, receiverOptionsSchema, getReceivers, getReceiverOptionsSchema } = useReceivers()
@@ -243,23 +241,12 @@ export default function useStreams () {
     await search('receiver', value)
   }
 
-  const setFocus = async (type: string, value: boolean) => {
-    let data
-    if (type === 'source') {
-      data = sourceSlugData
-    } else {
-      data = receiverSlugData
-    }
-    data.focused = value
-  }
-
   watch(
     () => sourceSlugData.search,
     debounce(async (value: string) => {
       // this fucking autocomplete component is so fucking stupid
-      // it set the value of search to empty string when it loses focus,
-      // so we need to check if it's focused before sending the request
-      if (value === '' && !sourceSlugData.focused) {
+      // it set the value of search to empty string when it loses focus
+      if (value === '') {
         return
       }
       await searchSource(value)
@@ -268,7 +255,7 @@ export default function useStreams () {
   watch(
     () => receiverSlugData.search,
     debounce(async (value: string) => {
-      if (value === '' && !receiverSlugData.focused) {
+      if (value === '') {
         return
       }
       await searchReceiver(value)
@@ -299,7 +286,6 @@ export default function useStreams () {
     getModifierOptionsSchema,
     searchSource,
     searchReceiver,
-    setFocus,
     updateSavedOptions,
     getIntervalTypes
   }

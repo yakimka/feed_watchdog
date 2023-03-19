@@ -6,36 +6,30 @@
     @submit="submit"
   >
     <template v-slot:formContent>
-      <v-autocomplete
-        @blur="setFocus('source', false)"
-        @focus="setFocus('source', true)"
+      <ForeignField
         v-model="stream.sourceSlug"
         v-model:search="sourceSlugData.search"
         :items="sourceSlugData.items"
         :loading="sourceSlugData.isLoading"
-        hide-selected
         item-title="name"
         item-value="slug"
         label="Source"
-        placeholder="Start typing to Search"
         :error-messages="formErrors.sourceSlug"
         :rules="[required()]"
-      ></v-autocomplete>
-      <v-autocomplete
-        @blur="setFocus('receiver', false)"
-        @focus="setFocus('receiver', true)"
+        router-name="edit-source"
+      ></ForeignField>
+      <ForeignField
         v-model="stream.receiverSlug"
         v-model:search="receiverSlugData.search"
         :items="receiverSlugData.items"
         :loading="receiverSlugData.isLoading"
-        hide-selected
         item-title="name"
         item-value="slug"
         label="Receiver"
-        placeholder="Start typing to Search"
         :error-messages="formErrors.receiverSlug"
         :rules="[required()]"
-      ></v-autocomplete>
+        router-name="edit-receiver"
+      ></ForeignField>
       <slug-field
         :follow-value="fieldForSlugFollowing"
         v-model="stream.slug"
@@ -90,6 +84,7 @@ import useStreams from '@/composables/useStreams'
 import { required } from '@/validation'
 import useForm from '@/composables/useForm'
 import JsonField from '@/components/core/JsonField.vue'
+import ForeignField from '@/components/core/ForeignField.vue'
 import SlugField from '@/components/core/SlugField.vue'
 import AdminModelEdit from '@/components/core/AdminModelEdit.vue'
 import ModifiersField from '@/components/stream/ModifiersField.vue'
@@ -104,7 +99,6 @@ const {
   storeStream,
   searchSource,
   searchReceiver,
-  setFocus,
   getIntervalTypes
 } = useStreams()
 
