@@ -1,43 +1,46 @@
 <template>
-  <v-card class="mx-auto my-auto mt-16 px-6 py-8" max-width="400">
-    <v-form
-      ref="form"
-      @submit.prevent="onSubmit"
-    >
-      <v-text-field
-        v-model="data.email"
-        :readonly="data.loading"
-        :rules="[required()]"
-        class="mb-2"
-        label="Email"
-      ></v-text-field>
-
-      <v-text-field
-        v-model="data.password"
-        :readonly="data.loading"
-        :rules="[required()]"
-        label="Password"
-        placeholder="Enter your password"
-        :append-inner-icon="data.showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-        @click:append-inner="data.showPassword = !data.showPassword"
-        :type="data.showPassword ? 'text' : 'password'"
-        :error-messages="data.error"
-      ></v-text-field>
-
-      <br>
-
-      <v-btn
-        :loading="data.loading"
-        block
-        color="success"
-        size="large"
-        type="submit"
-        variant="elevated"
+  <div class="d-flex justify-center align-center flex-column" style="height: 80dvh;">
+    <div class="text-h2 mb-6">Login</div>
+    <v-card class="px-6 py-8" min-width="320" max-width="520" width="100%">
+      <v-form
+        ref="form"
+        @submit.prevent="onSubmit"
       >
-        Sign In
-      </v-btn>
-    </v-form>
-  </v-card>
+        <v-text-field
+          v-model="data.email"
+          :readonly="data.loading"
+          :rules="[required()]"
+          class="mb-2"
+          label="Email"
+        ></v-text-field>
+
+        <v-text-field
+          v-model="data.password"
+          :readonly="data.loading"
+          :rules="[required()]"
+          label="Password"
+          placeholder="Enter your password"
+          :append-inner-icon="data.showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append-inner="data.showPassword = !data.showPassword"
+          :type="data.showPassword ? 'text' : 'password'"
+          :error-messages="data.error"
+        ></v-text-field>
+
+        <br>
+
+        <v-btn
+          :loading="data.loading"
+          block
+          color="primary"
+          size="large"
+          type="submit"
+          variant="elevated"
+        >
+          Sign In
+        </v-btn>
+      </v-form>
+    </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">
