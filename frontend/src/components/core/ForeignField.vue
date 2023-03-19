@@ -5,7 +5,16 @@
       placeholder="Start typing to Search"
       :item-value="itemValue"
       :items="itemsCombined"
-    ></v-autocomplete>
+    >
+      <template v-slot:append v-if="$attrs.modelValue">
+        <v-btn
+          icon="mdi-link"
+          variant="text"
+          title="Go to"
+          :to="{name: routerName, params: {id: $attrs.modelValue}}"
+        ></v-btn>
+        </template>
+    </v-autocomplete>
   </div>
 </template>
 
@@ -15,6 +24,10 @@ import { defineComponent } from 'vue'
 export default defineComponent({
   name: 'ForeignField',
   props: {
+    routerName: {
+      type: String,
+      required: true
+    },
     items: {
       type: Array,
       default: () => [],
@@ -29,10 +42,6 @@ export default defineComponent({
     return {
       savedItem: null
     }
-  },
-  mounted () {
-    console.log('mounted')
-    console.log(this.$attrs)
   },
   computed: {
     itemsCombined () {

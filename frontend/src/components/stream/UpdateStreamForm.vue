@@ -18,6 +18,7 @@
         label="Source"
         :error-messages="formErrors.sourceSlug"
         :rules="[required()]"
+        router-name="edit-source"
       ></ForeignField>
       <ForeignField
         v-model="stream.receiverSlug"
@@ -29,6 +30,7 @@
         label="Receiver"
         :error-messages="formErrors.receiverSlug"
         :rules="[required()]"
+        router-name="edit-receiver"
       ></ForeignField>
       <v-text-field
         v-model="stream.slug"
