@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex h-screen justify-center align-center flex-column">
+  <div class="d-flex justify-center align-center flex-column" style="height: 80dvh;">
     <div class="text-h2 mb-6">Login</div>
     <v-card class="px-6 py-8" min-width="320" max-width="520" width="100%">
       <v-form
