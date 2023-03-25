@@ -91,7 +91,7 @@ export default function useSources () {
 
   const handleRedirectsBySaveType = async (type: string) => {
     if (type === 'save-and-create-stream') {
-      await router.push({ name: 'home' })
+      await router.push({ name: 'create-stream', query: { source: source.value.slug } })
     } else {
       await router.push({ name: 'edit-source', params: { id: source.value.slug } })
     }
