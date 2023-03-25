@@ -35,8 +35,14 @@ export default function useStreams () {
     text: string
     value: string
   }
+  interface MessageTemplate {
+    text: string
+    value: string
+  }
   const streamTypes = ref<string[]>([])
   const intervalTypes = ref<Interval[]>([])
+  const selectedMessageTemplate = ref('')
+  const messageTemplates = ref<MessageTemplate[]>([])
   const modifierOptionsSchema = ref({})
   const savedReceiverOptionsOverride = ref('')
   const savedModifiers = ref<Modifier[]>([])
@@ -210,6 +216,11 @@ export default function useStreams () {
     intervalTypes.value = response.data
   }
 
+  const getMessageTemplates = async () => {
+    const response = await axios.get('/streams/message_templates/')
+    messageTemplates.value = response.data
+  }
+
   const search = async (type: string, value = '') => {
     let data, items, func
     if (type === 'source') {
@@ -261,6 +272,18 @@ export default function useStreams () {
       await searchReceiver(value)
     })
   )
+  watch(
+    () => stream.value.messageTemplate,
+    (value: string) => {
+      for (const item of messageTemplates.value) {
+        if (item.value === value) {
+          selectedMessageTemplate.value = value
+          return
+        }
+      }
+      selectedMessageTemplate.value = ''
+    }
+  )
 
   onMounted(async () => {
     await getReceiverOptionsSchema()
@@ -278,6 +301,8 @@ export default function useStreams () {
     savedReceiverOptionsOverride,
     savedModifiers,
     intervalTypes,
+    selectedMessageTemplate,
+    messageTemplates,
     getStream,
     getStreams,
     storeStream,
@@ -287,6 +312,7 @@ export default function useStreams () {
     searchSource,
     searchReceiver,
     updateSavedOptions,
-    getIntervalTypes
+    getIntervalTypes,
+    getMessageTemplates
   }
 }

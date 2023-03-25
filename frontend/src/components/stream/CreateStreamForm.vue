@@ -59,6 +59,14 @@
         :json-schema-mapping="overrideOptionsSchema"
         name="Override Receiver Options"
       ></json-field>
+      <v-select
+        v-model="selectedMessageTemplate"
+        :items="messageTemplates"
+        item-title="text"
+        item-value="value"
+        label="Message Templates"
+        @update:modelValue="stream.messageTemplate = selectedMessageTemplate"
+      ></v-select>
       <v-textarea
         name="Message Template"
         label="Message Template"
@@ -83,6 +91,7 @@ import { computed, onMounted } from 'vue'
 import useStreams from '@/composables/useStreams'
 import { required } from '@/validation'
 import useForm from '@/composables/useForm'
+import useURL from '@/composables/useURL'
 import JsonField from '@/components/core/JsonField.vue'
 import ForeignField from '@/components/core/ForeignField.vue'
 import SlugField from '@/components/core/SlugField.vue'
@@ -96,10 +105,13 @@ const {
   receiverSlugData,
   overrideOptionsSchema,
   intervalTypes,
+  selectedMessageTemplate,
+  messageTemplates,
   storeStream,
   searchSource,
   searchReceiver,
-  getIntervalTypes
+  getIntervalTypes,
+  getMessageTemplates
 } = useStreams()
 
 const {
@@ -110,6 +122,8 @@ const {
   await storeStream(event.submitter.id)
 })
 
+const { getParamsFromURL } = useURL()
+
 const fieldForSlugFollowing = computed(() => {
   if (!stream.value.sourceSlug && !stream.value.receiverSlug) {
     return ''
@@ -119,9 +133,14 @@ const fieldForSlugFollowing = computed(() => {
 
 onMounted(async () => {
   formIsLoading.value = false
-
+  await getMessageTemplates()
   await getIntervalTypes()
-  await searchSource()
+  const params = getParamsFromURL()
+  const sourceSlug = (params.source || '').toString()
+  if (sourceSlug) {
+    stream.value.sourceSlug = sourceSlug
+  }
+  await searchSource(sourceSlug)
   await searchReceiver()
 })
 </script>

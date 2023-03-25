@@ -31,6 +31,11 @@ class Interval(BaseModel):
     value: str
 
 
+class MessageTemplate(BaseModel):
+    text: str
+    value: str
+
+
 class AppSettings(BaseModel):
     handlers_config_path: str = "/app/handlers.json"
     intervals: list[Interval] = [
@@ -38,6 +43,15 @@ class AppSettings(BaseModel):
         Interval(text="At 6 PM", value="0 18 * * *"),
         Interval(text="Every 10 minutes", value="*/10 * * * *"),
         Interval(text="Every 30 minutes", value="*/30 * * * *"),
+    ]
+    message_templates: list[MessageTemplate] = [
+        MessageTemplate(
+            text="Default Telegram",
+            value=(
+                '<a href="${url}">${title}</a>\n\n'
+                "${source_hash_tags}\n${post_hash_tags}"
+            ),
+        ),
     ]
 
 
