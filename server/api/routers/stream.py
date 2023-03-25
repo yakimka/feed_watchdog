@@ -114,7 +114,7 @@ async def get_intervals(
 
 @router.get("/streams/message_templates/")
 @inject
-async def get_intervals(
+async def get_message_templates(
     intervals=Depends(Provide[Container.config.app.message_templates]),
 ) -> list[dict]:
     return intervals

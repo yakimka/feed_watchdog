@@ -48,7 +48,8 @@ class AppSettings(BaseModel):
         MessageTemplate(
             text="Default Telegram",
             value=(
-                '<a href="${url}">${title}</a>\n\n${source_hash_tags}\n${post_hash_tags}'
+                '<a href="${url}">${title}</a>\n\n'
+                "${source_hash_tags}\n${post_hash_tags}"
             ),
         ),
     ]
