@@ -61,6 +61,14 @@
         :json-schema-mapping="overrideOptionsSchema"
         name="Override Receiver Options"
       ></json-field>
+      <v-select
+        v-model="selectedMessageTemplate"
+        :items="messageTemplates"
+        item-title="text"
+        item-value="value"
+        label="Message Templates"
+        @update:modelValue="stream.messageTemplate = selectedMessageTemplate"
+      ></v-select>
       <v-textarea
         name="Message Template"
         label="Message Template"
@@ -108,13 +116,16 @@ const {
   savedReceiverOptionsOverride,
   savedModifiers,
   intervalTypes,
+  selectedMessageTemplate,
+  messageTemplates,
   getStream,
   updateStream,
   deleteStream,
   searchSource,
   searchReceiver,
   updateSavedOptions,
-  getIntervalTypes
+  getIntervalTypes,
+  getMessageTemplates
 } = useStreams()
 
 const {
@@ -134,6 +145,7 @@ const deleteStreamAndRedirect = async () => {
 }
 
 onMounted(async () => {
+  await getMessageTemplates()
   await getStream(props.id)
   await searchSource(stream.value.sourceSlug)
   await searchReceiver(stream.value.receiverSlug)

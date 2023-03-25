@@ -59,6 +59,14 @@
         :json-schema-mapping="overrideOptionsSchema"
         name="Override Receiver Options"
       ></json-field>
+      <v-select
+        v-model="selectedMessageTemplate"
+        :items="messageTemplates"
+        item-title="text"
+        item-value="value"
+        label="Message Templates"
+        @update:modelValue="stream.messageTemplate = selectedMessageTemplate"
+      ></v-select>
       <v-textarea
         name="Message Template"
         label="Message Template"
@@ -96,10 +104,13 @@ const {
   receiverSlugData,
   overrideOptionsSchema,
   intervalTypes,
+  selectedMessageTemplate,
+  messageTemplates,
   storeStream,
   searchSource,
   searchReceiver,
-  getIntervalTypes
+  getIntervalTypes,
+  getMessageTemplates
 } = useStreams()
 
 const {
@@ -119,7 +130,7 @@ const fieldForSlugFollowing = computed(() => {
 
 onMounted(async () => {
   formIsLoading.value = false
-
+  await getMessageTemplates()
   await getIntervalTypes()
   await searchSource()
   await searchReceiver()

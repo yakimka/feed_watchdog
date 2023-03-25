@@ -112,6 +112,14 @@ async def get_intervals(
     return intervals
 
 
+@router.get("/streams/message_templates/")
+@inject
+async def get_intervals(
+    intervals=Depends(Provide[Container.config.app.message_templates]),
+) -> list[dict]:
+    return intervals
+
+
 @router.post("/streams/", response_model=StreamResp, status_code=201)
 async def add(
     stream: StreamBody = Body(),
