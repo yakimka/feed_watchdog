@@ -138,7 +138,6 @@ onMounted(async () => {
   const params = getParamsFromURL()
   const sourceSlug = (params.source || '').toString()
   if (sourceSlug) {
-    console.log('sourceSlug', sourceSlug)
     stream.value.sourceSlug = sourceSlug
   }
   await searchSource(sourceSlug)
