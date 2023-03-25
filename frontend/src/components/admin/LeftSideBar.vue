@@ -39,6 +39,19 @@
           ></v-btn>
         </template>
       </v-list-item>
+<!--      <v-list-group value="Settings">-->
+<!--        <template v-slot:activator="{ props }">-->
+<!--          <v-list-item-->
+<!--            v-bind="props"-->
+<!--            prepend-icon="mdi-cog"-->
+<!--            title="Settings"-->
+<!--          ></v-list-item>-->
+<!--        </template>-->
+<!--        <v-list-item-->
+<!--          title="Message templates"-->
+<!--          :to="{name: 'streams'}"-->
+<!--        ></v-list-item>-->
+<!--      </v-list-group>-->
     </v-list>
     </v-card>
   </v-navigation-drawer>
