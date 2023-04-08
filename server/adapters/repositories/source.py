@@ -81,6 +81,6 @@ class MongoSourceRepository(ISourceRepository):
             return Source.parse_obj(result)
         return None
 
-    async def delete_by_slug(self, slug: str) -> bool:
-        result = await self.db.sources.delete_one({"slug": slug})
+    async def delete(self, source: Source) -> bool:
+        result = await self.db.sources.delete_one({"slug": source.slug})
         return result.deleted_count > 0

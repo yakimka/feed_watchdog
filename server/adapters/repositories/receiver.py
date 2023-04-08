@@ -71,6 +71,6 @@ class MongoReceiverRepository(IReceiverRepository):
             return Receiver.parse_obj(result)
         return None
 
-    async def delete_by_slug(self, slug: str) -> bool:
-        result = await self.db.receivers.delete_one({"slug": slug})
+    async def delete(self, receiver: Receiver) -> bool:
+        result = await self.db.receivers.delete_one({"slug": receiver.slug})
         return result.deleted_count > 0

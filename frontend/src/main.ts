@@ -42,6 +42,8 @@ axios.interceptors.response.use(function (response) {
 
   if (status === 0 || status >= 500) {
     dialog.set(error.message, 'Something went wrong')
+  } else if (status === 409) {
+    dialog.set(error.response.data.detail, 'Conflict')
   }
   return Promise.reject(error)
 })
