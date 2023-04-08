@@ -54,7 +54,7 @@ class ISourceRepository(abc.ABC):
         pass
 
     @abstractmethod
-    async def delete_by_slug(self, slug: str) -> bool:
+    async def delete(self, source: Source) -> bool:
         pass
 
 
@@ -80,7 +80,7 @@ class IReceiverRepository(abc.ABC):
         pass
 
     @abstractmethod
-    async def delete_by_slug(self, slug: str) -> bool:
+    async def delete(self, receiver: Receiver) -> bool:
         pass
 
 
@@ -103,6 +103,14 @@ class IStreamRepository(abc.ABC):
 
     @abstractmethod
     async def get_by_slug(self, slug: str) -> Stream | None:
+        pass
+
+    @abstractmethod
+    async def get_by_source_slug(self, source_slug: str) -> list[Stream]:
+        pass
+
+    @abstractmethod
+    async def get_by_receiver_slug(self, receiver_slug: str) -> list[Stream]:
         pass
 
     @abstractmethod

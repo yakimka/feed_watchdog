@@ -65,6 +65,18 @@ class MongoStreamRepository(IStreamRepository):
             return Stream.parse_obj(result)
         return None
 
+    async def get_by_source_slug(self, source_slug: str) -> list[Stream]:
+        cursor = self.db.streams.find({"source_slug": source_slug})
+        return [
+            Stream.parse_obj(item) for item in await cursor.to_list(length=None)
+        ]
+
+    async def get_by_receiver_slug(self, receiver_slug: str) -> list[Stream]:
+        cursor = self.db.streams.find({"receiver_slug": receiver_slug})
+        return [
+            Stream.parse_obj(item) for item in await cursor.to_list(length=None)
+        ]
+
     async def delete_by_slug(self, slug: str) -> bool:
         result = await self.db.streams.delete_one({"slug": slug})
         return result.deleted_count > 0

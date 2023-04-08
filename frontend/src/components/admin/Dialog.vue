@@ -4,6 +4,7 @@
       <v-dialog
         v-model="dialog.isActive"
         transition="dialog-bottom-transition"
+        max-width="500"
       >
         <v-card>
           <v-toolbar
@@ -12,7 +13,7 @@
             <v-toolbar-title>{{ dialog.title }}</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-            <div class="text-h2 pa-12">{{ dialog.text }}</div>
+            <div class="text-h5 text-center pa-12">{{ dialog.text }}</div>
           </v-card-text>
           <v-card-actions class="justify-end">
             <v-btn

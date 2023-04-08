@@ -3,9 +3,14 @@ from pydantic import BaseModel
 
 from api.deps.pagination import Pagination, get_pagination_params
 from api.deps.receiver import get_by_slug, get_receiver_repo
+from api.deps.stream import get_stream_repo
 from api.deps.user import get_current_user
 from api.routers.core import ListResponse
-from domain.interfaces import IReceiverRepository, ReceiverQuery
+from domain.interfaces import (
+    IReceiverRepository,
+    IStreamRepository,
+    ReceiverQuery,
+)
 from domain.models import Receiver as ReceiverModel
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
@@ -82,10 +87,14 @@ async def detail(
 
 @router.delete("/receivers/{slug}/", status_code=204)
 async def delete(
-    slug: str,
+    receiver: ReceiverModel = Depends(get_by_slug),
     receivers: IReceiverRepository = Depends(get_receiver_repo),
+    streams: IStreamRepository = Depends(get_stream_repo),
 ) -> str:
-    deleted = await receivers.delete_by_slug(slug)
+    if await streams.get_by_receiver_slug(receiver.slug):
+        raise HTTPException(status_code=409, detail="Receiver is in use")
+
+    deleted = await receivers.delete(receiver)
     if not deleted:
         raise HTTPException(status_code=404, detail="Receiver not found")
     return ""

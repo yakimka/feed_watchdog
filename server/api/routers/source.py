@@ -3,9 +3,10 @@ from pydantic import BaseModel, Field
 
 from api.deps.pagination import Pagination, get_pagination_params
 from api.deps.source import get_by_slug, get_source_repo
+from api.deps.stream import get_stream_repo
 from api.deps.user import get_current_user
 from api.routers.core import ListResponse
-from domain.interfaces import ISourceRepository, SourceQuery
+from domain.interfaces import ISourceRepository, IStreamRepository, SourceQuery
 from domain.models import Source as SourceModel
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
@@ -92,10 +93,14 @@ async def detail(
 
 @router.delete("/sources/{slug}/", status_code=204)
 async def delete(
-    slug: str,
+    source: SourceModel = Depends(get_by_slug),
     sources: ISourceRepository = Depends(get_source_repo),
+    streams: IStreamRepository = Depends(get_stream_repo),
 ) -> str:
-    deleted = await sources.delete_by_slug(slug)
+    if await streams.get_by_source_slug(source.slug):
+        raise HTTPException(status_code=409, detail="Source is in use")
+
+    deleted = await sources.delete(source)
     if not deleted:
         raise HTTPException(status_code=404, detail="Source not found")
     return ""
