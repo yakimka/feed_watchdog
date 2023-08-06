@@ -1,43 +1,43 @@
 ---
-version: '2'
 
+x-feed-watchdog: &fw-common
+  build:
+    context: .
+    target: development
+  image: feed_watchdog:dev
+  env_file: .env
+  volumes:
+    - .:/app
+
+x-worker: &fw-worker-common
+  <<: *fw-common
+  depends_on:
+    - feed_watchdog_api
+    - redis
+  restart: "no"
 
 services:
-  feed_watchdog:
-    container_name: feed_watchdog
-    build:
-      context: .
-      target: development
-    env_file: .env
-    hostname: feed_watchdog
-    image: feed_watchdog:dev
+  feed_watchdog_api:
+    <<: *fw-common
+    container_name: feed_watchdog_api
+    hostname: feed_watchdog_api
     restart: "no"
     depends_on:
       - mongo4
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app
 
-#  fw_scheduler:
-#    command: python -m workers.scheduler
-#    container_name: fw_scheduler
-#    env_file: server/.env
-#    hostname: fw_scheduler
-#    image: feed_watchdog:dev
-#    depends_on:
-#      - redis
-#    restart: "no"
-#
-#  fw_processor:
-#    command: python -m processors
-#    container_name: fw_processor
-#    env_file: server/.env
-#    hostname: fw_processor
-#    image: feed_watchdog:dev
-#    depends_on:
-#      - redis
-#    restart: "no"
+  publish_streams_by_schedule_worker:
+    <<: *fw-worker-common
+    command: python -m feed_watchdog.workers.run_worker publish_streams_by_schedule
+
+  fetch_posts_from_streams_worker:
+    <<: *fw-worker-common
+    command: python -m feed_watchdog.workers.run_worker fetch_posts_from_streams
+
+  send_parsed_posts_worker:
+    <<: *fw-worker-common
+    command: python -m feed_watchdog.workers.run_worker send_parsed_posts
 
   redis:
     container_name: redis

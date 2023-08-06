@@ -4,7 +4,7 @@ from feed_watchdog.domain.models import BaseModel
 
 
 class AppSettings(BaseModel):
-    api_base_url: str = "http://feed_watchdog:8000/api"
+    api_base_url: str = "http://feed_watchdog_api:8000/api"
     api_token: str
     api_timeout: int = 30
     handlers_conf_path: str = "/app/fw_handlers_conf.yaml"

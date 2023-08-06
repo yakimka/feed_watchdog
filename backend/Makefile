@@ -1,6 +1,6 @@
 SHELL:=/usr/bin/env bash
 
-ENTRYPOINT=docker compose run --rm -it feed_watchdog
+ENTRYPOINT=docker compose run --rm -it feed_watchdog_api
 POETRY_RUN=$(ENTRYPOINT) poetry
 SRC_DIR=.
 

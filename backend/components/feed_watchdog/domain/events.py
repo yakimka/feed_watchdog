@@ -55,3 +55,7 @@ class ProcessStreamEvent(Event):
 class PostParsed(Event):
     stream_slug: str
     post: Post
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return from_dict(data_class=PostParsed, data=data)

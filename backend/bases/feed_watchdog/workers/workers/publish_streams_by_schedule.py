@@ -5,7 +5,6 @@ from typing import Iterable
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.interval import IntervalTrigger
 from dependency_injector.wiring import Provide, inject
 
 from feed_watchdog.api_client.client import FeedWatchdogAPIClient
@@ -41,15 +40,6 @@ async def add_interval_jobs(
         Container.feed_watchdog_api_client
     ],
 ) -> None:
-    collect = partial(collect_and_publish_streams, "*/10 * * * *")
-    scheduler.add_job(
-        collect,
-        IntervalTrigger(seconds=5),
-        name="collect_and_publish_streams_every_5_seconds",
-        replace_existing=True,
-    )
-    return
-
     for interval in await api_client.get_intervals():
         collect = partial(collect_and_publish_streams, interval)
         scheduler.add_job(

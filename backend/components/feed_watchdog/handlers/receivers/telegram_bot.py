@@ -1,7 +1,7 @@
 import dataclasses
 import logging
 from functools import lru_cache
-from typing import Awaitable, Callable, Iterable
+from typing import Iterable
 
 from aiogram import Bot
 

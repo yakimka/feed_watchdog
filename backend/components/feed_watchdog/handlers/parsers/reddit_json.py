@@ -2,6 +2,7 @@ import dataclasses
 import json
 import logging
 
+from feed_watchdog.domain.models import Post as BasePost
 from feed_watchdog.handlers import HandlerType, register_handler
 from feed_watchdog.text import make_hash_tags
 
@@ -9,13 +10,13 @@ logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass()
-class Post:
+class Post(BasePost):
     post_id: str
     title: str
     url: str
     comments: str
     score: int
-    source_tags: tuple | list = ()
+    source_tags: tuple | list
 
     def template_kwargs(self):
         return {
@@ -42,7 +43,9 @@ class Post:
 
 
 @register_handler(
-    type=HandlerType.parsers.value, return_fields_schema=Post.fields_schema()
+    type=HandlerType.parsers.value,
+    return_fields_schema=Post.fields_schema(),
+    return_model=Post,
 )
 async def reddit_json(
     text: str, *, options=None  # noqa: PLW0613
@@ -55,6 +58,7 @@ async def reddit_json(
             url=entry["data"]["url"],
             comments=f"https://reddit.com{entry['data']['permalink']}",
             score=entry["data"]["score"],
+            source_tags=[],
         )
         for entry in raw_post["data"]["children"]
     ]

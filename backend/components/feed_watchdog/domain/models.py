@@ -1,5 +1,7 @@
+import dataclasses
 from typing import Protocol
 
+from dacite import from_dict
 from pydantic import BaseModel as PydanticBaseModel
 
 
@@ -65,13 +67,18 @@ class StreamWithRelations(Stream):
     receiver: Receiver
 
 
+@dataclasses.dataclass()
 class Post(Protocol):
     post_id: str
-    source_tags: list | tuple
+    source_tags: tuple | list
 
     def template_kwargs(self) -> dict:
-        pass
+        raise NotImplementedError
 
     @classmethod
     def fields_schema(cls) -> dict:
-        pass
+        raise NotImplementedError
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return from_dict(cls, data=data)

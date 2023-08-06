@@ -13,7 +13,7 @@ class AuthSettings(BaseModel):
 
 
 class RedisSettings(BaseModel):
-    pub_sub_url: str = "redis://localhost:6379"
+    pub_sub_url: str = "redis://localhost:6379/2"
 
 
 class MongoSettings(BaseModel):

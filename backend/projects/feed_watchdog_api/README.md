@@ -21,4 +21,3 @@ docker run --rm --name feed_watchdog -p 8000:8000 feed_watchdog
 ```
 
 The OpenAPI specification of this FastAPI app can now be accessed at http://localhost:8000/docs/
-

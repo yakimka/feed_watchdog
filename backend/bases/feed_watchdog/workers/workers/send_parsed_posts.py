@@ -6,8 +6,11 @@ from dependency_injector.wiring import Provide, inject
 
 from feed_watchdog.api_client.client import FeedWatchdogAPIClient, StreamResp
 from feed_watchdog.commands.core import BaseCommand
-from feed_watchdog.domain.events import PostParsed
-from feed_watchdog.handlers import HandlerType, get_handler_by_name
+from feed_watchdog.handlers import (
+    HandlerType,
+    get_handler_by_name,
+    get_handler_return_model_by_name,
+)
 from feed_watchdog.pubsub.publisher import Publisher
 from feed_watchdog.repositories.post import RedisPostRepository
 from feed_watchdog.sentry.error_tracking import write_warn_message
@@ -34,7 +37,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         self._api_client = api_client
         self._subscriber = container.subscriber(
             topic_name=self._settings.app.post_parsed_topic,
-            group_id=f"send_parsed_posts",
+            group_id="send_parsed_posts",
             consumer_id=uuid.uuid4().hex,
         )
 
@@ -43,11 +46,17 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
 
     async def process_posts(self) -> None:
         async for msg_id, msg_data in self._subscriber:
-            event = PostParsed.from_dict(msg_data)
-            stream = await self.receive_stream(event.stream_slug)
+            stream_slug = msg_data["stream_slug"]
+            stream = await self.receive_stream(stream_slug)
             if not stream:
-                write_warn_message(f"Can't find stream {event.stream_slug}")
+                write_warn_message(f"Can't find stream {stream_slug}")
                 continue
+
+            post_class = get_handler_return_model_by_name(
+                type=HandlerType.parsers.value, name=stream.source.parser_type
+            )
+
+            post = post_class.from_dict(msg_data["post"])
 
             receiver = get_handler_by_name(
                 name=stream.receiver.type,
@@ -58,16 +67,16 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
                 },
             )
             await receiver(
-                [event.post],
+                [post],
                 template=stream.message_template,
                 squash=stream.squash,
             )
-            self._subscriber.commit(msg_id)
+            await self._subscriber.commit(msg_id)
             logger.info(
                 "New post with id %s sent to %s (%s)",
-                event.post.id,
+                post.post_id,
                 stream.receiver.type,
-                event.slug,
+                stream_slug,
             )
 
     async def receive_stream(self, stream_slug: str) -> StreamResp | None:

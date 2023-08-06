@@ -5,6 +5,7 @@ import logging
 
 import feedparser
 
+from feed_watchdog.domain.models import Post as BasePost
 from feed_watchdog.handlers import HandlerType, register_handler
 from feed_watchdog.text import make_hash_tags
 
@@ -12,12 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass()
-class Post:
+class Post(BasePost):
     post_id: str
     title: str
     url: str
-    post_tags: tuple
-    source_tags: tuple | list = ()
+    post_tags: tuple | list
+    source_tags: tuple | list
 
     def template_kwargs(self):
         return {
@@ -44,7 +45,9 @@ class Post:
 
 
 @register_handler(
-    type=HandlerType.parsers.value, return_fields_schema=Post.fields_schema()
+    type=HandlerType.parsers.value,
+    return_fields_schema=Post.fields_schema(),
+    return_model=Post,
 )
 async def rss(text: str, *, options=None) -> list[Post]:  # noqa: PLW0613
     loop = asyncio.get_running_loop()
@@ -72,6 +75,7 @@ def _handler(text: str) -> list[Post]:
                     title=entry.title,
                     url=entry.get("link"),
                     post_tags=get_tags(entry),
+                    source_tags=[],
                 ),
             )
         except Exception:  # noqa: PLW0703, PLW0718

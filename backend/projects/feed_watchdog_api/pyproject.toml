@@ -8,12 +8,18 @@ license = ""
 packages = [
     {include = "feed_watchdog/rest_api", from = "../../bases"},
     {include = "feed_watchdog/workers", from = "../../bases"},
-    {include = "feed_watchdog/utils",from = "../../components"},
+    {include = "feed_watchdog/handlers",from = "../../components"},
+    {include = "feed_watchdog/commands",from = "../../components"},
+    {include = "feed_watchdog/repositories",from = "../../components"},
     {include = "feed_watchdog/sentry",from = "../../components"},
     {include = "feed_watchdog/fetchers",from = "../../components"},
-    {include = "feed_watchdog/pubsub",from = "../../components"},
-    {include = "feed_watchdog/repositories",from = "../../components"},
+    {include = "feed_watchdog/synchronize",from = "../../components"},
+    {include = "feed_watchdog/api_client",from = "../../components"},
+    {include = "feed_watchdog/utils",from = "../../components"},
     {include = "feed_watchdog/domain",from = "../../components"},
+    {include = "feed_watchdog/text",from = "../../components"},
+    {include = "feed_watchdog/pubsub",from = "../../components"},
+    {include = "feed_watchdog/http",from = "../../components"},
 ]
 
 [tool.poetry.dependencies]
@@ -27,6 +33,10 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 redis = "^4.6.0"
 sentry-sdk = "^1.28.1"
 pydantic-settings = "^2.0.2"
+aiogram = "^2.20"
+apscheduler = "^3.9.1"
+dacite = "^1.8.0"
+tldextract = "^3.2.1"
 
 [tool.poetry.group.dev.dependencies]
 

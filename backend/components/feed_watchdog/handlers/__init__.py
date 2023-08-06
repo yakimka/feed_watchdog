@@ -20,7 +20,10 @@ __all__ = [
     "HandlerOptions",
     "HandlerType",
     "init_handlers_config",
+    "get_handler_return_model_by_name",
 ]
+
+from feed_watchdog.domain.models import Post
 
 
 class HandlerType(Enum):
@@ -89,11 +92,15 @@ class HandlerOptions:
         return schema
 
 
+ReturnModel = Type[Post]
+
+
 class Handler(NamedTuple):
     name: str
     obj: Callable
     options_class: Optional[Type[HandlerOptions]]
     return_fields_schema: Optional[dict]
+    return_model: Optional[ReturnModel]
 
 
 RawHandler = tuple[
@@ -102,6 +109,7 @@ RawHandler = tuple[
     Optional[dict],
     Optional[Type[HandlerOptions]],
     Optional[dict],
+    Optional[ReturnModel],
 ]
 HANDLERS: dict[str, dict[str, RawHandler]] = defaultdict(dict)
 HANDLERS_CONFIG: dict = {}
@@ -136,8 +144,13 @@ def register_handler(
     name: Optional[str] = None,
     options: Optional[Type[HandlerOptions]] = None,
     return_fields_schema: Optional[dict] = None,
+    return_model: Optional[ReturnModel] = None,
 ):  # noqa: PLW0622
     def wrapper(func_or_class):
+        if type == HandlerType.parsers.value:
+            if not return_model:
+                raise ValueError("Parsers must be registered with return_model")
+
         if isclass(func_or_class):
             handler_name = name or func_or_class.__name__
 
@@ -150,6 +163,7 @@ def register_handler(
                         kwargs,
                         options,
                         return_fields_schema,
+                        return_model,
                     )
             else:
                 HANDLERS[type][handler_name] = (
@@ -158,6 +172,7 @@ def register_handler(
                     {},
                     options,
                     return_fields_schema,
+                    return_model,
                 )
 
         elif callable(func_or_class):
@@ -168,6 +183,7 @@ def register_handler(
                 None,
                 options,
                 return_fields_schema,
+                return_model,
             )
 
         return func_or_class
@@ -194,6 +210,7 @@ def get_registered_handlers() -> dict[str, dict[str, Handler]]:
                 obj if kwargs is None else obj(**kwargs),
                 options_class,
                 return_fields_schema,
+                return_model,
             )
             for name, (
                 name_,
@@ -201,6 +218,7 @@ def get_registered_handlers() -> dict[str, dict[str, Handler]]:
                 kwargs,
                 options_class,
                 return_fields_schema,
+                return_model,
             ) in handlers.items()
         }
     return result
@@ -225,6 +243,14 @@ def get_handler_by_name(
     if options and handler.options_class:
         options_ = handler.options_class(**options)
     return partial(handler.obj, options=options_)
+
+
+def get_handler_return_model_by_name(type: str, name: str) -> ReturnModel:
+    registered_handlers = get_registered_handlers()
+    handler = dict(registered_handlers[type])[name]
+    if handler.return_model is None:
+        raise ValueError(f"Handler {name} does not have return model")
+    return handler.return_model
 
 
 Schema = TypedDict(

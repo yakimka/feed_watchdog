@@ -35,7 +35,7 @@ class CreateUserCommand(BaseCommand):
 
         new_user = UserInDB(
             id=str(uuid4()),
-            email=data.email,
+            email=user_data.email,
             password=hash_password(user_data.password),
         )
         await user_repo.create_user(new_user)
