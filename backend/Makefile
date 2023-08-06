@@ -1,12 +1,8 @@
 SHELL:=/usr/bin/env bash
 
-DOCKER_VERSION := $(shell docker --version 2>/dev/null)
-ifdef DOCKER_VERSION
-    POETRY_RUN=docker compose run --workdir=/app --rm devtools poetry
-else
-    POETRY_RUN=poetry
-endif
-SRC_DIR=server
+ENTRYPOINT=docker compose run --rm -it feed_watchdog
+POETRY_RUN=$(ENTRYPOINT) poetry
+SRC_DIR=.
 
 
 .PHONY: lint
@@ -52,13 +48,13 @@ verify_format:
 	$(POETRY_RUN) run black --preview --check --diff $(SRC_DIR)
 	$(POETRY_RUN) run isort --check-only --diff --src=$(SRC_DIR) $(SRC_DIR)
 
-.PHONY: collectstatic
-collectstatic:
-	$(POETRY_RUN) run python -m  server.commands.collectstatic
+.PHONY: run_command
+run_command:
+	$(POETRY_RUN) run python -m feed_watchdog.rest_api.cli.$(args)
 
 .PHONY: bash
 bash:
-	docker compose run --rm devtools bash
+	$(ENTRYPOINT) bash
 
 .PHONY: poetry
 poetry:

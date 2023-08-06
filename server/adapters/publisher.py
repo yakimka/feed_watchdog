@@ -15,3 +15,4 @@ class Publisher:
 
     async def publish(self, channel, event: Event):
         await self.redis_client.publish(channel, json.dumps(event.as_dict()))
+        await self.redis_client.xadd(channel, json.dumps(event.as_dict()))

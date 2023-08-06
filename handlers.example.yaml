@@ -3,4 +3,4 @@ receivers:
     "@mybot":
       kwargs:
         name: "@mybot"
-        token: 'ENV:FW_MYBOT_TOKEN'
+        token: 'ENV:MYBOT_TOKEN'

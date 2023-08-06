@@ -1,27 +1,11 @@
 import asyncio
 import logging
-import os
-from functools import partial, wraps
-from typing import Iterable
+from functools import wraps
 
 import httpx
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
 from pydantic import BaseModel
 
-from adapters import sentry
-from app_settings import Topic
-from container import container
-from domain.events import ProcessStreamEvent
-
 logger = logging.getLogger(__name__)
-
-
-def get_client() -> httpx.AsyncClient:
-    transport = httpx.AsyncHTTPTransport(retries=2)
-    token = os.environ["SCHEDULER_FW_API_TOKEN"]
-    headers = {"Authorization": f"Bearer {token}"}
-    return httpx.AsyncClient(headers=headers, transport=transport, timeout=30)
 
 
 class SourceResp(BaseModel):
@@ -81,7 +65,7 @@ def infinite_retry(func):
     return wrapper
 
 
-class HTTPXStreamClient:
+class FeedWatchdogAPIClient:
     def __init__(self, client: httpx.AsyncClient, base_url: str):
         self._client = client
         self._base_url = base_url.removesuffix("/")
@@ -127,60 +111,3 @@ class HTTPXStreamClient:
         )
         response.raise_for_status()
         return [item["value"] for item in response.json()]
-
-
-class Command:
-    help = "Runs the scheduler"
-
-    async def handle(self, stream_client: HTTPXStreamClient):  # noqa: E800
-        logger.info("Starting scheduler")
-        scheduler = AsyncIOScheduler()
-        await add_interval_jobs(scheduler, stream_client=stream_client)
-        scheduler.start()
-
-
-async def add_interval_jobs(
-    scheduler: AsyncIOScheduler, stream_client: HTTPXStreamClient
-) -> None:
-    for interval in await stream_client.get_intervals():
-        collect = partial(collect_and_publish_streams, interval, stream_client)
-        scheduler.add_job(
-            collect,
-            CronTrigger.from_crontab(interval),
-            replace_existing=True,
-        )
-
-
-async def send_events(events: Iterable[ProcessStreamEvent]):
-    i, publisher = 0, container.publisher()
-    for i, event in enumerate(events, start=1):  # noqa: B007
-        await publisher.publish(Topic.STREAMS.value, event)
-    logger.info("Sent %s events", i)
-
-
-async def collect_and_publish_streams(
-    cron_interval: str, stream_client: HTTPXStreamClient
-):
-    logger.info("Collecting streams for %s", cron_interval)
-    streams = await stream_client.get_streams(interval=cron_interval)
-    await send_events(
-        ProcessStreamEvent.from_dict(stream.dict()) for stream in streams
-    )
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-
-    sentry.setup_logging(os.environ.get("FW_SENTRY__DSN"))
-
-    httpx_client = get_client()
-    httpx_stream_client = HTTPXStreamClient(
-        httpx_client, "http://feed_watchdog:8000/api"
-    )
-
-    loop = asyncio.new_event_loop()
-    loop.create_task(Command().handle(stream_client=httpx_stream_client))
-    try:
-        loop.run_forever()
-    finally:
-        loop.close()
