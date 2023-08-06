@@ -41,17 +41,16 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
     def handle(self, args):
         asyncio.run(self.process_streams(), debug=True)
 
-    @inject
     async def process_streams(self) -> None:
         async for msg_id, msg_data in self._subscriber:
             event = ProcessStreamEvent.from_dict(msg_data)
             text = await self.fetch_text(event)
             if not text:
-                return None
+                continue
 
             posts = await self.parse_posts(event, text)
             if not posts:
-                return None
+                continue
 
             final_posts = await self.apply_modifiers_to_posts(
                 event.modifiers, posts

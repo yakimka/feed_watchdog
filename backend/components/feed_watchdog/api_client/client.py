@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from functools import wraps
+from typing import AsyncGenerator
 
 import httpx
 from pydantic import BaseModel
@@ -44,7 +45,7 @@ class StreamResp(BaseModel):
     receiver: ReceiverResp
 
 
-class StreamClientError(Exception):
+class FeedWatchdogAPIClientError(Exception):
     pass
 
 
@@ -70,39 +71,50 @@ class FeedWatchdogAPIClient:
         self._client = client
         self._base_url = base_url.removesuffix("/")
 
-    async def get_streams(self, interval: str) -> list[StreamResp]:
+    async def get_streams(
+        self, interval: str | None = None
+    ) -> list[StreamResp]:
         result: list[StreamResp] = []
-        has_next = True
-        page = 1
-        while has_next:
-            try:
-                has_next, streams = await self._get_streams(
-                    interval=interval, page=page
-                )
-            except httpx.HTTPError as e:
-                raise StreamClientError("Error while fetching streams") from e
-            page += 1
-            result.extend(streams)
+        params = {"only_active": True}
+        if interval is not None:
+            params["interval"] = interval
+        async for row in self._iterate_pagination(path="/streams/", **params):
+            result.append(StreamResp.parse_obj(row))
         return result
 
-    async def _get_streams(
-        self, interval: str, page=1, page_size=300
-    ) -> tuple[bool, list[StreamResp]]:
-        response = await self._client.get(
-            f"{self._base_url}/streams/",
-            params={
-                "only_active": True,
-                "page": page,
-                "page_size": page_size,
-                "interval": interval,
-            },
-        )
-        response.raise_for_status()
-        result = response.json()
-        has_next = result["count"] > page * page_size
-        return has_next, [
-            StreamResp.parse_obj(stream) for stream in result["results"]
-        ]
+    async def get_stream(self, slug: str) -> StreamResp | None:
+        async for row in self._iterate_pagination(
+            path="/streams/", q=slug, page_size=10
+        ):
+            stream = StreamResp.parse_obj(row)
+            if stream.slug == slug:
+                return stream
+        return None
+
+    async def _iterate_pagination(
+        self, path: str, page=1, page_size=300, **kwargs
+    ) -> AsyncGenerator[dict, None]:
+        has_next = True
+        while has_next:
+            try:
+                response = await self._client.get(
+                    f"{self._base_url}{path}",
+                    params={
+                        "page": page,
+                        "page_size": page_size,
+                        **kwargs,
+                    },
+                )
+                response.raise_for_status()
+                result = response.json()
+                has_next = result["count"] > page * page_size
+                for row in result["results"]:
+                    yield row
+            except httpx.HTTPError as e:
+                raise FeedWatchdogAPIClientError(
+                    "Error while fetching streams"
+                ) from e
+            page += 1
 
     @infinite_retry
     async def get_intervals(self) -> list[str]:

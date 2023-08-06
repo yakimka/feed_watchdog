@@ -53,21 +53,18 @@ class TelegramBot:
         template: str,
         squash: bool = False,
         options: TelegramBotOptions,
-        callback: Callable[[Post], Awaitable] | None = None,
     ) -> None:
         if squash:
             await self._send_squashed_message(
                 posts,
                 template=template,
                 options=options,
-                callback=callback,
             )
         else:
             await self._send_separate_messages(
                 posts,
                 template=template,
                 options=options,
-                callback=callback,
             )
 
     async def _send_separate_messages(
@@ -76,7 +73,6 @@ class TelegramBot:
         *,
         template: str,
         options: TelegramBotOptions,
-        callback: Callable[[Post], Awaitable] | None = None,
     ) -> None:
         for post in posts:
             message = template_to_text(template, **post.template_kwargs())
@@ -85,8 +81,6 @@ class TelegramBot:
                 chat_id=options.chat_id,
                 disable_link_preview=options.disable_link_preview,
             )
-            if callback is not None:
-                await callback(post)
 
     async def _send_squashed_message(  # noqa C901
         self,
@@ -94,7 +88,6 @@ class TelegramBot:
         *,
         template: str,
         options: TelegramBotOptions,
-        callback: Callable[[Post], Awaitable] | None = None,
     ) -> None:
         posts = list(posts)
         if not posts:
@@ -120,9 +113,6 @@ class TelegramBot:
             chat_id=options.chat_id,
             disable_link_preview=options.disable_link_preview,
         )
-        if callback is not None:
-            for post in posts:
-                await callback(post)
 
     @async_lock(key=_lock_key, wait_time=pause_between_send)
     async def _send_message(

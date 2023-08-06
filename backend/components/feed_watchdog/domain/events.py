@@ -47,11 +47,8 @@ class ModifierData:
 @dataclasses.dataclass
 class ProcessStreamEvent(Event):
     slug: str
-    squash: bool
-    message_template: str
     modifiers: list[ModifierData]
     source: SourceData
-    receiver: ReceiverData
 
 
 @dataclasses.dataclass

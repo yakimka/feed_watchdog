@@ -7,6 +7,7 @@ license = ""
 
 packages = [
     {include = "feed_watchdog/rest_api", from = "../../bases"},
+    {include = "feed_watchdog/workers", from = "../../bases"},
     {include = "feed_watchdog/utils",from = "../../components"},
     {include = "feed_watchdog/sentry",from = "../../components"},
     {include = "feed_watchdog/fetchers",from = "../../components"},
