@@ -132,7 +132,7 @@ class IProcessorsConfigurationRepository(abc.ABC):
 
 class IUserRepository(abc.ABC):
     @abstractmethod
-    async def get_user_by_id(self, id: str) -> UserInDB | None:  # noqa: PLW0622
+    async def get_user_by_id(self, id: str) -> UserInDB | None:
         pass
 
     @abstractmethod

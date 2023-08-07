@@ -49,7 +49,7 @@ class Post(BasePost):
     return_fields_schema=Post.fields_schema(),
     return_model=Post,
 )
-async def rss(text: str, *, options=None) -> list[Post]:  # noqa: PLW0613
+async def rss(text: str, *, options=None) -> list[Post]:  # noqa: U100
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _handler, text)
 
@@ -78,7 +78,7 @@ def _handler(text: str) -> list[Post]:
                     source_tags=[],
                 ),
             )
-        except Exception:  # noqa: PLW0703, PLW0718
+        except Exception:  # noqa: PIE786
             entry = json.dumps(entry, sort_keys=True, indent=4)
             logger.exception("Failed to parse entry: %s", entry)
 

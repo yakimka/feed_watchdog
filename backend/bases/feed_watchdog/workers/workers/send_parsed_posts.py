@@ -11,8 +11,6 @@ from feed_watchdog.handlers import (
     get_handler_by_name,
     get_handler_return_model_by_name,
 )
-from feed_watchdog.pubsub.publisher import Publisher
-from feed_watchdog.repositories.post import RedisPostRepository
 from feed_watchdog.sentry.error_tracking import write_warn_message
 from feed_watchdog.workers.container import Container, container
 from feed_watchdog.workers.settings import Settings
@@ -25,10 +23,6 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
     def setup(
         self,
         settings: Settings = Provide[Container.settings],
-        post_repository: RedisPostRepository = Provide[
-            Container.post_repository
-        ],
-        publisher: Publisher = Provide[Container.publisher],
         api_client: FeedWatchdogAPIClient = Provide[
             Container.feed_watchdog_api_client
         ],
@@ -41,7 +35,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             consumer_id=uuid.uuid4().hex,
         )
 
-    def handle(self, args):
+    def handle(self, args):  # noqa: U100
         asyncio.run(self.process_posts(), debug=True)
 
     async def process_posts(self) -> None:

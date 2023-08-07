@@ -71,7 +71,7 @@ async def add(
     await sources.add(source.to_domain())
     result = await sources.get_by_slug(source.slug)
     # TODO https://stackoverflow.com/a/68552742
-    assert isinstance(result, SourceModel)  # noqa S101
+    assert isinstance(result, SourceModel)  # S101
     return result
 
 
@@ -87,7 +87,7 @@ async def update(
 
     result = await sources.get_by_slug(source.slug)
     # TODO https://stackoverflow.com/a/68552742
-    assert isinstance(result, SourceModel)  # noqa S101
+    assert isinstance(result, SourceModel)  # S101
     return result
 
 

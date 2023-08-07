@@ -61,7 +61,7 @@ async def add(
     await receivers.add(receiver.to_domain())
     result = await receivers.get_by_slug(receiver.slug)
     # TODO https://stackoverflow.com/a/68552742
-    assert isinstance(result, ReceiverModel)  # noqa S101
+    assert isinstance(result, ReceiverModel)  # S101
     return result
 
 
@@ -77,7 +77,7 @@ async def update(
 
     result = await receivers.get_by_slug(receiver.slug)
     # TODO https://stackoverflow.com/a/68552742
-    assert isinstance(result, ReceiverModel)  # noqa S101
+    assert isinstance(result, ReceiverModel)  # S101
     return result
 
 

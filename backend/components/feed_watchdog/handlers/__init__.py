@@ -140,16 +140,15 @@ def _yaml_string_constructor(self, node, env_prefix):
 
 
 def register_handler(
-    type: str,  # noqa: PLW0622
+    type: str,
     name: Optional[str] = None,
     options: Optional[Type[HandlerOptions]] = None,
     return_fields_schema: Optional[dict] = None,
     return_model: Optional[ReturnModel] = None,
-):  # noqa: PLW0622
+):
     def wrapper(func_or_class):
-        if type == HandlerType.parsers.value:
-            if not return_model:
-                raise ValueError("Parsers must be registered with return_model")
+        if type == HandlerType.parsers.value and not return_model:
+            raise ValueError("Parsers must be registered with return_model")
 
         if isclass(func_or_class):
             handler_name = name or func_or_class.__name__
@@ -235,7 +234,7 @@ def _parse_modules(package) -> list[str]:
 
 
 def get_handler_by_name(
-    type: str, name: str, options: Optional[dict] = None  # noqa: PLW0622
+    type: str, name: str, options: Optional[dict] = None
 ) -> Any:
     registered_handlers = get_registered_handlers()
     handler = dict(registered_handlers[type])[name]

@@ -131,7 +131,7 @@ async def add(
     await streams.add(stream.to_internal())
     result = await streams.get_by_slug(stream.slug)
     # TODO https://stackoverflow.com/a/68552742
-    assert isinstance(result, Stream)  # noqa S101
+    assert isinstance(result, Stream)  # S101
     return result
 
 
@@ -147,7 +147,7 @@ async def update(
 
     result = await streams.get_by_slug(stream.slug)
     # TODO https://stackoverflow.com/a/68552742
-    assert isinstance(result, Stream)  # noqa S101
+    assert isinstance(result, Stream)  # S101
     return result
 
 

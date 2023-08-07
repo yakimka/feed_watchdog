@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProcessStreamsByScheduleWorker(BaseCommand):
-    def handle(self, args):
+    def handle(self, args):  # noqa: U100
         loop = asyncio.new_event_loop()
         loop.create_task(self._run_scheduler())
         try:

@@ -8,7 +8,7 @@ FRONTEND_DEST_DIR = "/var/www/frontend"
 
 
 class CollectStatic(BaseCommand):
-    def handle(self, args) -> None:
+    def handle(self, args) -> None:  # noqa: U100
         shutil.copytree(
             FRONTEND_SOURCE_DIR, FRONTEND_DEST_DIR, dirs_exist_ok=True
         )

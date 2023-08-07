@@ -13,7 +13,7 @@ class MongoUserRepository(IUserRepository):
     def __init__(self, db: AsyncIOMotorClient) -> None:
         self.db = db
 
-    async def get_user_by_id(self, id: str) -> UserInDB | None:  # noqa: PLW0622
+    async def get_user_by_id(self, id: str) -> UserInDB | None:
         result = await self.db.users.find_one({"id": id})
         if result is not None:
             return UserInDB.parse_obj(result)

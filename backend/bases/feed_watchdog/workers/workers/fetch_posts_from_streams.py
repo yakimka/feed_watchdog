@@ -38,7 +38,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             consumer_id=uuid.uuid4().hex,
         )
 
-    def handle(self, args):
+    def handle(self, args):  # noqa: U100
         asyncio.run(self.process_streams(), debug=True)
 
     async def process_streams(self) -> None:

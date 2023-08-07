@@ -30,7 +30,7 @@ app.add_middleware(
 
 
 @app.exception_handler(ValueExistsError)
-async def http_exception_handler(request, exc):  # noqa: PLW0613
+async def http_exception_handler(request, exc):  # noqa: U100
     return JSONResponse(
         status_code=400,
         content=ErrorResponse(
@@ -44,7 +44,7 @@ async def http_exception_handler(request, exc):  # noqa: PLW0613
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):  # noqa: PLW0613
+async def validation_exception_handler(request, exc):  # noqa: U100
     return JSONResponse(
         status_code=422,
         content=ErrorResponse.from_validation_error(exc).to_response(),

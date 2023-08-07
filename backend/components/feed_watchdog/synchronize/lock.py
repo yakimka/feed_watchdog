@@ -26,7 +26,7 @@ class AsyncLockError(Exception):
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def async_lock(  # noqa: C901
+def async_lock(
     key: str | Callable[..., str],
     wait_time=1.0,
     lock_timeout=10.0,

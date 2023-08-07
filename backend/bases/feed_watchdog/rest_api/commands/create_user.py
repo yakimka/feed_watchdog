@@ -18,7 +18,7 @@ class User(BaseModel):
 
 
 class CreateUserCommand(BaseCommand):
-    def handle(self, args):
+    def handle(self, args):  # noqa: U100
         email = input("Email: ")
         password = getpass.getpass("Password: ")
         asyncio.run(self._handle(User(email=email, password=password)))

@@ -82,7 +82,7 @@ class TelegramBot:
                 disable_link_preview=options.disable_link_preview,
             )
 
-    async def _send_squashed_message(  # noqa C901
+    async def _send_squashed_message(  # C901
         self,
         posts: Iterable[Post],
         *,

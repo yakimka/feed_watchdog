@@ -47,9 +47,7 @@ class Post(BasePost):
     return_fields_schema=Post.fields_schema(),
     return_model=Post,
 )
-async def reddit_json(
-    text: str, *, options=None  # noqa: PLW0613
-) -> list[Post]:
+async def reddit_json(text: str, *, options=None) -> list[Post]:  # noqa: U100
     raw_post = json.loads(text)
     return [
         Post(
