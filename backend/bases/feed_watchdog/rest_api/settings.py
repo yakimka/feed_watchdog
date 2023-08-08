@@ -35,7 +35,7 @@ class MessageTemplate(BaseModel):
 
 
 class AppSettings(BaseModel):
-    handlers_config_path: str = "/app/handlers.json"
+    handlers_conf_path: str = "/app/fw_handlers_conf.yaml"
     intervals: list[Interval] = [
         Interval(text="At 6 AM", value="0 6 * * *"),
         Interval(text="At 6 PM", value="0 18 * * *"),

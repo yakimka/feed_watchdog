@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 from redis import asyncio as aioredis
 
 from feed_watchdog.pubsub.publisher import Publisher
+from feed_watchdog.repositories.processor import FileProcessorsConfigRepo
 from feed_watchdog.repositories.user import MongoUserRepository
 from feed_watchdog.rest_api.settings import get_settings
 
@@ -36,6 +37,10 @@ class Container(containers.DeclarativeContainer):
     user_repository = providers.Factory(
         MongoUserRepository,
         db=mongo_db,
+    )
+    processors_conf_repository = providers.Factory(
+        FileProcessorsConfigRepo,
+        handlers_conf_path=config.app.handlers_conf_path,
     )
 
 

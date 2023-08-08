@@ -109,11 +109,12 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
 
     async def parse_new_events(self, event, posts) -> list[PostParsed]:
         events_for_sending = []
-        is_first_run = bool(
+
+        has_posts = bool(
             await self._post_repository.seen_posts_count(stream_id=event.slug)
         )
         for post in reversed(posts):
-            if is_first_run:
+            if not has_posts:  # first run, don't send all posts in stream
                 write_warn_message(f"First run for {event.slug}", logger=logger)
                 break
             if await self._post_repository.is_post_seen(

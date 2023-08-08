@@ -15,7 +15,7 @@ def parse_configuration() -> dict:
                 "options": dict(opt.to_json_schema()) if opt else {},
                 "return_fields_schema": f_schema,
             }
-            for name, _, opt, f_schema in handlers[item.value].values()
+            for name, _, opt, f_schema, _ in handlers[item.value].values()
         ]
 
     return results

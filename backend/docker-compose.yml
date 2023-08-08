@@ -14,7 +14,7 @@ x-worker: &fw-worker-common
   depends_on:
     - feed_watchdog_api
     - redis
-  restart: "no"
+  restart: "on-failure"
 
 services:
   feed_watchdog_api:
@@ -38,6 +38,17 @@ services:
   send_parsed_posts_worker:
     <<: *fw-worker-common
     command: python -m feed_watchdog.workers.run_worker send_parsed_posts
+
+  mock_feed_server:
+    image: feed_watchdog:dev
+    container_name: mock_feed_server
+    hostname: mock_feed_server
+    command: python -m development.mock_feed_server
+    env_file: .env
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8001"
 
   redis:
     container_name: redis

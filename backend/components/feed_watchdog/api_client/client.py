@@ -101,13 +101,13 @@ class FeedWatchdogAPIClient:
                     f"{self._base_url}{path}",
                     params={
                         "page": page,
-                        "page_size": page_size,
+                        "page_size": page_size + 1,
                         **kwargs,
                     },
                 )
                 response.raise_for_status()
                 result = response.json()
-                has_next = result["count"] > page * page_size
+                has_next = len(result["results"]) == page_size + 1
                 for row in result["results"]:
                     yield row
             except httpx.HTTPError as e:
