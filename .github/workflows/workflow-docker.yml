@@ -42,7 +42,7 @@ jobs:
           pip install dump-env
           dump-env \
             -t .env.template \
-            -p 'SECRET_' > server/.env
+            -p 'SECRET_' > backend/.env
           echo "Debug information"
           docker info && docker-compose --version && git --version
           echo "Pulling cache"
@@ -52,26 +52,43 @@ jobs:
       - name: Run checks
         run: |
           echo "Checking config"
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml config --quiet
           echo "Running checks"
-          docker-compose build feed_watchdog
-          docker-compose run --user=root --rm feed_watchdog bash -c "cd /app && ./ci.sh"
+          pip install pre-commit
+          cd backend
+          pre-commit run --all-files
+#          docker-compose build feed_watchdog
+#          docker-compose run --user=root --rm feed_watchdog bash -c "cd /app && ./ci.sh"
 
-      - name: Push image for caching purposes
-        if: github.actor != 'dependabot[bot]'
+#      - name: Push image for caching purposes
+#        if: github.actor != 'dependabot[bot]'
+#        run: |
+#          echo "Login into Docker registry"
+#          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
+#          docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:dev"
+#          docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:${GITHUB_SHA::7}"
+#          docker push "${IMAGE_FULL_NAME}" --all-tags
+
+#      - name: Upload coverage to Codecov
+#        uses: codecov/codecov-action@v3
+#        with:
+#          file: ./coverage.xml
+#          root_dir: backend
+#          # token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+
+      - name: Build image
         run: |
-          echo "Login into Docker registry"
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
-          docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:dev"
-          docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:${GITHUB_SHA::7}"
-          docker push "${IMAGE_FULL_NAME}" --all-tags
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.xml
-          root_dir: server
-          # token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          echo "Building frontend image"
+          cd frontend
+          docker build -t feed_watchdog_frontend . && cd ..
+          echo "Building backend image"
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install poetry==1.5.1
+          poetry self add poetry-multiproject-plugin
+          poetry self add poetry-polylith-plugin
+          cd backend/projects/feed_watchdog_api
+          poetry build-project
+          docker build -t feed_watchdog .
 
   # Releasing image, when in `master` branch or tag
   release-image:
@@ -91,7 +108,7 @@ jobs:
           pip install dump-env
           dump-env \
             -t .env.template \
-            -p 'SECRET_' > server/.env
+            -p 'SECRET_' > backend/.env
           echo "Login into Docker registry"
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
           echo "Debug information"
