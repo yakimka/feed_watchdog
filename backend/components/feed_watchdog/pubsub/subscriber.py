@@ -98,7 +98,9 @@ class Subscriber:
                 name=self._topic_name, groupname=self._group_id, mkstream=True
             )
         else:
-            groups = await self._redis_client.xinfo_groups(self._topic_name)
+            groups = await self._redis_client.xinfo_groups(  # type: ignore[no-untyped-call] # noqa: E501
+                self._topic_name
+            )
             if all(group["name"] != self._group_id for group in groups):
                 logger.info(
                     "Creating group %s on existing stream %s",
@@ -113,4 +115,8 @@ class Subscriber:
         self._is_initialized = True
 
     async def commit(self, msg_id: str) -> None:
-        await self._redis_client.xack(self._topic_name, self._group_id, msg_id)
+        await self._redis_client.xack(  # type: ignore[no-untyped-call]
+            self._topic_name,
+            self._group_id,
+            msg_id,
+        )

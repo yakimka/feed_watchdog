@@ -8,7 +8,7 @@ from feed_watchdog.rest_api.container import wire_modules
 CURR_DIR = Path(__file__).parent
 
 
-def main():
+def main() -> None:
     setup()
     parser = argparse.ArgumentParser()
     worker, args = parse_command_and_args(
@@ -19,7 +19,7 @@ def main():
     worker.handle(args)
 
 
-def setup():
+def setup() -> None:
     wire_modules()
     logging.basicConfig(level=logging.INFO)
 

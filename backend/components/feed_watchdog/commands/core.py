@@ -6,10 +6,10 @@ from typing import Generator
 
 
 class BaseCommand:
-    def setup(self):
+    def setup(self) -> None:
         pass
 
-    def handle(self, args: Namespace):
+    def handle(self, args: Namespace) -> None:
         raise NotImplementedError
 
     def add_arguments(self, parser: ArgumentParser) -> None:

@@ -22,13 +22,15 @@ async def send_stream_event(
     stream_slug: str,
     api_client: FeedWatchdogAPIClient,
     publisher: Publisher,
-):
+) -> None:
     stream = await api_client.get_stream(slug=stream_slug)
+    if stream is None:
+        raise ValueError(f"Stream {stream_slug} not found")
     event = ProcessStreamEvent.from_dict(stream.dict())
     await publisher.publish(topic_name, event.as_dict())
 
 
-async def main(args: argparse.Namespace):
+async def main(args: argparse.Namespace) -> None:
     if args.api_token.startswith("ENV:"):
         args.api_token = os.getenv(args.api_token[4:], "").strip()
 

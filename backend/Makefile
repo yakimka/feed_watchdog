@@ -5,18 +5,6 @@ POETRY_RUN=$(ENTRYPOINT) poetry
 SRC_DIR=.
 
 
-.PHONY: lint
-lint:
-	@make flake8
-	@make mypy
-	@make verify_format
-	$(POETRY_RUN) run doc8 -q docs
-	#$(POETRY_RUN) run yamllint -s .
-
-.PHONY: flake8
-flake8:
-	$(POETRY_RUN) run flake8 $(SRC_DIR)
-
 .PHONY: mypy
 mypy:
 	$(POETRY_RUN) run mypy $(SRC_DIR)
@@ -30,23 +18,8 @@ package:
 	$(POETRY_RUN) check
 	#$(POETRY_RUN) run pip check
 
-.PHONY: safety
-safety:
-	$(POETRY_RUN) run safety check --full-report
-
 .PHONY: test
 test: lint package unit
-
-.PHONY: format
-format:
-	$(POETRY_RUN) run black --preview $(SRC_DIR)
-	$(POETRY_RUN) run isort --color --src=$(SRC_DIR) $(SRC_DIR)
-
-
-.PHONY: verify_format
-verify_format:
-	$(POETRY_RUN) run black --preview --check --diff $(SRC_DIR)
-	$(POETRY_RUN) run isort --check-only --diff --src=$(SRC_DIR) $(SRC_DIR)
 
 .PHONY: run_command
 run_command:

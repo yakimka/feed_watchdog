@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from functools import wraps
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 
 import httpx
 from pydantic import BaseModel
@@ -75,7 +75,7 @@ class FeedWatchdogAPIClient:
         self, interval: str | None = None
     ) -> list[StreamResp]:
         result: list[StreamResp] = []
-        params = {"only_active": True}
+        params: dict[str, Any] = {"only_active": True}
         if interval is not None:
             params["interval"] = interval
         async for row in self._iterate_pagination(path="/streams/", **params):

@@ -34,9 +34,9 @@ XML_ENTRY = """
 """
 
 
-def feed_request_handler():
+def feed_request_handler() -> type[BaseHTTPRequestHandler]:
     class MyMockFeedHandler(BaseHTTPRequestHandler):
-        def do_GET(self):  # noqa: N802
+        def do_GET(self) -> None:  # noqa: N802
             self.send_response(200)
             self.send_header("Content-type", "text/xml")
             self.end_headers()
@@ -62,20 +62,20 @@ def feed_request_handler():
             )
 
         @property
-        def QUERY(self):  # noqa: N802
+        def QUERY(self) -> dict:  # noqa: N802
             res = urlparse(self.path)
             return parse_qs(res.query)
 
     return MyMockFeedHandler
 
 
-def run_server(port: int, server_class=ThreadingHTTPServer):
+def run_server(port: int, server_class=ThreadingHTTPServer) -> None:
     server_address = ("", port)
     httpd = server_class(server_address, feed_request_handler())
     httpd.serve_forever()
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=8001)
     args = parser.parse_args()

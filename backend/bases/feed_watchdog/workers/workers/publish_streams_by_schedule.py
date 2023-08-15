@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProcessStreamsByScheduleWorker(BaseCommand):
-    def handle(self, args):  # noqa: U100
+    def handle(self, args) -> None:  # noqa: U100
         loop = asyncio.new_event_loop()
         loop.create_task(self._run_scheduler())
         try:
@@ -26,7 +26,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         finally:
             loop.close()
 
-    async def _run_scheduler(self):
+    async def _run_scheduler(self) -> None:
         logger.info("Starting scheduler")
         scheduler = AsyncIOScheduler()
         await add_interval_jobs(scheduler)
@@ -57,7 +57,7 @@ async def collect_and_publish_streams(
         Container.feed_watchdog_api_client
     ],
     settings: Settings = Provide[Container.settings],
-):
+) -> None:
     logger.info("Collecting streams for %s", cron_interval)
     streams = await api_client.get_streams(interval=cron_interval)
     await send_events(
@@ -71,7 +71,7 @@ async def send_events(
     topic_name,
     events: Iterable[ProcessStreamEvent],
     publisher: Publisher = Provide[Container.publisher],
-):
+) -> None:
     i = 0
     for i, event in enumerate(events, start=1):  # noqa: B007
         await publisher.publish(topic_name, event.as_dict())

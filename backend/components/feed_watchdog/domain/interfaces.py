@@ -162,15 +162,18 @@ class IRefreshTokenRepository(abc.ABC):
         pass
 
 
-class IPostRepository:
+class IPostRepository(abc.ABC):
+    @abstractmethod
     async def sent_posts_count(self, stream_id: str, receiver_type: str) -> int:
         pass
 
+    @abstractmethod
     async def post_was_sent(
         self, post_id: str, stream_id: str, receiver_type: str
     ) -> bool:
         pass
 
+    @abstractmethod
     async def save_post_sent_flag(
         self, post_id: str, stream_id: str, receiver_type: str
     ) -> None:

@@ -25,7 +25,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         api_client: FeedWatchdogAPIClient = Provide[
             Container.feed_watchdog_api_client
         ],
-    ):
+    ) -> None:
         self._settings = settings
         self._api_client = api_client
         self._subscriber = container.subscriber(
@@ -34,7 +34,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             consumer_id=uuid.uuid4().hex,
         )
 
-    def handle(self, args):  # noqa: U100
+    def handle(self, args) -> None:  # noqa: U100
         asyncio.run(self.process_posts(), debug=True)
 
     async def process_posts(self) -> None:

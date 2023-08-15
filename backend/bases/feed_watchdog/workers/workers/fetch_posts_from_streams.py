@@ -2,7 +2,7 @@ import asyncio
 import logging
 import uuid
 from dataclasses import asdict
-from typing import Iterable, Sequence
+from typing import Sequence
 
 from dependency_injector.wiring import Provide, inject
 
@@ -28,7 +28,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             Container.post_repository
         ],
         publisher: Publisher = Provide[Container.publisher],
-    ):
+    ) -> None:
         self._settings = settings
         self._post_repository = post_repository
         self._publisher = publisher
@@ -38,7 +38,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             consumer_id=uuid.uuid4().hex,
         )
 
-    def handle(self, args):  # noqa: U100
+    def handle(self, args) -> None:  # noqa: U100
         asyncio.run(self.process_streams(), debug=True)
 
     async def process_streams(self) -> None:
@@ -110,7 +110,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         return posts
 
     async def apply_modifiers_to_posts(
-        self, modifiers: list, posts: Iterable[Post]
+        self, modifiers: list, posts: list[Post]
     ) -> list[Post]:
         for modifier in modifiers:
             modifier_func = get_handler_by_name(
