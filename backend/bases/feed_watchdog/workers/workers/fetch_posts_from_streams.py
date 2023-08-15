@@ -42,20 +42,43 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         asyncio.run(self.process_streams(), debug=True)
 
     async def process_streams(self) -> None:
+        logger.info("Start processing streams for fetching")
         async for msg_id, msg_data in self._subscriber:
             event = ProcessStreamEvent.from_dict(msg_data)
             text = await self.fetch_text(event)
             if not text:
+                logger.warning(
+                    "Can't fetch text for %s",
+                    event.slug,
+                    extra={
+                        "stream_slug": event.slug,
+                        "fetcher_type": event.source.fetcher_type,
+                        "fetcher_options": event.source.fetcher_options,
+                    },
+                )
                 continue
 
             posts = await self.parse_posts(event, text)
             if not posts:
+                logger.warning(
+                    "Can't parse posts for %s",
+                    event.slug,
+                    extra={
+                        "stream_slug": event.slug,
+                        "text": text,
+                        "parser_type": event.source.parser_type,
+                        "parser_options": event.source.parser_options,
+                    },
+                )
                 continue
 
             final_posts = await self.apply_modifiers_to_posts(
                 event.modifiers, posts
             )
             events_for_sending = await self.parse_new_events(event, final_posts)
+            logger.info(
+                "Sending %s events for %s", len(events_for_sending), event.slug
+            )
             await self.send_events(events_for_sending)
 
             left_posts = {post.post_id for post in posts} - {
@@ -74,12 +97,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             name=event.source.fetcher_type,
             options=event.source.fetcher_options,
         )
-        text = await fetcher()
-        if not text:
-            write_warn_message(
-                f"Can't fetch text for {event.slug}", logger=logger
-            )
-        return text
+        return await fetcher()
 
     async def parse_posts(self, event, text) -> list[Post]:
         parser = get_handler_by_name(
@@ -88,10 +106,6 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             options=event.source.parser_options,
         )
         posts = await parser(text)
-        if not posts:
-            write_warn_message(
-                f"Can't find posts for {event.slug}", logger=logger
-            )
         mutate_posts_with_stream_data(event, posts)
         return posts
 

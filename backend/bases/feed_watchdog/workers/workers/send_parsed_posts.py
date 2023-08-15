@@ -11,7 +11,6 @@ from feed_watchdog.handlers import (
     get_handler_by_name,
     get_handler_return_model_by_name,
 )
-from feed_watchdog.sentry.error_tracking import write_warn_message
 from feed_watchdog.workers.container import Container, container
 from feed_watchdog.workers.settings import Settings
 
@@ -39,11 +38,12 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         asyncio.run(self.process_posts(), debug=True)
 
     async def process_posts(self) -> None:
+        logger.info("Start processing posts for sending")
         async for msg_id, msg_data in self._subscriber:
             stream_slug = msg_data["stream_slug"]
             stream = await self.receive_stream(stream_slug)
             if not stream:
-                write_warn_message(f"Can't find stream {stream_slug}")
+                logger.warning("Can't find stream %s", stream_slug)
                 continue
 
             post_class = get_handler_return_model_by_name(

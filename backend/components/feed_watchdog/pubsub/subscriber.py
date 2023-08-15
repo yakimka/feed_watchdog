@@ -36,7 +36,9 @@ class Subscriber:
             iterations = max(0, iterations - 1)
 
             if self._check_backlog_every and iterations == 0:
+                logger.info("Checking backlog")
                 async for msg_id, msg_data in self.autoclaim():
+                    logger.info("Found message in backlog: %s", msg_id)
                     yield msg_id, msg_data
                 iterations = self._check_backlog_every
 
@@ -87,14 +89,22 @@ class Subscriber:
             return
         exists = await self._redis_client.exists(self._topic_name)
         if not exists:
-            logger.info("init redis stream and consumer group")
+            logger.info(
+                "Creating group %s on new stream %s",
+                self._group_id,
+                self._topic_name,
+            )
             await self._redis_client.xgroup_create(
                 name=self._topic_name, groupname=self._group_id, mkstream=True
             )
         else:
             groups = await self._redis_client.xinfo_groups(self._topic_name)
             if all(group["name"] != self._group_id for group in groups):
-                logger.info("init consumer group on existing stream")
+                logger.info(
+                    "Creating group %s on existing stream %s",
+                    self._group_id,
+                    self._topic_name,
+                )
                 # set id = '0' to make sure this new consumer group
                 #   will catch up existing messages in stream
                 await self._redis_client.xgroup_create(
