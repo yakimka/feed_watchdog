@@ -1,5 +1,5 @@
 FROM python:3.11-slim
-COPY --from=feed_watchdog_frontend:latest /app/frontend/dist /app/frontend
+COPY --from=feed_watchdog_frontend:latest /app/frontend/dist /frontend
 
 ARG WHEEL=feed_watchdog_api-0.1.0-py3-none-any.whl
 

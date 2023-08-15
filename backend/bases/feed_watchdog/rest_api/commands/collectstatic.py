@@ -3,7 +3,7 @@ import shutil
 
 from feed_watchdog.commands.core import BaseCommand
 
-FRONTEND_SOURCE_DIR = "/app/frontend"
+FRONTEND_SOURCE_DIR = "/frontend"
 FRONTEND_DEST_DIR = "/var/www/frontend"
 
 
