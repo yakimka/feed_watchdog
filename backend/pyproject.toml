@@ -40,7 +40,7 @@ tomlkit = { version = "^0.11", optional = true }
 redis = "^5.0.0rc2"
 APScheduler = "^3.9.1"
 dependency-injector = "^4.41.0"
-httpx = {version = "^0.23.0", extras = ["processors"]}
+httpx = {version = "^0.24.1", extras = ["processors"]}
 async-timeout = {version = "^4.0.2", extras = ["processors"]}
 tldextract = {version = "^3.2.1", extras = ["processors"]}
 feedparser = {version = "^6.0.8", extras = ["processors"]}
