@@ -1643,13 +1643,13 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "pre-commit"
-version = "2.21.0"
+version = "3.3.3"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "pre_commit-2.21.0-py2.py3-none-any.whl", hash = "sha256:e2f91727039fc39a92f58a588a25b87f936de6567eed4f0e673e0507edc75bad"},
-    {file = "pre_commit-2.21.0.tar.gz", hash = "sha256:31ef31af7e474a8d8995027fefdfcf509b5c913ff31f2015b4ec4beb26a6f658"},
+    {file = "pre_commit-3.3.3-py2.py3-none-any.whl", hash = "sha256:10badb65d6a38caff29703362271d7dca483d01da88f9d7e05d0b97171c136cb"},
+    {file = "pre_commit-3.3.3.tar.gz", hash = "sha256:a2256f489cd913d575c145132ae196fe335da32d91a8294b7afe6622335dd023"},
 ]
 
 [package.dependencies]
@@ -2888,4 +2888,4 @@ docs = ["m2r2", "sphinx", "sphinx-autodoc-typehints", "tomlkit"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "db7d43b03185e9ac199595eaeaf9d2e2273c2938565987fb606ec14936f2aa46"
+content-hash = "7ce6d1cdfe4f3bdff03e31b554fb1a8316c2dc06bb1706652c94592d67e89860"
