@@ -1,6 +1,0 @@
-receivers:
-  telegram_bot:
-    "@mybot":
-      kwargs:
-        name: "@mybot"
-        token: 'ENV:FW_MYBOT_TOKEN'
