@@ -34,21 +34,6 @@ jobs:
       - name: Set Image full name variable
         run: echo "IMAGE_FULL_NAME=$(echo ${DOCKER_USERNAME}/${PROJECT_NAME})" >> $GITHUB_ENV
 
-      - name: Prepare docker
-        run: |
-          echo "Making sure we are in the right directory, does nothing by default"
-          pwd && echo "$GITHUB_WORKSPACE" && cd "$GITHUB_WORKSPACE"
-          echo "Creating `.env` configuration file"
-          pip install dump-env
-          dump-env \
-            -t .env.template \
-            -p 'SECRET_' > backend/.env
-          echo "Debug information"
-          docker info && docker-compose --version && git --version
-          echo "Pulling cache"
-          docker pull "${IMAGE_FULL_NAME}:dev" || true
-          docker tag "${IMAGE_FULL_NAME}:dev" "${PROJECT_NAME}:dev" || true
-
       - name: Run checks
         run: |
           echo "Checking config"
@@ -56,24 +41,6 @@ jobs:
           pip install pre-commit
           cd backend
           pre-commit run --all-files
-#          docker-compose build feed_watchdog
-#          docker-compose run --user=root --rm feed_watchdog bash -c "cd /app && ./ci.sh"
-
-#      - name: Push image for caching purposes
-#        if: github.actor != 'dependabot[bot]'
-#        run: |
-#          echo "Login into Docker registry"
-#          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
-#          docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:dev"
-#          docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:${GITHUB_SHA::7}"
-#          docker push "${IMAGE_FULL_NAME}" --all-tags
-
-#      - name: Upload coverage to Codecov
-#        uses: codecov/codecov-action@v3
-#        with:
-#          file: ./coverage.xml
-#          root_dir: backend
-#          # token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
 
   # Releasing image, when in `master` branch or tag
   release-image:
@@ -89,11 +56,6 @@ jobs:
 
       - name: Prepare docker
         run: |
-          echo "Creating `.env` configuration file"
-          pip install dump-env
-          dump-env \
-            -t .env.template \
-            -p 'SECRET_' > backend/.env
           echo "Login into Docker registry"
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
           echo "Debug information"
