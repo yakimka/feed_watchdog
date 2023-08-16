@@ -33,7 +33,7 @@ packages = [
 python = "^3.10"
 
 # Docs, optional, use `poetry install -E docs` to install them:
-sphinx = { version = "^5.0",  optional = true }
+sphinx = { version = "^7.1",  optional = true }
 sphinx-autodoc-typehints = { version = "^1.18", optional = true }
 m2r2 = { version = "^0.3",  optional = true }
 tomlkit = { version = "^0.11", optional = true }
