@@ -46,7 +46,7 @@ tldextract = {version = "^3.2.1", extras = ["processors"]}
 feedparser = {version = "^6.0.8", extras = ["processors"]}
 aiogram = {version = "^2.20", extras = ["processors"]}
 PyYAML = {version = "^6.0", extras = ["processors"]}
-gunicorn = "^20.1.0"
+gunicorn = "^21.2.0"
 python-decouple = "^3.6"
 sentry-sdk = "^1.5.12"
 fastapi = "^0.100.0"
