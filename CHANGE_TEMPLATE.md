@@ -1,5 +1,0 @@
-- README.md to README.rst
-- Add autoformatters
-- Replace https://github.com/PyCQA/flake8-commas with https://github.com/asottile/add-trailing-comma
-- Delete https://github.com/zheller/flake8-quotes
-- Add https://github.com/PyCQA/flake8-bugbear
