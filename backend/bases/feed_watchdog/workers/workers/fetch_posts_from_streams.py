@@ -45,51 +45,52 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         logger.info("Start processing streams for fetching")
         async for msg_id, msg_data in self._subscriber:
             event = ProcessStreamEvent.from_dict(msg_data)
-            text = await self.fetch_text(event)
-            if not text:
-                logger.warning(
-                    "Can't fetch text for %s",
-                    event.slug,
-                    extra={
-                        "stream_slug": event.slug,
-                        "fetcher_type": event.source.fetcher_type,
-                        "fetcher_options": event.source.fetcher_options,
-                    },
-                )
-                continue
-
-            posts = await self.parse_posts(event, text)
-            if not posts:
-                logger.warning(
-                    "Can't parse posts for %s",
-                    event.slug,
-                    extra={
-                        "stream_slug": event.slug,
-                        "text": text,
-                        "parser_type": event.source.parser_type,
-                        "parser_options": event.source.parser_options,
-                    },
-                )
-                continue
-
-            final_posts = await self.apply_modifiers_to_posts(
-                event.modifiers, posts
-            )
-            events_for_sending = await self.parse_new_events(event, final_posts)
-            logger.info(
-                "Sending %s events for %s", len(events_for_sending), event.slug
-            )
-            await self.send_events(events_for_sending)
-
-            left_posts = {post.post_id for post in posts} - {
-                event.post.post_id for event in events_for_sending
-            }
-            if left_posts:
-                await self._post_repository.mark_post_as_seen(
-                    event.slug, *left_posts
-                )
-
+            await self.process_event(event)
             await self._subscriber.commit(msg_id)
+
+    async def process_event(self, event: ProcessStreamEvent) -> None:
+        text = await self.fetch_text(event)
+        if not text:
+            logger.warning(
+                "Can't fetch text for %s",
+                event.slug,
+                extra={
+                    "stream_slug": event.slug,
+                    "fetcher_type": event.source.fetcher_type,
+                    "fetcher_options": event.source.fetcher_options,
+                },
+            )
+            return
+
+        posts = await self.parse_posts(event, text)
+        if not posts:
+            logger.warning(
+                "Can't parse posts for %s",
+                event.slug,
+                extra={
+                    "stream_slug": event.slug,
+                    "text": text,
+                    "parser_type": event.source.parser_type,
+                    "parser_options": event.source.parser_options,
+                },
+            )
+            return
+
+        final_posts = await self.apply_modifiers_to_posts(
+            event.modifiers, posts
+        )
+        events_for_sending = await self.parse_new_events(event, final_posts)
+        logger.info(
+            "Sending %s events for %s", len(events_for_sending), event.slug
+        )
+        await self.send_events(events_for_sending)
+
+        if left_posts := {post.post_id for post in posts} - {
+            event.post.post_id for event in events_for_sending
+        }:
+            await self._post_repository.mark_post_as_seen(
+                event.slug, *left_posts
+            )
 
     async def fetch_text(self, event) -> str | None:
         fetcher = get_handler_by_name(
