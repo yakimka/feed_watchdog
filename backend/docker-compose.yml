@@ -35,9 +35,9 @@ services:
     <<: *fw-worker-common
     command: python -m feed_watchdog.workers.run_worker fetch_posts_from_streams
 
-  send_parsed_posts_worker:
+  send_messages_worker:
     <<: *fw-worker-common
-    command: python -m feed_watchdog.workers.run_worker send_parsed_posts
+    command: python -m feed_watchdog.workers.run_worker send_messages
 
   mock_feed_server:
     image: feed_watchdog:dev

@@ -7,12 +7,18 @@ from typing import Sequence
 from dependency_injector.wiring import Provide, inject
 
 from feed_watchdog.commands.core import BaseCommand
-from feed_watchdog.domain.events import PostParsed, ProcessStreamEvent
+from feed_watchdog.domain.events import (
+    Message,
+    MessageBatch,
+    ModifierData,
+    ProcessStreamEvent,
+)
 from feed_watchdog.domain.models import Post
 from feed_watchdog.handlers import HandlerType, get_handler_by_name
 from feed_watchdog.pubsub.publisher import Publisher
 from feed_watchdog.repositories.post import RedisPostRepository
 from feed_watchdog.sentry.error_tracking import write_warn_message
+from feed_watchdog.text import template_to_text
 from feed_watchdog.workers.container import Container, container
 from feed_watchdog.workers.settings import Settings
 
@@ -80,19 +86,22 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             event.modifiers, posts
         )
         events_for_sending = await self.parse_new_events(event, final_posts)
+        post_ids = [
+            msg.post_id
+            for event in events_for_sending
+            for msg in event.messages
+        ]
         logger.info(
             "Sending %s events for %s", len(events_for_sending), event.slug
         )
         await self.send_events(events_for_sending)
 
-        if left_posts := {post.post_id for post in posts} - {
-            event.post.post_id for event in events_for_sending
-        }:
+        if left_posts := {post.post_id for post in posts} - set(post_ids):
             await self._post_repository.mark_post_as_seen(
                 event.slug, *left_posts
             )
 
-    async def fetch_text(self, event) -> str | None:
+    async def fetch_text(self, event: ProcessStreamEvent) -> str | None:
         fetcher = get_handler_by_name(
             type=HandlerType.fetchers.value,
             name=event.source.fetcher_type,
@@ -100,7 +109,9 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         )
         return await fetcher()
 
-    async def parse_posts(self, event, text) -> list[Post]:
+    async def parse_posts(
+        self, event: ProcessStreamEvent, text: str
+    ) -> list[Post]:
         parser = get_handler_by_name(
             name=event.source.parser_type,
             type=HandlerType.parsers.value,
@@ -111,7 +122,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         return posts
 
     async def apply_modifiers_to_posts(
-        self, modifiers: list, posts: list[Post]
+        self, modifiers: list[ModifierData], posts: list[Post]
     ) -> list[Post]:
         for modifier in modifiers:
             modifier_func = get_handler_by_name(
@@ -122,12 +133,13 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             posts = await modifier_func(posts)
         return posts
 
-    async def parse_new_events(self, event, posts) -> list[PostParsed]:
-        events_for_sending = []
-
+    async def parse_new_events(
+        self, event: ProcessStreamEvent, posts: list[Post]
+    ) -> list[MessageBatch]:
         has_posts = bool(
             await self._post_repository.seen_posts_count(stream_id=event.slug)
         )
+        messages = []
         for post in reversed(posts):
             if not has_posts:  # first run, don't send all posts in stream
                 write_warn_message(f"First run for {event.slug}", logger=logger)
@@ -137,21 +149,25 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             ):
                 continue
 
-            events_for_sending.append(
-                PostParsed(
-                    stream_slug=event.slug,
-                    post=post,
-                )
+            post_text = template_to_text(
+                event.message_template, **post.template_kwargs()
             )
-        return events_for_sending
+            messages.append(Message(post_id=post.post_id, text=post_text))
 
-    async def send_events(self, events_for_sending) -> None:
+        if event.squash:
+            return [MessageBatch(stream_slug=event.slug, messages=messages)]
+        return [
+            MessageBatch(stream_slug=event.slug, messages=[message])
+            for message in messages
+        ]
+
+    async def send_events(self, events_for_sending: list[MessageBatch]) -> None:
         for event in events_for_sending:
             await self._publisher.publish(
-                self._settings.app.post_parsed_topic, data=asdict(event)
+                self._settings.app.messages_topic, data=asdict(event)
             )
             await self._post_repository.mark_post_as_seen(
-                event.stream_slug, event.post.post_id
+                event.stream_slug, *[msg.post_id for msg in event.messages]
             )
 
 

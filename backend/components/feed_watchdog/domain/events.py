@@ -3,8 +3,6 @@ from typing import Any
 
 from dacite import from_dict
 
-from feed_watchdog.domain.models import Post
-
 
 @dataclasses.dataclass
 class Event:
@@ -47,15 +45,19 @@ class ModifierData:
 @dataclasses.dataclass
 class ProcessStreamEvent(Event):
     slug: str
+    message_template: str
+    squash: bool
     modifiers: list[ModifierData]
     source: SourceData
 
 
 @dataclasses.dataclass
-class PostParsed(Event):
-    stream_slug: str
-    post: Post
+class Message:
+    post_id: str
+    text: str
 
-    @classmethod
-    def from_dict(cls, data: dict):
-        return from_dict(data_class=PostParsed, data=data)
+
+@dataclasses.dataclass
+class MessageBatch(Event):
+    stream_slug: str
+    messages: list[Message]
