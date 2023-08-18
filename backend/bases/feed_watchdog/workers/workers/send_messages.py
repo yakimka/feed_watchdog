@@ -6,11 +6,8 @@ from dependency_injector.wiring import Provide, inject
 
 from feed_watchdog.api_client.client import FeedWatchdogAPIClient, StreamResp
 from feed_watchdog.commands.core import BaseCommand
-from feed_watchdog.handlers import (
-    HandlerType,
-    get_handler_by_name,
-    get_handler_return_model_by_name,
-)
+from feed_watchdog.domain.events import MessageBatch
+from feed_watchdog.handlers import HandlerType, get_handler_by_name
 from feed_watchdog.workers.container import Container, container
 from feed_watchdog.workers.settings import Settings
 
@@ -29,28 +26,25 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         self._settings = settings
         self._api_client = api_client
         self._subscriber = container.subscriber(
-            topic_name=self._settings.app.post_parsed_topic,
-            group_id="send_parsed_posts",
+            topic_name=self._settings.app.messages_topic,
+            group_id="send_messages",
             consumer_id=uuid.uuid4().hex,
         )
 
     def handle(self, args) -> None:  # noqa: U100
-        asyncio.run(self.process_posts(), debug=True)
+        asyncio.run(self.process_messages(), debug=True)
 
-    async def process_posts(self) -> None:
-        logger.info("Start processing posts for sending")
+    async def process_messages(self) -> None:
+        logger.info("Start processing messages for sending")
         async for msg_id, msg_data in self._subscriber:
-            stream_slug = msg_data["stream_slug"]
-            stream = await self.receive_stream(stream_slug)
+            message_batch = MessageBatch.from_dict(msg_data)
+            stream = await self.receive_stream(message_batch.stream_slug)
             if not stream:
-                logger.warning("Can't find stream %s", stream_slug)
+                logger.warning(
+                    "Can't find stream %s", message_batch.stream_slug
+                )
+                await self._subscriber.commit(msg_id)
                 continue
-
-            post_class = get_handler_return_model_by_name(
-                type=HandlerType.parsers.value, name=stream.source.parser_type
-            )
-
-            post = post_class.from_dict(msg_data["post"])
 
             receiver = get_handler_by_name(
                 name=stream.receiver.type,
@@ -60,17 +54,12 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
                     **stream.receiver_options_override,
                 },
             )
-            await receiver(
-                [post],
-                template=stream.message_template,
-                squash=stream.squash,
-            )
+            await receiver(message_batch.messages)
             await self._subscriber.commit(msg_id)
             logger.info(
-                "New post with id %s sent to %s (%s)",
-                post.post_id,
+                "Message batch sent to %s (%s)",
                 stream.receiver.type,
-                stream_slug,
+                message_batch.stream_slug,
             )
 
     async def receive_stream(self, stream_slug: str) -> StreamResp | None:

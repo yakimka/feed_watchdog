@@ -9,7 +9,7 @@ class AppSettings(BaseModel):
     api_timeout: int = 30
     handlers_conf_path: str = "/app/fw_handlers_conf.yaml"
     streams_topic: str = "feed_watchdog:streams"
-    post_parsed_topic: str = "feed_watchdog:post_parsed"
+    messages_topic: str = "feed_watchdog:messages"
 
 
 class RedisSettings(BaseModel):

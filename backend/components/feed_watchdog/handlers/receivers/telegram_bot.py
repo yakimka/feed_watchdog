@@ -1,16 +1,18 @@
 import dataclasses
 import logging
 from functools import lru_cache
-from typing import Iterable
+from typing import Protocol
 
 from aiogram import Bot
 
-from feed_watchdog.domain.models import Post
 from feed_watchdog.handlers import HandlerOptions, HandlerType, register_handler
 from feed_watchdog.synchronize.lock import async_lock
-from feed_watchdog.text import template_to_text
 
 logger = logging.getLogger(__name__)
+
+
+class Message(Protocol):
+    text: str
 
 
 @dataclasses.dataclass
@@ -48,55 +50,16 @@ class TelegramBot:
 
     async def __call__(
         self,
-        posts: Iterable[Post],
+        messages: list[Message],
         *,
-        template: str,
-        squash: bool = False,
         options: TelegramBotOptions,
     ) -> None:
-        if squash:
-            await self._send_squashed_message(
-                posts,
-                template=template,
-                options=options,
-            )
-        else:
-            await self._send_separate_messages(
-                posts,
-                template=template,
-                options=options,
-            )
-
-    async def _send_separate_messages(
-        self,
-        posts: Iterable[Post],
-        *,
-        template: str,
-        options: TelegramBotOptions,
-    ) -> None:
-        for post in posts:
-            message = template_to_text(template, **post.template_kwargs())
-            await self._send_message(
-                message=message,
-                chat_id=options.chat_id,
-                disable_link_preview=options.disable_link_preview,
-            )
-
-    async def _send_squashed_message(  # C901
-        self,
-        posts: Iterable[Post],
-        *,
-        template: str,
-        options: TelegramBotOptions,
-    ) -> None:
-        posts = list(posts)
-        if not posts:
+        if not messages:
             return
         parts: list[str] = []
         delimiter = "\n-----\n"
-        for post in posts:
-            message = template_to_text(template, **post.template_kwargs())
-            parts.extend((message.strip(), delimiter))
+        for message in messages:
+            parts.extend((message.text.strip(), delimiter))
         if parts:
             parts.pop()
 
@@ -107,9 +70,9 @@ class TelegramBot:
                 added_truncated_message = True
             parts.pop(-2)
 
-        message = "".join(parts)
+        text = "".join(parts)
         await self._send_message(
-            message=message,
+            message=text,
             chat_id=options.chat_id,
             disable_link_preview=options.disable_link_preview,
         )
@@ -124,4 +87,4 @@ class TelegramBot:
             parse_mode="HTML",
             disable_web_page_preview=disable_link_preview,
         )
-        logger.info("Sent post to %s (%s)", self._name, chat_id)
+        logger.info("Sent message to %s (%s)", self._name, chat_id)
