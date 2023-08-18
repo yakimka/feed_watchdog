@@ -154,6 +154,9 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             )
             messages.append(Message(post_id=post.post_id, text=post_text))
 
+        if not messages:
+            return []
+
         if event.squash:
             return [MessageBatch(stream_slug=event.slug, messages=messages)]
         return [
