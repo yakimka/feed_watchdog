@@ -66,6 +66,10 @@ jobs:
           cp .env.template .env
           docker compose build
           CI=1 ./ci.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: built-package
+          path: backend/projects/feed_watchdog_api/dist/
 
       - name: Push cache
         run: |
@@ -95,32 +99,27 @@ jobs:
         run: |
           docker pull "${IMAGE_FULL_NAME}:latest" || true
           docker tag "${IMAGE_FULL_NAME}:latest" "${PROJECT_NAME}:latest" || true
+          docker tag "${IMAGE_FULL_NAME}:latest" "${PROJECT_NAME}" || true
           docker pull "${IMAGE_FULL_NAME}:frontend-dev" || true
+          docker tag "${IMAGE_FULL_NAME}:frontend-dev" feed_watchdog_frontend || true
           docker image ls
 
-      - name: Cache venv with poetry
-        id: cache-venv-with-poetry-for-build
-        uses: actions/cache@v3
+      - uses: actions/download-artifact@v3
         with:
-          path: .venv
-          key: cache-venv-with-poetry-for-build
+          name: built-package
+          path: backend/projects/feed_watchdog_api/dist/
 
       - name: Build image
         run: |
           echo "Building frontend image"
           cd frontend
-          docker build --cache-from "${IMAGE_FULL_NAME}:frontend-dev" -t feed_watchdog_frontend .
+          docker build -t feed_watchdog_frontend .
           cd ..
-          echo "Building package"
-          python -m venv .venv && source .venv/bin/activate
-          pip install poetry==1.5.1
-          poetry self add poetry-multiproject-plugin
-          poetry self add poetry-polylith-plugin
-          cd backend/projects/feed_watchdog_api
-          poetry build-project
           echo "Building backend image"
-          docker build --cache-from "${IMAGE_FULL_NAME}:latest" -t feed_watchdog .
+          cd backend/projects/feed_watchdog_api
+          docker build -t feed_watchdog .
           docker tag feed_watchdog "${IMAGE_FULL_NAME}:latest"
+
 
       - name: Push cache
         run: |

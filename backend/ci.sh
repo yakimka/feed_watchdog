@@ -41,7 +41,7 @@ run_ci () {
   $EXEC poetry run mypy
   $EXEC poetry run pytest
   # try to build package
-  $EXEC cd projects/feed_watchdog_api && poetry build-project
+  $EXEC bash -c "cd projects/feed_watchdog_api && poetry build-project"
 
   set +x
   echo '[ci finished]'
