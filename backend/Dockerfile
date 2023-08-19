@@ -14,7 +14,7 @@ ENV PYTHONUNBUFFERED=1 \
     # https://python-poetry.org/docs/configuration/#using-environment-variables
     POETRY_VERSION=1.5.1 \
     # make poetry install to this location
-    POETRY_HOME="/opt/poetry" \
+    VENV_PATH="/opt/venv" \
     # make poetry create the virtual environment in the project's root
     # it gets named `.venv`
     POETRY_VIRTUALENVS_IN_PROJECT=true \
@@ -24,15 +24,19 @@ ENV PYTHONUNBUFFERED=1 \
     # paths
     # this is where our requirements + virtual environment will live
     APP_PATH="/app" \
-    XDG_CACHE_HOME="/app/.cache"
+    XDG_CACHE_HOME="/app/.cache" \
+    XDG_CONFIG_HOME="/app/.cache/config"
 
 # prepend poetry and venv to path
-ENV PATH="$POETRY_HOME/bin:$APP_PATH/.venv/bin:$PATH"
+ENV PATH="$VENV_PATH/bin:$APP_PATH/.venv/bin:$PATH"
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG USER_NAME=app
 
-RUN addgroup --gid 1000 --system app \
-    && adduser --uid 1000 --system --no-create-home --shell=/bin/false --disabled-password --group app \
+RUN addgroup --gid $GROUP_ID --system $USER_NAME \
+    && adduser --uid $USER_ID --system --no-create-home --shell=/bin/false --disabled-password --group $USER_NAME \
     && mkdir /app \
-    && chown -R 1000:1000 /app
+    && chown -R $USER_ID:$GROUP_ID /app
 
 RUN apt-get update && \
 apt-get install --no-install-recommends -y  \
@@ -41,7 +45,7 @@ apt-get install --no-install-recommends -y  \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /var/www/frontend \
-    && chown -R 1000:1000 /var/www/frontend
+    && chown -R $USER_ID:$GROUP_ID /var/www/frontend
 
 # `builder-base` stage is used to build deps + create our virtual environment
 FROM python-base as builder-base
@@ -54,25 +58,30 @@ RUN set -ex \
         build-essential \
         libpq-dev
 
-# install poetry - respects $POETRY_VERSION & $POETRY_HOME
-RUN curl -sSL https://install.python-poetry.org | python
-RUN poetry self add poetry-multiproject-plugin poetry-polylith-plugin
-
-# copy project requirement files here to ensure they will be cached.
-WORKDIR $APP_PATH
+RUN python -m venv /opt/venv
+RUN pip install poetry==$POETRY_VERSION \
+    && poetry self add poetry-multiproject-plugin poetry-polylith-plugin
 
 
 # `development` image is used during development / testing
 FROM python-base as development
+ARG USER_NAME=app
 ENV ENVIRONMENT=development \
     PYTHONDONTWRITEBYTECODE=1
+
+RUN set -ex \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y \
+    # for pre-commit
+        git \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR $APP_PATH
 
 # copy in our built poetry + venv
-COPY --from=builder-base $POETRY_HOME $POETRY_HOME
-COPY --from=builder-base $APP_PATH $APP_PATH
+COPY --from=builder-base $VENV_PATH $VENV_PATH
 
-USER app
+USER $USER_NAME
 
 EXPOSE 8000
 
