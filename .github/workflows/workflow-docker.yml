@@ -17,6 +17,7 @@ env:
   PROJECT_NAME: "feed_watchdog"
   REGISTRY: ""
   DOCKER_BUILDKIT: "1"
+  COMPOSE_DOCKER_CLI_BUILD: "1"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,6 +35,13 @@ jobs:
       - name: Set Image full name variable
         run: echo "IMAGE_FULL_NAME=$(echo ${DOCKER_USERNAME}/${PROJECT_NAME})" >> $GITHUB_ENV
 
+      - name: Prepare docker
+        run: |
+          echo "Login into Docker registry"
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
+          echo "Debug information"
+          docker info && docker-compose --version && git --version
+
       - name: Cache venv and pre-commit
         id: cache-venv-and-pre-commit
         uses: actions/cache@v3
@@ -44,6 +52,11 @@ jobs:
             backend/.venv
           key: cache-venv-and-pre-commit
 
+      - name: Pull image for cache purposes
+        run: |
+          docker pull "${IMAGE_FULL_NAME}:dev" || true
+          docker tag "${IMAGE_FULL_NAME}:dev" "${PROJECT_NAME}:dev" || true
+
       - name: Run checks
         run: |
           echo "Running checks"
@@ -51,6 +64,11 @@ jobs:
           cp .env.template .env
           docker compose build
           CI=1 ./ci.sh
+
+      - name: Push cache
+        run: |
+          docker tag "${PROJECT_NAME}:dev" "${IMAGE_FULL_NAME}:dev"
+          docker push "${IMAGE_FULL_NAME}:dev"
 
   # Releasing image, when in `master` branch or tag
   release-image:
@@ -75,6 +93,7 @@ jobs:
         run: |
           docker pull "${IMAGE_FULL_NAME}:latest" || true
           docker tag "${IMAGE_FULL_NAME}:latest" "${PROJECT_NAME}:latest" || true
+          docker pull "${IMAGE_FULL_NAME}:frontend-dev" || true
 
       - name: Cache venv with poetry
         id: cache-venv-with-poetry-for-build
@@ -87,7 +106,8 @@ jobs:
         run: |
           echo "Building frontend image"
           cd frontend
-          docker build -t feed_watchdog_frontend . && cd ..
+          docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from "${IMAGE_FULL_NAME}:frontend-dev" -t feed_watchdog_frontend .
+          cd ..
           echo "Building backend image"
           python -m venv .venv && source .venv/bin/activate
           pip install poetry==1.5.1
@@ -95,8 +115,13 @@ jobs:
           poetry self add poetry-polylith-plugin
           cd backend/projects/feed_watchdog_api
           poetry build-project
-          docker build -t feed_watchdog .
+          docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from "${IMAGE_FULL_NAME}:latest" -t feed_watchdog .
           docker tag feed_watchdog "${IMAGE_FULL_NAME}:latest"
+
+      - name: Push cache
+        run: |
+          docker tag feed_watchdog_frontend "${IMAGE_FULL_NAME}:frontend-dev"
+          docker push "${IMAGE_FULL_NAME}:frontend-dev"
 
       - name: Set version env (GITHUB_REF:10 for extract version from non-v-tags without the 'refs/tags/' prefix)
         run: echo "VERSION=$(echo ${GITHUB_REF:10})" >> $GITHUB_ENV
@@ -106,7 +131,6 @@ jobs:
       - name: Add version tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build feed_watchdog
           docker tag "${IMAGE_FULL_NAME}:latest" "${IMAGE_FULL_NAME}:${VERSION}"
           docker tag "${IMAGE_FULL_NAME}:latest" "${IMAGE_FULL_NAME}:${SHORT_VERSION}"
 

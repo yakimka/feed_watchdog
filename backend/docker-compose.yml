@@ -5,6 +5,7 @@ x-feed-watchdog: &fw-common
     context: .
     target: development
     args:
+      - BUILDKIT_INLINE_CACHE=1
       - USER_ID=${DOCKER_USER_ID:-1000}
       - USER_NAME=${DOCKER_USER_NAME:-app}
   image: feed_watchdog:dev
