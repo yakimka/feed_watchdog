@@ -113,11 +113,21 @@ branch = true
 
 [tool.coverage.report]
 precision = 2
+exclude_lines = [
+    "if TYPE_CHECKING:",
+]
 
 [tool.mypy]
 # mypy configurations: https://mypy.readthedocs.io/en/latest/config_file.html
 files = ["."]
+exclude = [
+    "tests/",
+]
 plugins = ["pydantic.mypy"]
+mypy_path = [
+    "components",
+    "bases",
+]
 
 allow_redefinition = false
 check_untyped_defs = true
@@ -139,20 +149,5 @@ warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
-mypy_path = [
-    "components",
-    "bases",
-]
 namespace_packages = true
 explicit_package_bases = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-
-[tool.pylint.master]
-extension-pkg-allow-list = ["dependency_injector"]
-
-[tool.pylint.messages_control]
-max-line-length = 80
