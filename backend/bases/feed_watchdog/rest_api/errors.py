@@ -16,9 +16,7 @@ class ErrorResponse(BaseModel):
     def from_validation_error(cls, error: RequestValidationError):
         errors = error.errors()
         first_error = errors[0]
-        response = cls(
-            type=first_error["type"], message=first_error["msg"], details=[]
-        )
+        response = cls(type=first_error["type"], message=first_error["msg"], details=[])
         for error_ in errors:
             if error_["type"] != response.type:
                 continue

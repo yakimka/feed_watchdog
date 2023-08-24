@@ -36,9 +36,7 @@ async def main(args: argparse.Namespace) -> None:
 
     http_client = get_httpx_stream_client(args.api_token)
     api_client = FeedWatchdogAPIClient(http_client, base_url=args.api_url)
-    redis_client = aioredis.from_url(
-        args.redis_pubsub_url, decode_responses=True
-    )
+    redis_client = aioredis.from_url(args.redis_pubsub_url, decode_responses=True)
     publisher = Publisher(redis_client)
     await send_stream_event(
         topic_name=STREAMS_TOPIC,
@@ -52,9 +50,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--api-token", required=True)
     parser.add_argument("--stream-slug", required=True)
-    parser.add_argument(
-        "--api-url", default="http://feed_watchdog_api:8000/api"
-    )
+    parser.add_argument("--api-url", default="http://feed_watchdog_api:8000/api")
     parser.add_argument("--redis-pubsub-url", default="redis://redis:6379/2")
     args = parser.parse_args()
 

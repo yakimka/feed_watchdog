@@ -22,8 +22,7 @@ class MongoReceiverRepository(IReceiverRepository):
             .limit(query.page_size)
         )
         return [
-            Receiver.parse_obj(item)
-            for item in await cursor.to_list(query.page_size)
+            Receiver.parse_obj(item) for item in await cursor.to_list(query.page_size)
         ]
 
     @staticmethod
@@ -33,36 +32,26 @@ class MongoReceiverRepository(IReceiverRepository):
         return {
             "$or": [
                 {"name": {"$regex": re.compile(query.search, re.IGNORECASE)}},
-                {
-                    "slug": {
-                        "$regex": re.compile(f"^{query.search}$", re.IGNORECASE)
-                    }
-                },
+                {"slug": {"$regex": re.compile(f"^{query.search}$", re.IGNORECASE)}},
             ]
         }
 
     async def get_count(self, query: ReceiverQuery | None = None) -> int:
         if query is None:
             query = ReceiverQuery()
-        return await self.db.receivers.count_documents(
-            self._make_find_query(query)
-        )
+        return await self.db.receivers.count_documents(self._make_find_query(query))
 
     async def add(self, receiver: Receiver) -> str:
         try:
             new_receiver = await self.db.receivers.insert_one(receiver.dict())
         except DuplicateKeyError as exc:
             if exc.details and "slug" in exc.details.get("keyPattern", {}):
-                raise ValueExistsError(
-                    value=receiver.slug, field="slug"
-                ) from None
+                raise ValueExistsError(value=receiver.slug, field="slug") from None
             raise
         return str(new_receiver.inserted_id)
 
     async def update(self, slug: str, receiver: Receiver) -> bool:
-        result = await self.db.receivers.replace_one(
-            {"slug": slug}, receiver.dict()
-        )
+        result = await self.db.receivers.replace_one({"slug": slug}, receiver.dict())
         return result.matched_count > 0
 
     async def get_by_slug(self, slug: str) -> Receiver | None:

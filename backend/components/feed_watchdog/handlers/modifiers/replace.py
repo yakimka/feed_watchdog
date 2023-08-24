@@ -24,9 +24,7 @@ class ReplaceTestOptions(HandlerOptions):
     type=HandlerType.modifiers.value,
     options=ReplaceTestOptions,
 )
-async def replace_text(
-    posts: list[Post], *, options: ReplaceTestOptions
-) -> list[Post]:
+async def replace_text(posts: list[Post], *, options: ReplaceTestOptions) -> list[Post]:
     def replace_text_in_post(post: Post) -> Post:
         value = getattr(post, options.field)
         value = value.replace(options.old, options.new)

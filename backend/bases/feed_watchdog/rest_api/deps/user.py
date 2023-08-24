@@ -4,17 +4,10 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException, status
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from feed_watchdog.domain.interfaces import (
-    IRefreshTokenRepository,
-    IUserRepository,
-)
+from feed_watchdog.domain.interfaces import IRefreshTokenRepository, IUserRepository
 from feed_watchdog.domain.models import User
 from feed_watchdog.repositories.user import MongoRefreshTokenRepository
-from feed_watchdog.rest_api.auth import (
-    InvalidTokenError,
-    decode_token,
-    oauth2_scheme,
-)
+from feed_watchdog.rest_api.auth import InvalidTokenError, decode_token, oauth2_scheme
 from feed_watchdog.rest_api.container import Container
 from feed_watchdog.rest_api.deps.mongo import get_db
 
@@ -60,12 +53,8 @@ async def get_current_user(
 @inject
 async def get_user_id_from_refresh_token(
     token: str = Depends(oauth2_scheme),
-    secret: str = Depends(
-        Provide[Container.config.auth.jwt_refresh_secret_key]
-    ),
-    refresh_token_repo: IRefreshTokenRepository = Depends(
-        get_refresh_token_repo
-    ),
+    secret: str = Depends(Provide[Container.config.auth.jwt_refresh_secret_key]),
+    refresh_token_repo: IRefreshTokenRepository = Depends(get_refresh_token_repo),
 ) -> str:
     try:
         token_data = decode_token(token, secret=secret)
@@ -73,9 +62,7 @@ async def get_user_id_from_refresh_token(
         raise INVALID_CREDENTIALS_EXC from None
 
     user_id = token_data.sub
-    tokens = [
-        item.token for item in await refresh_token_repo.get_by_user_id(user_id)
-    ]
+    tokens = [item.token for item in await refresh_token_repo.get_by_user_id(user_id)]
     if token not in tokens:
         raise INVALID_CREDENTIALS_EXC
 

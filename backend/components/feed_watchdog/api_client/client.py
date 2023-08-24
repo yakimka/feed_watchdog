@@ -71,9 +71,7 @@ class FeedWatchdogAPIClient:
         self._client = client
         self._base_url = base_url.removesuffix("/")
 
-    async def get_streams(
-        self, interval: str | None = None
-    ) -> list[StreamResp]:
+    async def get_streams(self, interval: str | None = None) -> list[StreamResp]:
         result: list[StreamResp] = []
         params: dict[str, Any] = {"only_active": True}
         if interval is not None:
@@ -111,15 +109,11 @@ class FeedWatchdogAPIClient:
                 for row in result["results"]:
                     yield row
             except httpx.HTTPError as e:
-                raise FeedWatchdogAPIClientError(
-                    "Error while fetching streams"
-                ) from e
+                raise FeedWatchdogAPIClientError("Error while fetching streams") from e
             page += 1
 
     @infinite_retry
     async def get_intervals(self) -> list[str]:
-        response = await self._client.get(
-            f"{self._base_url}/streams/intervals/"
-        )
+        response = await self._client.get(f"{self._base_url}/streams/intervals/")
         response.raise_for_status()
         return [item["value"] for item in response.json()]

@@ -22,6 +22,4 @@ class FetchTextOptions(HandlerOptions):
 @async_lock(key=lambda options: domain_from_url(options.url))
 @register_handler(type=HandlerType.fetchers.value, options=FetchTextOptions)
 async def fetch_text(*, options: FetchTextOptions) -> str | None:
-    return await fetch_text_from_url(
-        options.url, encoding=options.encoding, retry=2
-    )
+    return await fetch_text_from_url(options.url, encoding=options.encoding, retry=2)

@@ -19,9 +19,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
     def setup(
         self,
         settings: Settings = Provide[Container.settings],
-        api_client: FeedWatchdogAPIClient = Provide[
-            Container.feed_watchdog_api_client
-        ],
+        api_client: FeedWatchdogAPIClient = Provide[Container.feed_watchdog_api_client],
     ) -> None:
         self._settings = settings
         self._api_client = api_client
@@ -40,9 +38,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             message_batch = MessageBatch.from_dict(msg_data)
             stream = await self.receive_stream(message_batch.stream_slug)
             if not stream:
-                logger.warning(
-                    "Can't find stream %s", message_batch.stream_slug
-                )
+                logger.warning("Can't find stream %s", message_batch.stream_slug)
                 await self._subscriber.commit(msg_id)
                 continue
 

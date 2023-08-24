@@ -82,11 +82,11 @@ include_trailing_comma = true
 use_parentheses = true
 # See https://github.com/timothycrosley/isort#multi-line-output-modes
 multi_line_output = 3
-line_length = 80
+line_length = 88
 known_first_party = ["feed_watchdog"]
 
 [tool.black]
-line-length = 80
+line-length = 88
 
 [tool.pytest.ini_options]
 # Directories that are not visited by pytest collector:

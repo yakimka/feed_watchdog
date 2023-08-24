@@ -59,7 +59,5 @@ async def compare_and_filter(
     }
     operator_func = operator_map[options.operator]
     return [
-        post
-        for post in posts
-        if operator_func(getattr(post, options.field), value)
+        post for post in posts if operator_func(getattr(post, options.field), value)
     ]

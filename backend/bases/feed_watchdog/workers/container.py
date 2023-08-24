@@ -19,9 +19,7 @@ pydantic.BaseSettings = BaseSettings
 def get_httpx_stream_client(token: str, timeout: int) -> httpx.AsyncClient:
     transport = httpx.AsyncHTTPTransport(retries=2)
     headers = {"Authorization": f"Bearer {token}"}
-    return httpx.AsyncClient(
-        headers=headers, transport=transport, timeout=timeout
-    )
+    return httpx.AsyncClient(headers=headers, transport=transport, timeout=timeout)
 
 
 class Container(containers.DeclarativeContainer):

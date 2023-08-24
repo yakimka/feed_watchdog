@@ -24,9 +24,7 @@ class MongoStreamFetcher:
 
         streams = await cursor.to_list(query.page_size)
         sources = await self._fetch_sources([s["source_slug"] for s in streams])
-        receivers = await self._fetch_receivers(
-            [s["receiver_slug"] for s in streams]
-        )
+        receivers = await self._fetch_receivers([s["receiver_slug"] for s in streams])
         return [
             StreamWithRelations.parse_obj(
                 {
@@ -41,9 +39,7 @@ class MongoStreamFetcher:
     async def get_count(self, query: StreamQuery | None = None) -> int:
         if query is None:
             query = StreamQuery()
-        return await self.db.streams.count_documents(
-            self._make_find_query(query)
-        )
+        return await self.db.streams.count_documents(self._make_find_query(query))
 
     async def _fetch_sources(self, slugs: list[str]) -> dict[str, Source]:
         result = {}
@@ -61,9 +57,7 @@ class MongoStreamFetcher:
     def _make_find_query(query: StreamQuery) -> dict:
         filters: dict = {}
         if query.search:
-            filters["slug"] = {
-                "$regex": re.compile(query.search, re.IGNORECASE)
-            }
+            filters["slug"] = {"$regex": re.compile(query.search, re.IGNORECASE)}
         if query.interval:
             filters["intervals"] = query.interval
         if query.only_active:

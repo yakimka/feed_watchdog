@@ -76,9 +76,7 @@ class Subscriber:
             message_id = "0"
         return message_id
 
-    def _decode_message_data(
-        self, message_data: dict[str, bytes]
-    ) -> dict[str, Any]:
+    def _decode_message_data(self, message_data: dict[str, bytes]) -> dict[str, Any]:
         decoded_data = {}
         for key, value in message_data.items():
             decoded_data[key] = json.loads(value)

@@ -11,9 +11,7 @@ def setup_logging(dsn: str | None):
         logger.warning("Sentry DSN is not set")
         return
 
-    sentry_logging = LoggingIntegration(
-        level=logging.INFO, event_level=logging.ERROR
-    )
+    sentry_logging = LoggingIntegration(level=logging.INFO, event_level=logging.ERROR)
     sentry_sdk.init(dsn=dsn, integrations=[sentry_logging])
 
 

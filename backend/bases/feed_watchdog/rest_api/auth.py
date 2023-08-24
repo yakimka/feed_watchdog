@@ -8,9 +8,7 @@ from pydantic import BaseModel, ValidationError
 
 from feed_watchdog.rest_api.container import Container
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/api/user/login", scheme_name="JWT"
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login", scheme_name="JWT")
 
 
 def _create_token(
@@ -19,9 +17,7 @@ def _create_token(
     secret: str,
     algorithm: str,
 ) -> str:
-    expires_delta = datetime.now(timezone.utc) + timedelta(
-        minutes=expires_minutes
-    )
+    expires_delta = datetime.now(timezone.utc) + timedelta(minutes=expires_minutes)
 
     to_encode = {"exp": expires_delta, "sub": str(subject)}
     return jwt.encode(to_encode, secret, algorithm)
@@ -30,9 +26,7 @@ def _create_token(
 @inject
 def create_access_token(
     subject: Union[str, Any],
-    expires_minutes: int = Provide[
-        Container.config.auth.access_token_expire_minutes
-    ],
+    expires_minutes: int = Provide[Container.config.auth.access_token_expire_minutes],
     secret: str = Provide[Container.config.auth.jwt_secret_key],
     algorithm: str = Provide[Container.config.auth.algorithm],
 ) -> str:
@@ -47,9 +41,7 @@ def create_access_token(
 @inject
 def create_refresh_token(
     subject: Union[str, Any],
-    expires_minutes: int = Provide[
-        Container.config.auth.refresh_token_expire_minutes
-    ],
+    expires_minutes: int = Provide[Container.config.auth.refresh_token_expire_minutes],
     secret: str = Provide[Container.config.auth.jwt_refresh_secret_key],
     algorithm: str = Provide[Container.config.auth.algorithm],
 ) -> str:

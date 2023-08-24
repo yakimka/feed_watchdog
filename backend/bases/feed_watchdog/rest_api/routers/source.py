@@ -7,10 +7,7 @@ from feed_watchdog.domain.interfaces import (
     SourceQuery,
 )
 from feed_watchdog.domain.models import Source as SourceModel
-from feed_watchdog.rest_api.deps.pagination import (
-    Pagination,
-    get_pagination_params,
-)
+from feed_watchdog.rest_api.deps.pagination import Pagination, get_pagination_params
 from feed_watchdog.rest_api.deps.source import get_by_slug, get_source_repo
 from feed_watchdog.rest_api.deps.stream import get_stream_repo
 from feed_watchdog.rest_api.deps.user import get_current_user

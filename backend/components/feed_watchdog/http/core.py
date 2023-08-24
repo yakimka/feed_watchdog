@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 
 # https://user-agents.net/browsers/firefox
 DEFAULT_UA = (
-    "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:96.0)"
-    " Gecko/20100101 Firefox/96.0"
+    "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0"
 )
 
 
@@ -23,9 +22,7 @@ def domain_from_url(url: str):
     return f"{td}.{tsu}"
 
 
-async def fetch_text_from_url(
-    url: str, *, encoding="", retry=0
-) -> Optional[str]:
+async def fetch_text_from_url(url: str, *, encoding="", retry=0) -> Optional[str]:
     # TODO don't fetch if content is not changed
     async with httpx.AsyncClient(
         follow_redirects=True, verify=False  # noqa: S501
@@ -47,9 +44,7 @@ async def fetch_text_from_url(
                     await asyncio.sleep(3.0)
                     continue
 
-                msg = (
-                    f"Error while fetching {url}: error {type(e).__name__}\n{e}"
-                )
+                msg = f"Error while fetching {url}: error {type(e).__name__}\n{e}"
                 write_warn_message(
                     msg,
                     logger=logger,
