@@ -3,10 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from feed_watchdog.domain.interfaces import (
-    IRefreshTokenRepository,
-    IUserRepository,
-)
+from feed_watchdog.domain.interfaces import IRefreshTokenRepository, IUserRepository
 from feed_watchdog.domain.models import RefreshToken
 from feed_watchdog.rest_api.auth import (
     create_access_token,
@@ -39,9 +36,7 @@ class LoginData(BaseModel):
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     user_repo: IUserRepository = Depends(Provide[Container.user_repository]),
-    refresh_token_repo: IRefreshTokenRepository = Depends(
-        get_refresh_token_repo
-    ),
+    refresh_token_repo: IRefreshTokenRepository = Depends(get_refresh_token_repo),
 ):
     user = await user_repo.get_user_by_email(form_data.username)
     if user is None:
@@ -58,9 +53,7 @@ async def login(
         )
 
     refresh_token = create_refresh_token(user.id)
-    await refresh_token_repo.create(
-        RefreshToken(token=refresh_token, user_id=user.id)
-    )
+    await refresh_token_repo.create(RefreshToken(token=refresh_token, user_id=user.id))
 
     return {
         "access_token": create_access_token(user.id),

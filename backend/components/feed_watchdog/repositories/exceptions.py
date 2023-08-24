@@ -3,8 +3,7 @@ class ValueExistsError(Exception):
 
     def __init__(self, value: str, field: str) -> None:
         message = (
-            f"Object with value '{value}' in field '{field}' already exists in"
-            " storage."
+            f"Object with value '{value}' in field '{field}' already exists in storage."
         )
         super().__init__(message)
         self.message = message

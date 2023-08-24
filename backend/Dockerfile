@@ -1,84 +1,72 @@
 # https://github.com/python-poetry/poetry/discussions/1879#discussioncomment-216865
 # `python-base` sets up all our shared environment variables
-FROM python:3.11-slim as python-base
+ARG PYTHON_VERSION=3.11
+FROM python:${PYTHON_VERSION}-slim-bullseye as python-base
 
-    # python
 ENV PYTHONUNBUFFERED=1 \
-    \
-    # pip
+    PYTHONDEVMODE=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
-    \
-    # poetry
-    # https://python-poetry.org/docs/configuration/#using-environment-variables
     POETRY_VERSION=1.5.1 \
-    # make poetry install to this location
     VENV_PATH="/opt/venv" \
-    # make poetry create the virtual environment in the project's root
-    # it gets named `.venv`
     POETRY_VIRTUALENVS_IN_PROJECT=true \
-    # do not ask any interactive question
     POETRY_NO_INTERACTION=1 \
-    \
-    # paths
-    # this is where our requirements + virtual environment will live
-    APP_PATH="/app" \
-    XDG_CACHE_HOME="/app/.cache" \
-    XDG_CONFIG_HOME="/app/.cache/config"
+    CODE_PATH="/opt/code" \
+    BACKEND_PATH="/opt/code/backend"
 
-# prepend poetry and venv to path
-ENV PATH="$VENV_PATH/bin:$APP_PATH/.venv/bin:$PATH"
+ENV XDG_CACHE_HOME="$CODE_PATH/.cache" \
+    XDG_CONFIG_HOME="/tmp/.config"
+
+
+ENV PATH="$VENV_PATH/bin:$BACKEND_PATH/.venv/bin:$PATH"
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 ARG USER_NAME=app
 
 RUN addgroup --gid $GROUP_ID --system $USER_NAME \
     && adduser --uid $USER_ID --system --no-create-home --shell=/bin/false --disabled-password --group $USER_NAME \
-    && mkdir /app \
-    && chown -R $USER_ID:$GROUP_ID /app
+    && mkdir $CODE_PATH \
+    && chown -R $USER_ID:$GROUP_ID $CODE_PATH
 
-RUN apt-get update && \
-apt-get install --no-install-recommends -y  \
+RUN apt-get update \
+  && apt-get install --no-install-recommends -y  \
     make \
+    git \
     libpq5 \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /var/www/frontend \
     && chown -R $USER_ID:$GROUP_ID /var/www/frontend
 
-# `builder-base` stage is used to build deps + create our virtual environment
+# For pre-commit
+RUN mkdir -p $XDG_CONFIG_HOME/git \
+    && touch $XDG_CONFIG_HOME/git/config \
+    && chown -R $USER_ID:$GROUP_ID $XDG_CONFIG_HOME \
+    && git config --global safe.directory $CODE_PATH
+
+
 FROM python-base as builder-base
 RUN set -ex \
     && apt-get update \
     && apt-get install --no-install-recommends -y \
-        # deps for installing poetry
-        curl \
         # deps for building python deps
         build-essential \
-        libpq-dev
+        libpq-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN python -m venv /opt/venv
+RUN python -m venv $VENV_PATH
 RUN pip install poetry==$POETRY_VERSION \
     && poetry self add poetry-multiproject-plugin poetry-polylith-plugin
 
 
 # `development` image is used during development / testing
 FROM python-base as development
-ARG USER_NAME=app
-ENV ENVIRONMENT=development \
-    PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONDONTWRITEBYTECODE=1
+WORKDIR $BACKEND_PATH
 
-RUN set -ex \
-    && apt-get update \
-    && apt-get install --no-install-recommends -y \
-    # for pre-commit
-        git \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR $APP_PATH
-
-# copy in our built poetry + venv
 COPY --from=builder-base $VENV_PATH $VENV_PATH
 
 USER $USER_NAME

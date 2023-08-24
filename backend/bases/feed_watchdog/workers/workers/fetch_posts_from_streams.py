@@ -30,9 +30,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
     def setup(
         self,
         settings: Settings = Provide[Container.settings],
-        post_repository: RedisPostRepository = Provide[
-            Container.post_repository
-        ],
+        post_repository: RedisPostRepository = Provide[Container.post_repository],
         publisher: Publisher = Provide[Container.publisher],
     ) -> None:
         self._settings = settings
@@ -82,24 +80,16 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             )
             return
 
-        final_posts = await self.apply_modifiers_to_posts(
-            event.modifiers, posts
-        )
+        final_posts = await self.apply_modifiers_to_posts(event.modifiers, posts)
         events_for_sending = await self.parse_new_events(event, final_posts)
         post_ids = [
-            msg.post_id
-            for event in events_for_sending
-            for msg in event.messages
+            msg.post_id for event in events_for_sending for msg in event.messages
         ]
-        logger.info(
-            "Sending %s events for %s", len(events_for_sending), event.slug
-        )
+        logger.info("Sending %s events for %s", len(events_for_sending), event.slug)
         await self.send_events(events_for_sending)
 
         if left_posts := {post.post_id for post in posts} - set(post_ids):
-            await self._post_repository.mark_post_as_seen(
-                event.slug, *left_posts
-            )
+            await self._post_repository.mark_post_as_seen(event.slug, *left_posts)
 
     async def fetch_text(self, event: ProcessStreamEvent) -> str | None:
         fetcher = get_handler_by_name(
@@ -109,9 +99,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         )
         return await fetcher()
 
-    async def parse_posts(
-        self, event: ProcessStreamEvent, text: str
-    ) -> list[Post]:
+    async def parse_posts(self, event: ProcessStreamEvent, text: str) -> list[Post]:
         parser = get_handler_by_name(
             name=event.source.parser_type,
             type=HandlerType.parsers.value,

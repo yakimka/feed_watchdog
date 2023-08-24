@@ -22,8 +22,7 @@ class MongoSourceRepository(ISourceRepository):
             .limit(query.page_size)
         )
         return [
-            Source.parse_obj(item)
-            for item in await cursor.to_list(query.page_size)
+            Source.parse_obj(item) for item in await cursor.to_list(query.page_size)
         ]
 
     @staticmethod
@@ -33,20 +32,14 @@ class MongoSourceRepository(ISourceRepository):
         return {
             "$or": [
                 {"name": {"$regex": re.compile(query.search, re.IGNORECASE)}},
-                {
-                    "slug": {
-                        "$regex": re.compile(f"^{query.search}$", re.IGNORECASE)
-                    }
-                },
+                {"slug": {"$regex": re.compile(f"^{query.search}$", re.IGNORECASE)}},
             ]
         }
 
     async def get_count(self, query: SourceQuery | None = None) -> int:
         if query is None:
             query = SourceQuery()
-        return await self.db.sources.count_documents(
-            self._make_find_query(query)
-        )
+        return await self.db.sources.count_documents(self._make_find_query(query))
 
     async def get_all_tags(self) -> list[str]:
         cursor = self.db.sources.aggregate(
@@ -63,16 +56,12 @@ class MongoSourceRepository(ISourceRepository):
             new_source = await self.db.sources.insert_one(source.dict())
         except DuplicateKeyError as exc:
             if exc.details and "slug" in exc.details.get("keyPattern", {}):
-                raise ValueExistsError(
-                    value=source.slug, field="slug"
-                ) from None
+                raise ValueExistsError(value=source.slug, field="slug") from None
             raise
         return str(new_source.inserted_id)
 
     async def update(self, slug: str, source: Source) -> bool:
-        result = await self.db.sources.replace_one(
-            {"slug": slug}, source.dict()
-        )
+        result = await self.db.sources.replace_one({"slug": slug}, source.dict())
         return result.matched_count > 0
 
     async def get_by_slug(self, slug: str) -> Source | None:

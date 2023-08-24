@@ -83,9 +83,7 @@ class HandlerOptions:
                 default = field.default.value if is_enum else field.default
                 schema["properties"][field.name]["default"] = default
             elif field.default_factory is not m:
-                schema["properties"][field.name][
-                    "default"
-                ] = field.default_factory()
+                schema["properties"][field.name]["default"] = field.default_factory()
             else:
                 schema["required"].append(field.name)
 
@@ -115,18 +113,12 @@ HANDLERS: dict[str, dict[str, RawHandler]] = defaultdict(dict)
 HANDLERS_CONFIG: dict = {}
 
 
-def init_handlers_config(
-    path_to_config: Path | str, env_prefix: str = "FW_HNDR_"
-):
+def init_handlers_config(path_to_config: Path | str, env_prefix: str = "FW_HNDR_"):
     global HANDLERS_CONFIG
     if not HANDLERS_CONFIG:
-        string_constructor = partial(
-            _yaml_string_constructor, env_prefix=env_prefix
-        )
+        string_constructor = partial(_yaml_string_constructor, env_prefix=env_prefix)
         yaml.Loader.add_constructor("tag:yaml.org,2002:str", string_constructor)
-        yaml.SafeLoader.add_constructor(
-            "tag:yaml.org,2002:str", string_constructor
-        )
+        yaml.SafeLoader.add_constructor("tag:yaml.org,2002:str", string_constructor)
 
         with open(path_to_config) as conf:
             HANDLERS_CONFIG = yaml.safe_load(conf)
@@ -233,9 +225,7 @@ def _parse_modules(package) -> list[str]:
     return [name for _, name, _ in pkgutil.iter_modules([pkgpath])]
 
 
-def get_handler_by_name(
-    type: str, name: str, options: Optional[dict] = None
-) -> Any:
+def get_handler_by_name(type: str, name: str, options: Optional[dict] = None) -> Any:
     registered_handlers = get_registered_handlers()
     handler = dict(registered_handlers[type])[name]
     options_ = None
@@ -271,9 +261,7 @@ def _python_type_to_json_schema_type(python_type: Type | str) -> str:
         "float": "number",
         "bool": "boolean",
     }
-    python_type = (
-        python_type if isinstance(python_type, str) else python_type.__name__
-    )
+    python_type = python_type if isinstance(python_type, str) else python_type.__name__
     try:
         return types[python_type]
     except KeyError:
@@ -285,8 +273,6 @@ def _get_enum_values_type(enum_class: Type[Enum]) -> Type:
     klass = type(enums[0].value)
     is_consistent = all(isinstance(e.value, klass) for e in enums)
     if not is_consistent:
-        raise ValueError(
-            f"Enum {enum_class.__name__} has inconsistent values types"
-        )
+        raise ValueError(f"Enum {enum_class.__name__} has inconsistent values types")
 
     return klass

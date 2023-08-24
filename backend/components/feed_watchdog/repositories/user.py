@@ -1,10 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import DuplicateKeyError
 
-from feed_watchdog.domain.interfaces import (
-    IRefreshTokenRepository,
-    IUserRepository,
-)
+from feed_watchdog.domain.interfaces import IRefreshTokenRepository, IUserRepository
 from feed_watchdog.domain.models import RefreshToken, UserInDB
 from feed_watchdog.repositories.exceptions import ValueExistsError
 
@@ -30,9 +27,7 @@ class MongoUserRepository(IUserRepository):
             new_user = await self.db.users.insert_one(user.dict())
         except DuplicateKeyError as exc:
             if exc.details and "email" in exc.details.get("keyPattern", {}):
-                raise ValueExistsError(
-                    value=user.email, field="email"
-                ) from None
+                raise ValueExistsError(value=user.email, field="email") from None
             raise
         return str(new_user.inserted_id)
 
@@ -46,9 +41,7 @@ class MongoRefreshTokenRepository(IRefreshTokenRepository):
         return [RefreshToken.parse_obj(item) async for item in result]
 
     async def create(self, refresh_token: RefreshToken) -> str:
-        new_token = await self.db.refresh_tokens.insert_one(
-            refresh_token.dict()
-        )
+        new_token = await self.db.refresh_tokens.insert_one(refresh_token.dict())
         return str(new_token.inserted_id)
 
     async def delete(self, token: str) -> bool:

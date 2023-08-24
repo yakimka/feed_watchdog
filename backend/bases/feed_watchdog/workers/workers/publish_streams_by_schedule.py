@@ -36,9 +36,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
 @inject
 async def add_interval_jobs(
     scheduler: AsyncIOScheduler,
-    api_client: FeedWatchdogAPIClient = Provide[
-        Container.feed_watchdog_api_client
-    ],
+    api_client: FeedWatchdogAPIClient = Provide[Container.feed_watchdog_api_client],
 ) -> None:
     for interval in await api_client.get_intervals():
         collect = partial(collect_and_publish_streams, interval)
@@ -53,9 +51,7 @@ async def add_interval_jobs(
 @inject
 async def collect_and_publish_streams(
     cron_interval: str,
-    api_client: FeedWatchdogAPIClient = Provide[
-        Container.feed_watchdog_api_client
-    ],
+    api_client: FeedWatchdogAPIClient = Provide[Container.feed_watchdog_api_client],
     settings: Settings = Provide[Container.settings],
 ) -> None:
     logger.info("Collecting streams for %s", cron_interval)

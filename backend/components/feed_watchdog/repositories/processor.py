@@ -12,9 +12,7 @@ class FileProcessorsConfigRepo(IProcessorsConfigurationRepository):
 
     def get_config(self, handler: str) -> dict:
         config = self._get_configuration()
-        return {
-            item["type"]: item["options"] for item in config.get(handler, [])
-        }
+        return {item["type"]: item["options"] for item in config.get(handler, [])}
 
     def _get_configuration(self) -> dict:
         init_handlers_config(self._handlers_conf_path)

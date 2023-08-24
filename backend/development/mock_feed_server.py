@@ -55,11 +55,7 @@ def feed_request_handler() -> type[BaseHTTPRequestHandler]:
                 )
                 entries.append(entry)
 
-            return (
-                XML_BODY.strip()
-                .format(entries="".join(entries))
-                .encode("utf-8")
-            )
+            return XML_BODY.strip().format(entries="".join(entries)).encode("utf-8")
 
         @property
         def QUERY(self) -> dict:  # noqa: N802

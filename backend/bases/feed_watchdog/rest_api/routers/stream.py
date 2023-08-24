@@ -5,10 +5,7 @@ from pydantic import BaseModel
 from feed_watchdog.domain.interfaces import IStreamRepository, StreamQuery
 from feed_watchdog.domain.models import Stream, StreamWithRelations
 from feed_watchdog.rest_api.container import Container
-from feed_watchdog.rest_api.deps.pagination import (
-    Pagination,
-    get_pagination_params,
-)
+from feed_watchdog.rest_api.deps.pagination import Pagination, get_pagination_params
 from feed_watchdog.rest_api.deps.stream import (
     StreamFetcher,
     get_by_slug,
@@ -100,8 +97,7 @@ async def find(
         count=await fetcher.get_count(query),
         page=1,
         results=[
-            StreamExtendedResp.from_domain(item)
-            for item in await fetcher.search(query)
+            StreamExtendedResp.from_domain(item) for item in await fetcher.search(query)
         ],
         page_size=pagination.page_size,
     )

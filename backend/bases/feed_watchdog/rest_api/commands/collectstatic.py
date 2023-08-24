@@ -9,9 +9,7 @@ FRONTEND_DEST_DIR = "/var/www/frontend"
 
 class CollectStatic(BaseCommand):
     def handle(self, args) -> None:  # noqa: U100
-        shutil.copytree(
-            FRONTEND_SOURCE_DIR, FRONTEND_DEST_DIR, dirs_exist_ok=True
-        )
+        shutil.copytree(FRONTEND_SOURCE_DIR, FRONTEND_DEST_DIR, dirs_exist_ok=True)
         envs = _get_app_envs()
 
         _prepare_html(envs)
@@ -20,9 +18,7 @@ class CollectStatic(BaseCommand):
 
 def _get_app_envs() -> dict[str, str]:
     return {
-        key: value
-        for key, value in os.environ.items()
-        if key.startswith("VUE_APP_")
+        key: value for key, value in os.environ.items() if key.startswith("VUE_APP_")
     }
 
 

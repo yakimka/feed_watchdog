@@ -1,12 +1,6 @@
 from fastapi import APIRouter
 
-from feed_watchdog.rest_api.routers import (
-    processor,
-    receiver,
-    source,
-    stream,
-    user,
-)
+from feed_watchdog.rest_api.routers import processor, receiver, source, stream, user
 
 router = APIRouter()
 

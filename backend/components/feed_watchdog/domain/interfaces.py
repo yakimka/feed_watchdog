@@ -3,13 +3,7 @@ from abc import abstractmethod
 
 from pydantic import BaseModel
 
-from feed_watchdog.domain.models import (
-    Receiver,
-    RefreshToken,
-    Source,
-    Stream,
-    UserInDB,
-)
+from feed_watchdog.domain.models import Receiver, RefreshToken, Source, Stream, UserInDB
 
 
 class PaginationQuery(BaseModel):

@@ -67,6 +67,8 @@ types-PyYAML = "^6.0.7"
 types-redis = "^4.6.0.3"
 types-requests = "^2.27.16"
 yamllint = "^1.26.3"
+pytest-deadfixtures = "^2.2.1"
+pytest-asyncio = "^0.21.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -80,44 +82,69 @@ include_trailing_comma = true
 use_parentheses = true
 # See https://github.com/timothycrosley/isort#multi-line-output-modes
 multi_line_output = 3
-line_length = 80
+line_length = 88
 known_first_party = ["feed_watchdog"]
 
 [tool.black]
-line-length = 80
+line-length = 88
 
 [tool.pytest.ini_options]
 # Directories that are not visited by pytest collector:
-norecursedirs = ["*.egg", ".eggs", "dist", "build", "docs", ".tox", ".git", "__pycache__"]
+norecursedirs = [
+    "*.egg",
+    ".eggs",
+    "dist",
+    "build",
+    "docs",
+    ".tox",
+    ".git",
+    "__pycache__",
+    ".cache",
+    ".venv",
+    "venv",
+]
 
 # Strict `@xfail` by default:
 xfail_strict = true
 
 # Extra options:
 addopts = [
+  # don't add --cov because it breaks pycharm debugger
+  #   just add it manaually when needed to cmd args
   "--strict-markers",
   "--strict-config",
   "--tb=short",
-  "--cov=bases/feed_watchdog",
-  "--cov=components/feed_watchdog",
-  "--cov=development",
-  "--cov=tests",
-  "--cov-report=term:skip-covered",
-  "--cov-report=html",
+  "--cov-report=term-missing",
   "--cov-report=xml",
 #  "--cov-fail-under=100",
 ]
 
 [tool.coverage.run]
 branch = true
+source = [
+    "bases/feed_watchdog",
+    "components/feed_watchdog",
+    "development",
+    "tests",
+]
 
 [tool.coverage.report]
 precision = 2
+exclude_lines = [
+    "if TYPE_CHECKING:",
+]
 
 [tool.mypy]
 # mypy configurations: https://mypy.readthedocs.io/en/latest/config_file.html
 files = ["."]
+exclude = [
+    "tests/",
+]
 plugins = ["pydantic.mypy"]
+mypy_path = [
+    "components",
+    "bases",
+]
 
 allow_redefinition = false
 check_untyped_defs = true
@@ -139,20 +166,5 @@ warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
-mypy_path = [
-    "components",
-    "bases",
-]
 namespace_packages = true
 explicit_package_bases = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-
-[tool.pylint.master]
-extension-pkg-allow-list = ["dependency_injector"]
-
-[tool.pylint.messages_control]
-max-line-length = 80
