@@ -1,0 +1,243 @@
+name: CI\CD
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+  # Update docker hub retention policy
+  schedule:
+    - cron: "21 7 8 * *"
+
+env:
+  DOCKER_USERNAME: "yakim"
+  PROJECT_NAME: "feed_watchdog"
+  DOCKER_COMPOSE_SERVICE_NAME: "feed_watchdog_api"
+  MAIN_PY_VERSION: "3.11"
+  PIP_NO_CACHE_DIR: "off"
+  POETRY_VIRTUALENVS_IN_PROJECT: "true"
+  POETRY_NO_INTERACTION: "1"
+  REGISTRY: ""
+  DOCKER_BUILDKIT: "1"
+  COMPOSE_DOCKER_CLI_BUILD: "1"
+
+defaults:
+  run:
+    working-directory: backend
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: read-all
+
+jobs:
+  check-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: echo "IMAGE_FULL_NAME=$(echo ${DOCKER_USERNAME}/${PROJECT_NAME})" >> $GITHUB_ENV
+      - run: echo "DEV_VERSION=`(cat Dockerfile; cat .github/workflow/workflow-ci.yml)|sha1sum |cut -c 1-8`" >> $GITHUB_ENV
+      - run: echo "DEV_IMAGE=${IMAGE_FULL_NAME}:dev-${MAIN_PY_VERSION}-${DEV_VERSION}" >> $GITHUB_ENV
+      - run: echo "VERSION=$(echo ${GITHUB_REF:10})" >> $GITHUB_ENV
+      - run: echo "SHORT_VERSION=$(echo ${VERSION%.*})" >> $GITHUB_ENV
+
+      - name: Prepare Docker
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          cp .env.template .env
+          echo "${DOCKERHUB_TOKEN}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
+          docker buildx create --use --driver=docker-container
+          docker --version && docker compose --version
+
+      - name: Load cached venv and cache
+        id: cached-venv-and-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            backend/.venv
+            backend/.cache
+          key: py${{ env.MAIN_PY_VERSION }}-${{ hashFiles('backend/poetry.lock') }}
+
+      - name: Build docker dev image
+        run: |
+          docker pull ${DEV_IMAGE} || (
+            PYTHON_VERSION=${MAIN_PY_VERSION} docker compose build ${DOCKER_COMPOSE_SERVICE_NAME} ;
+            docker tag ${PROJECT_NAME}:dev ${DEV_IMAGE} ;
+            docker push ${DEV_IMAGE}
+          )
+          docker tag ${DEV_IMAGE} ${PROJECT_NAME}:dev
+
+      - name: Run checks
+        run: docker compose run -e CI=1 --user=$(id -u) --rm devtools ./ci.sh
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          # token: ${{ secrets.CODECOV_TOKEN }} # for private repos
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: built-package-py${{ env.MAIN_PY_VERSION }}
+          path: backend/projects/feed_watchdog_api/dist/
+
+  release-package:
+    runs-on: ubuntu-latest
+    needs: [ check-code ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: built-package-py${{ env.MAIN_PY_VERSION }}
+          path: backend/projects/feed_watchdog_api/dist/
+
+      - run: echo "IMAGE_FULL_NAME=$(echo ${DOCKER_USERNAME}/${PROJECT_NAME})" >> $GITHUB_ENV
+      - run: echo "DEV_VERSION=`(cat Dockerfile; cat .github/workflow/workflow-ci.yml)|sha1sum |cut -c 1-8`" >> $GITHUB_ENV
+      - run: echo "DEV_IMAGE=${IMAGE_FULL_NAME}:dev-${MAIN_PY_VERSION}-${DEV_VERSION}" >> $GITHUB_ENV
+
+      - name: Prepare Docker
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          cp .env.template .env
+          echo "${DOCKERHUB_TOKEN}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
+          docker buildx create --use --driver=docker-container
+          docker --version && docker compose --version
+
+      - name: Pull and spin dev container
+        run: |
+          docker pull ${DEV_IMAGE}
+          docker tag ${DEV_IMAGE} ${PROJECT_NAME}:dev
+          docker compose run --user=$(id -u) --rm -d devtools sleep infinity
+
+      - run: echo "PROJECT_VERSION=$(docker compose exec devtools poetry version --short)" >> $GITHUB_ENV
+
+      - name: Login to PyPI
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          echo "Login"
+          docker compose exec devtools poetry config pypi-token.pypi $PYPI_TOKEN || true
+
+      - name: Check if tag version matches project version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF:10}
+          echo $TAG
+          echo $PROJECT_VERSION
+          if [[ "$TAG" != "$PROJECT_VERSION" ]]; then exit 1; fi
+
+      - name: Build and publish (dry-run)
+        if: github.actor != 'dependabot[bot]'
+        run: docker compose exec devtools bash -c "cd projects/feed_watchdog_api/ && poetry publish --dry-run"
+
+      - name: Build and publish
+        if: startsWith(github.ref, 'refs/tags/')
+        run: docker compose exec devtools bash -c "cd projects/feed_watchdog_api/ && poetry publish"
+
+  release-image:
+    runs-on: ubuntu-latest
+    needs: [ check-code ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: built-package-py${{ env.MAIN_PY_VERSION }}
+          path: backend/projects/feed_watchdog_api/dist/
+
+      - name: Set Image full name variable
+        run: echo "IMAGE_FULL_NAME=$(echo ${DOCKER_USERNAME}/${PROJECT_NAME})" >> $GITHUB_ENV
+
+      - run: echo "IMAGE_FULL_NAME=$(echo ${DOCKER_USERNAME}/${PROJECT_NAME})" >> $GITHUB_ENV
+      - run: echo "DEV_VERSION=`(cat Dockerfile; cat .github/workflow/workflow-ci.yml)|sha1sum |cut -c 1-8`" >> $GITHUB_ENV
+      - run: echo "DEV_IMAGE=${IMAGE_FULL_NAME}:dev-${MAIN_PY_VERSION}-${DEV_VERSION}" >> $GITHUB_ENV
+      - run: echo "VERSION=$(echo ${GITHUB_REF:10})" >> $GITHUB_ENV
+      - run: echo "SHORT_VERSION=$(echo ${VERSION%.*})" >> $GITHUB_ENV
+
+      - name: Prepare Docker
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          cp .env.template .env
+          echo "${DOCKERHUB_TOKEN}" | docker login "$REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
+          docker buildx create --use --driver=docker-container
+          docker --version && docker compose --version
+
+      - name: Pull and spin dev container
+        run: |
+          docker pull ${DEV_IMAGE}
+          docker tag ${DEV_IMAGE} ${PROJECT_NAME}:dev
+          docker compose run --user=$(id -u) --rm -d devtools sleep infinity
+
+      - run: echo "PROJECT_VERSION=$(docker compose exec devtools poetry version --short)" >> $GITHUB_ENV
+
+      - name: Pull frontend image for cache
+        run: |
+          docker pull "${IMAGE_FULL_NAME}:frontend-dist" || true
+          docker tag "${IMAGE_FULL_NAME}:frontend-dist" feed_watchdog_frontend || true
+          docker image ls
+
+      # https://docs.docker.com/build/cache/backends/gha/
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v2
+
+      - name: Build frontend image
+        working-directory: frontend
+        run: docker build -t feed_watchdog_frontend .
+
+      - name: Push frontend cache
+        run: |
+          docker tag feed_watchdog_frontend "${IMAGE_FULL_NAME}:frontend-dist"
+          docker push "${IMAGE_FULL_NAME}:frontend-dist"
+
+      - name: Build backend image
+        working-directory: backend/projects/feed_watchdog_api
+        run: >
+          docker buildx build --load --build-arg IMAGE=${IMAGE_FULL_NAME}:frontend-dist
+          --build-arg WHEEL=${PROJECT_NAME}_api-${PROJECT_VERSION}-py3-none-any.whl
+          -t ${IMAGE_FULL_NAME}:latest . --cache-to type=gha,mode=max --cache-from type=gha
+
+      - name: Add version from git tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          docker tag "${IMAGE_FULL_NAME}:latest" "${IMAGE_FULL_NAME}:${VERSION}"
+          docker tag "${IMAGE_FULL_NAME}:latest" "${IMAGE_FULL_NAME}:${SHORT_VERSION}"
+
+      - name: Push production images
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master'
+        run: |
+          echo "Showing debug information"
+          docker image ls
+          docker push "${IMAGE_FULL_NAME}" --all-tags
+
+  deploy:
+    name: Deploy To Production
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    needs: [release-image]
+    if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master'
+    steps:
+      - name: install ssh keys
+        # check this thread to understand why its needed:
+        # https://stackoverflow.com/a/70447517
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} -p  > ~/.ssh/known_hosts
+      - name: connect and update
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} \
+            "cd ~/projects && ./update_feed_watchdog.sh"
+      - name: cleanup
+        run: rm -rf ~/.ssh

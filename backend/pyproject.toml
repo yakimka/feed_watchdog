@@ -67,6 +67,8 @@ types-PyYAML = "^6.0.7"
 types-redis = "^4.6.0.3"
 types-requests = "^2.27.16"
 yamllint = "^1.26.3"
+pytest-deadfixtures = "^2.2.1"
+pytest-asyncio = "^0.21.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -88,28 +90,43 @@ line-length = 80
 
 [tool.pytest.ini_options]
 # Directories that are not visited by pytest collector:
-norecursedirs = ["*.egg", ".eggs", "dist", "build", "docs", ".tox", ".git", "__pycache__"]
+norecursedirs = [
+    "*.egg",
+    ".eggs",
+    "dist",
+    "build",
+    "docs",
+    ".tox",
+    ".git",
+    "__pycache__",
+    ".cache",
+    ".venv",
+    "venv",
+]
 
 # Strict `@xfail` by default:
 xfail_strict = true
 
 # Extra options:
 addopts = [
+  # don't add --cov because it breaks pycharm debugger
+  #   just add it manaually when needed to cmd args
   "--strict-markers",
   "--strict-config",
   "--tb=short",
-  "--cov=bases/feed_watchdog",
-  "--cov=components/feed_watchdog",
-  "--cov=development",
-  "--cov=tests",
-  "--cov-report=term:skip-covered",
-  "--cov-report=html",
+  "--cov-report=term-missing",
   "--cov-report=xml",
 #  "--cov-fail-under=100",
 ]
 
 [tool.coverage.run]
 branch = true
+source = [
+    "bases/feed_watchdog",
+    "components/feed_watchdog",
+    "development",
+    "tests",
+]
 
 [tool.coverage.report]
 precision = 2

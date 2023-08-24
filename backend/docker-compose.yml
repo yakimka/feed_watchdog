@@ -14,7 +14,7 @@ x-feed-watchdog: &fw-common
   image: feed_watchdog:dev
   env_file: .env
   volumes:
-    - .:/app
+    - ..:/opt/code
 
 x-worker: &fw-worker-common
   <<: *fw-common
@@ -24,6 +24,13 @@ x-worker: &fw-worker-common
   restart: "on-failure"
 
 services:
+  devtools:
+    command: sleep infinity
+    restart: "no"
+    image: feed_watchdog:dev
+    volumes:
+      - ..:/opt/code
+
   feed_watchdog_api:
     <<: *fw-common
     container_name: feed_watchdog_api
@@ -53,7 +60,7 @@ services:
     command: python -m development.mock_feed_server
     env_file: .env
     volumes:
-      - .:/app
+      - .:/opt/code
     ports:
       - "8001:8001"
 
