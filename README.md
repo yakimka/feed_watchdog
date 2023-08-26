@@ -1,8 +1,7 @@
 # feed_watchdog
 
-[![Build Status](https://github.com/yakimka/feed_watchdog/workflows/docker/badge.svg?branch=master&event=push)](https://github.com/yakimka/feed_watchdog/actions?query=workflow%3Adocker)
+[![Build Status](https://github.com/yakimka/feed_watchdog/actions/workflows/workflow-ci.yml/badge.svg?branch=master&event=push)](https://github.com/yakimka/feed_watchdog/actions/workflows/workflow-ci.yml)
 [![codecov](https://codecov.io/gh/yakimka/feed_watchdog/branch/master/graph/badge.svg)](https://codecov.io/gh/yakimka/feed_watchdog)
-[![docs](https://readthedocs.org/projects/feed_watchdog/badge/?version=latest)](https://feed_watchdog.readthedocs.io/en/latest/?badge=latest)
 
 Feed watchdog web service
 
