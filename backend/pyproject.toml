@@ -22,6 +22,7 @@ packages = [
     {include = "feed_watchdog/fetchers", from = "components"},
     {include = "feed_watchdog/handlers", from = "components"},
     {include = "feed_watchdog/http", from = "components"},
+    {include = "feed_watchdog/migrations", from = "components"},
     {include = "feed_watchdog/pubsub", from = "components"},
     {include = "feed_watchdog/repositories", from = "components"},
     {include = "feed_watchdog/sentry", from = "components"},

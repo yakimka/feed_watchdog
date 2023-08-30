@@ -12,6 +12,7 @@ packages = [
     {include = "feed_watchdog/commands",from = "../../components"},
     {include = "feed_watchdog/repositories",from = "../../components"},
     {include = "feed_watchdog/sentry",from = "../../components"},
+    {include = "feed_watchdog/migrations",from = "../../components"},
     {include = "feed_watchdog/fetchers",from = "../../components"},
     {include = "feed_watchdog/synchronize",from = "../../components"},
     {include = "feed_watchdog/api_client",from = "../../components"},
@@ -41,6 +42,7 @@ pyyaml = "^6.0"
 python-multipart = "^0.0.6"
 httpx = "^0.24.1"
 feedparser = "^6.0.10"
+mongodex = "^0.0.1"
 
 [tool.poetry.group.dev.dependencies]
 
