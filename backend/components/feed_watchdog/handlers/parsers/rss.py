@@ -17,6 +17,7 @@ class Post(BasePost):
     post_id: str
     title: str
     url: str
+    comments_url: str
     post_tags: tuple | list
     source_tags: tuple | list
 
@@ -25,6 +26,7 @@ class Post(BasePost):
             "post_id": self.post_id,
             "title": self.title,
             "url": self.url,
+            "comments_url": self.comments_url,
             "post_tags": "; ".join(self.post_tags),
             "source_tags": "; ".join(self.source_tags),
             "post_hash_tags": " ".join(make_hash_tags(self.post_tags)),
@@ -37,6 +39,7 @@ class Post(BasePost):
             "post_id": {"type": "string"},
             "title": {"type": "string"},
             "url": {"type": "string"},
+            "comments_url": {"type": "string"},
             "post_tags": {"type": "array"},
             "source_tags": {"type": "array"},
             "post_hash_tags": {"only_template": True},
@@ -74,6 +77,7 @@ def _handler(text: str) -> list[Post]:
                     post_id=entry.get(id_field) or entry.link,
                     title=entry.title,
                     url=entry.get("link"),
+                    comments_url=entry.get("comments"),
                     post_tags=get_tags(entry),
                     source_tags=[],
                 ),

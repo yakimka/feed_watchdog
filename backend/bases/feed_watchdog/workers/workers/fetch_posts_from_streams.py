@@ -130,7 +130,7 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
         messages = []
         for post in reversed(posts):
             if not has_posts:  # first run, don't send all posts in stream
-                write_warn_message(f"First run for {event.slug}", logger=logger)
+                write_warn_message(f"First run for {event.slug}", logger.warning)
                 break
             if await self._post_repository.is_post_seen(
                 post.post_id, stream_id=event.slug

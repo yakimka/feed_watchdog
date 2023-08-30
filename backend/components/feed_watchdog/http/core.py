@@ -45,10 +45,7 @@ async def fetch_text_from_url(url: str, *, encoding="", retry=0) -> Optional[str
                     continue
 
                 msg = f"Error while fetching {url}: error {type(e).__name__}\n{e}"
-                write_warn_message(
-                    msg,
-                    logger=logger,
-                )
+                write_warn_message(msg, logger.warning)
                 return None
 
             if encoding:
