@@ -62,7 +62,7 @@ def async_lock(
                 if raise_on_fail:
                     raise AsyncLockError(f"Can't lock {lock_key}")
 
-                write_warn_message(f"Can't lock {lock_key}", logger=logger)
+                write_warn_message(f"Can't lock {lock_key}", logger.warning)
 
         return wrapped
 

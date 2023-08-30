@@ -87,5 +87,13 @@ services:
       - ./createUser.js:/docker-entrypoint-initdb.d/createUser.js
       - mongo4:/data/db
 
+  test_redis:
+    container_name: test_redis
+    hostname: test_redis
+    image: redis:7
+    restart: "no"
+    ports:
+      - 16379:6379
+
 volumes:
   mongo4: {}

@@ -1,4 +1,5 @@
 import argparse
+import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
@@ -71,12 +72,12 @@ def run_server(port: int, server_class=ThreadingHTTPServer) -> None:
     httpd.serve_forever()
 
 
-def main() -> None:
+def main(argv: list[str]) -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=8001)
-    args = parser.parse_args()
+    args = parser.parse_args(argv[1:])
     run_server(port=args.port)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)

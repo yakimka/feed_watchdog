@@ -107,6 +107,8 @@ norecursedirs = [
 # Strict `@xfail` by default:
 xfail_strict = true
 
+asyncio_mode = "auto"
+
 # Extra options:
 addopts = [
   # don't add --cov because it breaks pycharm debugger
