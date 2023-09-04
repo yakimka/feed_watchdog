@@ -34,7 +34,7 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 redis = "^5.0.0"
 sentry-sdk = "^1.28.1"
 pydantic-settings = "^2.0.2"
-aiogram = "^2.20"
+aiogram = "^3.0"
 apscheduler = "^3.10.4"
 dacite = "^1.8.0"
 tldextract = "^3.2.1"
