@@ -1,5 +1,5 @@
-ARG IMAGE=feed_watchdog_frontend:latest
-FROM $IMAGE as frontend
+ARG FRONTEND_IMAGE=feed_watchdog_frontend:latest
+FROM $FRONTEND_IMAGE as frontend
 
 
 FROM python:3.11-slim-bullseye as builder

@@ -157,9 +157,6 @@ jobs:
           name: built-package-py${{ env.MAIN_PY_VERSION }}
           path: backend/projects/feed_watchdog_api/dist/
 
-      - name: Set Image full name variable
-        run: echo "IMAGE_FULL_NAME=$(echo ${DOCKER_USERNAME}/${PROJECT_NAME})" >> $GITHUB_ENV
-
       - run: echo "IMAGE_FULL_NAME=$(echo ${DOCKER_USERNAME}/${PROJECT_NAME})" >> $GITHUB_ENV
       - run: echo "DEV_VERSION=`(cat Dockerfile; cat .github/workflow/workflow-ci.yml)|sha1sum |cut -c 1-8`" >> $GITHUB_ENV
       - run: echo "DEV_IMAGE=${IMAGE_FULL_NAME}:dev-${MAIN_PY_VERSION}-${DEV_VERSION}" >> $GITHUB_ENV
@@ -189,10 +186,6 @@ jobs:
           docker tag "${IMAGE_FULL_NAME}:frontend-dist" feed_watchdog_frontend || true
           docker image ls
 
-      # https://docs.docker.com/build/cache/backends/gha/
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v2
-
       - name: Build frontend image
         working-directory: frontend
         run: docker build -t feed_watchdog_frontend .
@@ -202,25 +195,30 @@ jobs:
           docker tag feed_watchdog_frontend "${IMAGE_FULL_NAME}:frontend-dist"
           docker push "${IMAGE_FULL_NAME}:frontend-dist"
 
-      - name: Build backend image
-        working-directory: backend/projects/feed_watchdog_api
-        run: >
-          docker buildx build --load --build-arg IMAGE=${IMAGE_FULL_NAME}:frontend-dist
-          --build-arg WHEEL=${PROJECT_NAME}_api-${PROJECT_VERSION}-py3-none-any.whl
-          -t ${IMAGE_FULL_NAME}:latest . --cache-to type=gha,mode=max --cache-from type=gha
+      # https://docs.docker.com/build/cache/backends/gha/
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v2
+
+      - name: Create tag string
+        run: echo "TAG_ARGS=-t ${IMAGE_FULL_NAME}:latest" >> $GITHUB_ENV
 
       - name: Add version from git tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          docker tag "${IMAGE_FULL_NAME}:latest" "${IMAGE_FULL_NAME}:${VERSION}"
-          docker tag "${IMAGE_FULL_NAME}:latest" "${IMAGE_FULL_NAME}:${SHORT_VERSION}"
+          echo "TAG_ARGS=${TAGS} -t ${IMAGE_FULL_NAME}:${VERSION} -t ${IMAGE_FULL_NAME}:${SHORT_VERSION}" >> $GITHUB_ENV
 
-      - name: Push production images
+      - name: Set push flag
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master'
-        run: |
-          echo "Showing debug information"
-          docker image ls
-          docker push "${IMAGE_FULL_NAME}" --all-tags
+        run: echo "PUSH_FLAG=--push" >> $GITHUB_ENV
+
+      - name: Build image
+        run: >
+          docker buildx build ${PUSH_FLAG:-}
+          --build-arg FRONTEND_IMAGE=${IMAGE_FULL_NAME}:frontend-dist
+          --build-arg WHEEL=${PROJECT_NAME}_api-${PROJECT_VERSION}-py3-none-any.whl
+          --cache-to type=gha,mode=max --cache-from type=gha
+          --platform=linux/arm64,linux/amd64
+          ${TAG_ARGS} .
 
   deploy:
     name: Deploy To Production

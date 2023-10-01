@@ -7,10 +7,6 @@ x-feed-watchdog: &fw-common
     args:
       - USER_ID=${DOCKER_USER_ID:-1000}
       - USER_NAME=${DOCKER_USER_NAME:-app}
-    cache_from:
-      - yakim/feed_watchdog:dev-cache
-    cache_to:
-      - yakim/feed_watchdog:dev-cache
   image: feed_watchdog:dev
   env_file: .env
   volumes:
