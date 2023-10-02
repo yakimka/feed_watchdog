@@ -212,6 +212,7 @@ jobs:
         run: echo "PUSH_FLAG=--push" >> $GITHUB_ENV
 
       - name: Build image
+        working-directory: backend/projects/feed_watchdog_api
         run: >
           docker buildx build ${PUSH_FLAG:-}
           --build-arg FRONTEND_IMAGE=${IMAGE_FULL_NAME}:frontend-dist
