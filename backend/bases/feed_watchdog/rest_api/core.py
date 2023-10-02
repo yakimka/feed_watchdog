@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
+from starlette_exporter import PrometheusMiddleware, handle_metrics
 
 from feed_watchdog.repositories.exceptions import ValueExistsError
 from feed_watchdog.rest_api.container import container, wire_modules
@@ -27,6 +28,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(PrometheusMiddleware)
+app.add_route("/metrics", handle_metrics)
 
 
 @app.exception_handler(ValueExistsError)
