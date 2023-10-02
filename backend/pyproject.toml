@@ -40,7 +40,7 @@ dacite = "^1.8.0"
 dependency-injector = "^4.41.0"
 fastapi = "^0.101.1"
 feedparser = {version = "^6.0.8"}
-httpx = {version = "^0.24.1"}
+httpx = {version = "^0.25.0"}
 mongodex = "^0.0.1"
 motor = "^3.2.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
