@@ -42,7 +42,7 @@ fastapi = "^0.101.1"
 feedparser = {version = "^6.0.8"}
 httpx = {version = "^0.24.1"}
 mongodex = "^0.0.1"
-motor = "^3.0.0"
+motor = "^3.2.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 pydantic-settings = "^2.0.2"
 python-decouple = "^3.6"
