@@ -38,7 +38,7 @@ APScheduler = "^3.9.1"
 async-timeout = {version = "^4.0.2"}
 dacite = "^1.8.0"
 dependency-injector = "^4.41.0"
-fastapi = "^0.101.1"
+fastapi = "^0.103.2"
 feedparser = {version = "^6.0.8"}
 httpx = {version = "^0.25.0"}
 mongodex = "^0.0.1"
