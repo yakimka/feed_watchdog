@@ -33,7 +33,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.10"
 
-aiogram = {version = "^2.20"}
+aiogram = {version = "^3.1"}
 APScheduler = "^3.9.1"
 async-timeout = {version = "^4.0.2"}
 dacite = "^1.8.0"
