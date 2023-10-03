@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - run: echo "IMAGE_FULL_NAME=$(echo ${DOCKER_USERNAME}/${PROJECT_NAME})" >> $GITHUB_ENV
       - run: echo "DEV_VERSION=`(cat Dockerfile; cat .github/workflow/workflow-ci.yml)|sha1sum |cut -c 1-8`" >> $GITHUB_ENV
@@ -96,7 +96,7 @@ jobs:
     needs: [ check-code ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: built-package-py${{ env.MAIN_PY_VERSION }}
@@ -151,7 +151,7 @@ jobs:
     needs: [ check-code ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: built-package-py${{ env.MAIN_PY_VERSION }}
