@@ -1608,13 +1608,13 @@ full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyam
 
 [[package]]
 name = "starlette-exporter"
-version = "0.16.0"
+version = "0.17.1"
 description = "Prometheus metrics exporter for Starlette applications."
 optional = false
 python-versions = "*"
 files = [
-    {file = "starlette_exporter-0.16.0-py3-none-any.whl", hash = "sha256:9dbe8dc647acbeb8680d53cedbbb8042ca75ca1b6987f609c5601ea96ddb7422"},
-    {file = "starlette_exporter-0.16.0.tar.gz", hash = "sha256:728cccf975c85d3cf2844b0110b51e1fa2dce628ef68bc38da58ad691f9b5d68"},
+    {file = "starlette_exporter-0.17.1-py3-none-any.whl", hash = "sha256:40f8667a6cf6c569c4eb090a7cc0bbd426ff5a732b8fea232100064cec8256d0"},
+    {file = "starlette_exporter-0.17.1.tar.gz", hash = "sha256:c9979c87efdef956e880075f4358deec234208c62d71448a58b7a3a45056209d"},
 ]
 
 [package.dependencies]
@@ -1817,4 +1817,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ebc775504e5e96de308db792b92c6fdfb34e02369fc2bebab074b9dc0bac26f2"
+content-hash = "ad2aa3ab44cc40e285844736274c057e04f67adec040b369890fff07b23aa992"
