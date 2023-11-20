@@ -51,7 +51,7 @@ python-multipart = "^0.0.6"
 PyYAML = {version = "^6.0"}
 redis = "^5.0.0rc2"
 sentry-sdk = "^1.5.12"
-tldextract = {version = "^3.2.1"}
+tldextract = {version = "^5.1.1"}
 uvicorn = {extras = ["standart"], version = "^0.23.2"}
 starlette-exporter = "^0.16.0"
 
