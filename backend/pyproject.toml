@@ -56,7 +56,7 @@ uvicorn = {extras = ["standart"], version = "^0.23.2"}
 starlette-exporter = "^0.16.0"
 
 [tool.poetry.group.dev.dependencies]
-hypothesis = "^6.46.3"
+hypothesis = "^6.92.0"
 ipython = "^8.11.0"
 isort = "^5.10.1"
 mypy = "^1.5.1"
