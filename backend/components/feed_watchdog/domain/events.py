@@ -55,6 +55,8 @@ class ProcessStreamEvent(Event):
 class Message:
     post_id: str
     text: str
+    template: str = ""
+    template_kwargs: dict = dataclasses.field(default_factory=dict)
 
 
 @dataclasses.dataclass
