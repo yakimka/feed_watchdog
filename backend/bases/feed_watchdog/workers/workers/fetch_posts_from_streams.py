@@ -18,7 +18,6 @@ from feed_watchdog.handlers import HandlerType, get_handler_by_name
 from feed_watchdog.pubsub.publisher import Publisher
 from feed_watchdog.repositories.post import RedisPostRepository
 from feed_watchdog.sentry.error_tracking import write_warn_message
-from feed_watchdog.text import template_to_text
 from feed_watchdog.workers.container import Container, container
 from feed_watchdog.workers.settings import Settings
 
@@ -137,10 +136,15 @@ class ProcessStreamsByScheduleWorker(BaseCommand):
             ):
                 continue
 
-            post_text = template_to_text(
-                event.message_template, **post.template_kwargs()
+            messages.append(
+                Message(
+                    post_id=post.post_id,
+                    # TODO: text deprecated, remove in future
+                    text="",
+                    template=event.message_template,
+                    template_kwargs=post.template_kwargs(),
+                )
             )
-            messages.append(Message(post_id=post.post_id, text=post_text))
 
         if not messages:
             return []

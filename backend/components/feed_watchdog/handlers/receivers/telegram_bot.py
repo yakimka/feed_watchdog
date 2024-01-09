@@ -1,4 +1,5 @@
 import dataclasses
+import html
 import logging
 from functools import lru_cache
 from typing import Protocol
@@ -7,12 +8,15 @@ from aiogram import Bot
 
 from feed_watchdog.handlers import HandlerOptions, HandlerType, register_handler
 from feed_watchdog.synchronize.lock import async_lock
+from feed_watchdog.text import template_to_text
 
 logger = logging.getLogger(__name__)
 
 
 class Message(Protocol):
     text: str
+    template: str
+    template_kwargs: dict
 
 
 @dataclasses.dataclass
@@ -59,7 +63,7 @@ class TelegramBot:
         parts: list[str] = []
         delimiter = "\n-----\n"
         for message in messages:
-            parts.extend((message.text.strip(), delimiter))
+            parts.extend((_from_message_to_text(message), delimiter))
         if parts:
             parts.pop()
 
@@ -88,3 +92,16 @@ class TelegramBot:
             disable_web_page_preview=disable_link_preview,
         )
         logger.info("Sent message to %s (%s)", self._name, chat_id)
+
+
+def _from_message_to_text(message: Message) -> str:
+    text = message.text
+    if message.template:
+        template_kwargs = _html_escape_kwargs(message.template_kwargs)
+        text = template_to_text(message.template, **template_kwargs)
+
+    return text.strip()
+
+
+def _html_escape_kwargs(template_kwargs: dict) -> dict[str, str]:
+    return {key: html.escape(value) for key, value in template_kwargs.items()}
