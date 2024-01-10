@@ -104,4 +104,7 @@ def _from_message_to_text(message: Message) -> str:
 
 
 def _html_escape_kwargs(template_kwargs: dict) -> dict[str, str]:
-    return {key: html.escape(value) for key, value in template_kwargs.items()}
+    return {
+        key: html.escape(value) if value else value
+        for key, value in template_kwargs.items()
+    }
