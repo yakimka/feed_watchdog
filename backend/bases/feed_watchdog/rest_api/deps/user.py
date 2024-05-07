@@ -1,14 +1,15 @@
 from datetime import datetime
 
 from fastapi import Depends, HTTPException, status
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from picodi import Provide, inject
 
 from feed_watchdog.domain.interfaces import IRefreshTokenRepository, IUserRepository
 from feed_watchdog.domain.models import User
-from feed_watchdog.repositories.user import MongoRefreshTokenRepository
 from feed_watchdog.rest_api.auth import InvalidTokenError, decode_token, oauth2_scheme
-from feed_watchdog.rest_api.dependencies import get_mongo_db, get_user_repository
+from feed_watchdog.rest_api.dependencies import (
+    get_refresh_token_repository,
+    get_user_repository,
+)
 from feed_watchdog.rest_api.settings import Settings, get_settings
 
 INVALID_CREDENTIALS_EXC = HTTPException(
@@ -16,13 +17,6 @@ INVALID_CREDENTIALS_EXC = HTTPException(
     detail="Could not validate credentials",
     headers={"WWW-Authenticate": "Bearer"},
 )
-
-
-@inject
-async def get_refresh_token_repo(
-    db: AsyncIOMotorDatabase = Provide(get_mongo_db),
-) -> IRefreshTokenRepository:
-    return MongoRefreshTokenRepository(db)
 
 
 @inject
@@ -54,7 +48,7 @@ async def get_current_user(
 @inject
 async def get_user_id_from_refresh_token(
     token: str = Depends(oauth2_scheme),
-    refresh_token_repo: IRefreshTokenRepository = Provide(get_refresh_token_repo),
+    refresh_token_repo: IRefreshTokenRepository = Provide(get_refresh_token_repository),
     settings: Settings = Provide(get_settings),
 ) -> str:
     try:

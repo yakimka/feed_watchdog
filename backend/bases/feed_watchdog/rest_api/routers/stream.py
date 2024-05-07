@@ -4,13 +4,13 @@ from pydantic import BaseModel
 
 from feed_watchdog.domain.interfaces import IStreamRepository, StreamQuery
 from feed_watchdog.domain.models import Stream, StreamWithRelations
-from feed_watchdog.rest_api.deps.pagination import Pagination, get_pagination_params
-from feed_watchdog.rest_api.deps.stream import (
+from feed_watchdog.rest_api.dependencies import (
     StreamFetcher,
-    get_by_slug,
     get_stream_fetcher,
-    get_stream_repo,
+    get_stream_repository,
 )
+from feed_watchdog.rest_api.deps.pagination import Pagination, get_pagination_params
+from feed_watchdog.rest_api.deps.stream import get_by_slug
 from feed_watchdog.rest_api.deps.user import get_current_user
 from feed_watchdog.rest_api.routers.core import ListResponse
 from feed_watchdog.rest_api.settings import Settings, get_settings
@@ -124,7 +124,7 @@ async def get_message_templates(
 @inject
 async def add(
     stream: StreamBody = Body(),
-    streams: IStreamRepository = Depends(Provide(get_stream_repo)),
+    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
 ) -> Stream:
     await streams.add(stream.to_internal())
     result = await streams.get_by_slug(stream.slug)
@@ -138,7 +138,7 @@ async def add(
 async def update(
     slug: str,
     stream: StreamBody = Body(),
-    streams: IStreamRepository = Depends(Provide(get_stream_repo)),
+    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
 ) -> Stream:
     updated = await streams.update(slug, stream.to_internal())
     if not updated:
@@ -162,7 +162,7 @@ async def detail(
 @inject
 async def delete(
     slug: str,
-    streams: IStreamRepository = Depends(Provide(get_stream_repo)),
+    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
 ) -> None:
     deleted = await streams.delete_by_slug(slug)
     if not deleted:

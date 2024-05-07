@@ -1,13 +1,32 @@
-from typing import Any, AsyncGenerator, Callable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, AsyncGenerator, Callable, Protocol
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from picodi import Provide, inject, resource
 from redis import asyncio as aioredis
 
+from feed_watchdog.domain.interfaces import (
+    IReceiverRepository,
+    IRefreshTokenRepository,
+    ISourceRepository,
+    IStreamRepository,
+    StreamQuery,
+)
+from feed_watchdog.fetchers.stream import MongoStreamFetcher
 from feed_watchdog.pubsub.publisher import Publisher
 from feed_watchdog.repositories.processor import FileProcessorsConfigRepo
-from feed_watchdog.repositories.user import MongoUserRepository
+from feed_watchdog.repositories.receiver import MongoReceiverRepository
+from feed_watchdog.repositories.source import MongoSourceRepository
+from feed_watchdog.repositories.stream import MongoStreamRepository
+from feed_watchdog.repositories.user import (
+    MongoRefreshTokenRepository,
+    MongoUserRepository,
+)
 from feed_watchdog.rest_api.settings import Settings, get_settings
+
+if TYPE_CHECKING:
+    from feed_watchdog.domain.models import StreamWithRelations
 
 
 @inject
@@ -37,6 +56,51 @@ async def get_mongo_db(
         yield client.get_database()
     finally:
         client.close()
+
+
+@inject
+async def get_receiver_repository(
+    db: AsyncIOMotorClient = Provide(get_mongo_db),
+) -> IReceiverRepository:
+    return MongoReceiverRepository(db)
+
+
+@inject
+async def get_source_repository(
+    db: AsyncIOMotorClient = Provide(get_mongo_db),
+) -> ISourceRepository:
+    return MongoSourceRepository(db)
+
+
+@inject
+async def get_stream_repository(
+    db: AsyncIOMotorClient = Provide(get_mongo_db),
+) -> IStreamRepository:
+    return MongoStreamRepository(db)
+
+
+class StreamFetcher(Protocol):
+    async def search(
+        self, query: StreamQuery = StreamQuery()
+    ) -> list[StreamWithRelations]:
+        pass
+
+    async def get_count(self, query: StreamQuery = StreamQuery()) -> int:
+        pass
+
+
+@inject
+async def get_stream_fetcher(
+    db: AsyncIOMotorClient = Provide(get_mongo_db),
+) -> StreamFetcher:
+    return MongoStreamFetcher(db)
+
+
+@inject
+async def get_refresh_token_repository(
+    db: AsyncIOMotorDatabase = Provide(get_mongo_db),
+) -> IRefreshTokenRepository:
+    return MongoRefreshTokenRepository(db)
 
 
 @inject

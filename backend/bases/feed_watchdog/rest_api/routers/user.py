@@ -10,11 +10,11 @@ from feed_watchdog.rest_api.auth import (
     create_refresh_token,
     oauth2_scheme,
 )
-from feed_watchdog.rest_api.dependencies import get_user_repository
-from feed_watchdog.rest_api.deps.user import (
-    get_refresh_token_repo,
-    get_user_id_from_refresh_token,
+from feed_watchdog.rest_api.dependencies import (
+    get_refresh_token_repository,
+    get_user_repository,
 )
+from feed_watchdog.rest_api.deps.user import get_user_id_from_refresh_token
 from feed_watchdog.utils.security import verify_password
 
 router = APIRouter()
@@ -37,7 +37,7 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     user_repo: IUserRepository = Depends(Provide(get_user_repository)),
     refresh_token_repo: IRefreshTokenRepository = Depends(
-        Provide(get_refresh_token_repo)
+        Provide(get_refresh_token_repository)
     ),
 ):
     user = await user_repo.get_user_by_email(form_data.username)
