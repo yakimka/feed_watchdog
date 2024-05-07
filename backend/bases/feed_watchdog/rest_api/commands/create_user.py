@@ -2,13 +2,13 @@ import asyncio
 import getpass
 from uuid import uuid4
 
-from dependency_injector.wiring import Provide, inject
+from picodi import Provide, inject
 from pydantic import BaseModel
 
 from feed_watchdog.commands.core import BaseCommand
 from feed_watchdog.domain.interfaces import IUserRepository
 from feed_watchdog.domain.models import UserInDB
-from feed_watchdog.rest_api.container import Container
+from feed_watchdog.rest_api.dependencies import get_user_repository
 from feed_watchdog.utils.security import hash_password
 
 
@@ -27,7 +27,7 @@ class CreateUserCommand(BaseCommand):
     async def _handle(
         self,
         user_data: User,
-        user_repo: IUserRepository = Provide[Container.user_repository],
+        user_repo: IUserRepository = Provide(get_user_repository),
     ):
         user = await user_repo.get_user_by_email(user_data.email)
         if user is not None:

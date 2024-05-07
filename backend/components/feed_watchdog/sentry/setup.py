@@ -22,5 +22,5 @@ def setup_fastapi(dsn: str | None):
 
     sentry_sdk.init(
         dsn=dsn,
-        traces_sample_rate=1.0,
+        traces_sample_rate=0,
     )

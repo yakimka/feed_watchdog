@@ -1,6 +1,6 @@
-from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from picodi import Provide, inject
 from pydantic import BaseModel
 
 from feed_watchdog.domain.interfaces import IRefreshTokenRepository, IUserRepository
@@ -10,7 +10,7 @@ from feed_watchdog.rest_api.auth import (
     create_refresh_token,
     oauth2_scheme,
 )
-from feed_watchdog.rest_api.container import Container
+from feed_watchdog.rest_api.dependencies import get_user_repository
 from feed_watchdog.rest_api.deps.user import (
     get_refresh_token_repo,
     get_user_id_from_refresh_token,
@@ -35,8 +35,10 @@ class LoginData(BaseModel):
 @inject
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    user_repo: IUserRepository = Depends(Provide[Container.user_repository]),
-    refresh_token_repo: IRefreshTokenRepository = Depends(get_refresh_token_repo),
+    user_repo: IUserRepository = Depends(Provide(get_user_repository)),
+    refresh_token_repo: IRefreshTokenRepository = Depends(
+        Provide(get_refresh_token_repo)
+    ),
 ):
     user = await user_repo.get_user_by_email(form_data.username)
     if user is None:
@@ -65,7 +67,7 @@ async def login(
 @router.post("/user/refresh_token/", response_model=TokenResponse)
 async def refresh(
     token: str = Depends(oauth2_scheme),
-    user_id: str = Depends(get_user_id_from_refresh_token),
+    user_id: str = Depends(Provide(get_user_id_from_refresh_token)),
 ):
     return {
         "access_token": create_access_token(user_id),

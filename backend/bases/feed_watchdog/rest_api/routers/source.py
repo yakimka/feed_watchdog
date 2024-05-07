@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
+from picodi import Provide, inject
 from pydantic import BaseModel, Field
 
 from feed_watchdog.domain.interfaces import (
@@ -13,7 +14,7 @@ from feed_watchdog.rest_api.deps.stream import get_stream_repo
 from feed_watchdog.rest_api.deps.user import get_current_user
 from feed_watchdog.rest_api.routers.core import ListResponse
 
-router = APIRouter(dependencies=[Depends(get_current_user)])
+router = APIRouter(dependencies=[Depends(Provide(get_current_user))])
 
 
 class Source(BaseModel):
@@ -35,8 +36,9 @@ class Sources(ListResponse):
 
 
 @router.get("/sources/", response_model=Sources)
+@inject
 async def find(
-    sources: ISourceRepository = Depends(get_source_repo),
+    sources: ISourceRepository = Depends(Provide(get_source_repo)),
     q: str = "",
     pagination: Pagination = Depends(get_pagination_params),
 ) -> ListResponse:
@@ -54,16 +56,18 @@ async def find(
 
 
 @router.get("/sources/tags/", response_model=list[str])
+@inject
 async def tags(
-    sources: ISourceRepository = Depends(get_source_repo),
+    sources: ISourceRepository = Depends(Provide(get_source_repo)),
 ) -> list[str]:
     return await sources.get_all_tags()
 
 
 @router.post("/sources/", response_model=Source, status_code=201)
+@inject
 async def add(
     source: Source = Body(),
-    sources: ISourceRepository = Depends(get_source_repo),
+    sources: ISourceRepository = Depends(Provide(get_source_repo)),
 ) -> SourceModel:
     await sources.add(source.to_domain())
     result = await sources.get_by_slug(source.slug)
@@ -73,10 +77,11 @@ async def add(
 
 
 @router.put("/sources/{slug}/", response_model=Source, status_code=201)
+@inject
 async def update(
     slug: str,
     source: Source = Body(),
-    sources: ISourceRepository = Depends(get_source_repo),
+    sources: ISourceRepository = Depends(Provide(get_source_repo)),
 ) -> SourceModel:
     updated = await sources.update(slug, source.to_domain())
     if not updated:
@@ -89,17 +94,19 @@ async def update(
 
 
 @router.get("/sources/{slug}/", response_model=Source)
+@inject
 async def detail(
-    source: SourceModel = Depends(get_by_slug),
+    source: SourceModel = Depends(Provide(get_by_slug)),
 ) -> SourceModel:
     return source
 
 
 @router.delete("/sources/{slug}/", response_model=None, status_code=204)
+@inject
 async def delete(
-    source: SourceModel = Depends(get_by_slug),
-    sources: ISourceRepository = Depends(get_source_repo),
-    streams: IStreamRepository = Depends(get_stream_repo),
+    source: SourceModel = Depends(Provide(get_by_slug)),
+    sources: ISourceRepository = Depends(Provide(get_source_repo)),
+    streams: IStreamRepository = Depends(Provide(get_stream_repo)),
 ) -> None:
     if await streams.get_by_source_slug(source.slug):
         raise HTTPException(status_code=409, detail="Source is in use")

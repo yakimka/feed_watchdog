@@ -5,14 +5,13 @@ from starlette.responses import JSONResponse
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 
 from feed_watchdog.repositories.exceptions import ValueExistsError
-from feed_watchdog.rest_api.container import container, wire_modules
 from feed_watchdog.rest_api.errors import ErrorResponse, FieldError
 from feed_watchdog.rest_api.routers import router
+from feed_watchdog.rest_api.settings import get_settings
 from feed_watchdog.sentry import setup as setup_sentry
 
-wire_modules()
-
-setup_sentry.setup_fastapi(container.settings().sentry.dsn)
+settings = get_settings()
+setup_sentry.setup_fastapi(settings.sentry.dsn)
 
 app = FastAPI()
 app.include_router(router)
