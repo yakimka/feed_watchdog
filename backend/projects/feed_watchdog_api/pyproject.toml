@@ -25,25 +25,26 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-uvicorn = "^0.23.1"
-dependency-injector = "^4.41.0"
-fastapi = "^0.103.2"
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-motor = "^3.2.0"
-passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-redis = "^5.0.0"
-sentry-sdk = "^1.28.1"
-pydantic-settings = "^2.0.2"
 aiogram = "^2.20"
 apscheduler = "^3.10.4"
 dacite = "^1.8.0"
-tldextract = "^3.2.1"
-pyyaml = "^6.0"
-python-multipart = "^0.0.6"
-httpx = "^0.25.0"
+dependency-injector = "^4.41.0"
+fastapi = "^0.111.0"
 feedparser = "^6.0.10"
+httpx = "^0.25.0"
 mongodex = "^0.0.1"
+motor = "^3.2.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+picodi = "^0.4.3"
+pydantic-settings = "^2.0.2"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+python-multipart = "^0.0.9"
+pyyaml = "^6.0"
+redis = "^5.0.0"
+sentry-sdk = "^1.28.1"
 starlette-exporter = "^0.16.0"
+tldextract = "^3.2.1"
+uvicorn = "^0.29.0"
 
 [tool.poetry.group.dev.dependencies]
 

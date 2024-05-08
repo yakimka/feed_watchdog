@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from feed_watchdog.domain.models import BaseModel
@@ -64,8 +66,10 @@ class Settings(BaseSettings):
         env_prefix="FW_API_",
         env_nested_delimiter="__",
         env_file=".env",
+        extra="ignore",
     )
 
 
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
     return Settings()

@@ -1,20 +1,14 @@
 from fastapi import Depends, HTTPException
-from motor.motor_asyncio import AsyncIOMotorClient
+from picodi import Provide, inject
 
 from feed_watchdog.domain.interfaces import IReceiverRepository
-from feed_watchdog.repositories.receiver import MongoReceiverRepository
-from feed_watchdog.rest_api.deps.mongo import get_db
+from feed_watchdog.rest_api.dependencies import get_receiver_repository
 
 
-def get_receiver_repo(
-    db: AsyncIOMotorClient = Depends(get_db),
-) -> IReceiverRepository:
-    return MongoReceiverRepository(db)
-
-
+@inject
 async def get_by_slug(
     slug: str,
-    receivers: IReceiverRepository = Depends(get_receiver_repo),
+    receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
 ):
     receiver = await receivers.get_by_slug(slug)
     if receiver is None:

@@ -1,4 +1,4 @@
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
 from feed_watchdog.domain.interfaces import IRefreshTokenRepository, IUserRepository
@@ -7,7 +7,7 @@ from feed_watchdog.repositories.exceptions import ValueExistsError
 
 
 class MongoUserRepository(IUserRepository):
-    def __init__(self, db: AsyncIOMotorClient) -> None:
+    def __init__(self, db: AsyncIOMotorDatabase) -> None:
         self.db = db
 
     async def get_user_by_id(self, id: str) -> UserInDB | None:
@@ -33,7 +33,7 @@ class MongoUserRepository(IUserRepository):
 
 
 class MongoRefreshTokenRepository(IRefreshTokenRepository):
-    def __init__(self, db: AsyncIOMotorClient) -> None:
+    def __init__(self, db: AsyncIOMotorDatabase) -> None:
         self.db = db
 
     async def get_by_user_id(self, user_id: str) -> list[RefreshToken]:

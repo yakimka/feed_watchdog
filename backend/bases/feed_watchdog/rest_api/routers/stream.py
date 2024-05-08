@@ -1,19 +1,19 @@
-from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
+from picodi import Provide, inject
 from pydantic import BaseModel
 
 from feed_watchdog.domain.interfaces import IStreamRepository, StreamQuery
 from feed_watchdog.domain.models import Stream, StreamWithRelations
-from feed_watchdog.rest_api.container import Container
-from feed_watchdog.rest_api.deps.pagination import Pagination, get_pagination_params
-from feed_watchdog.rest_api.deps.stream import (
+from feed_watchdog.rest_api.dependencies import (
     StreamFetcher,
-    get_by_slug,
     get_stream_fetcher,
-    get_stream_repo,
+    get_stream_repository,
 )
+from feed_watchdog.rest_api.deps.pagination import Pagination, get_pagination_params
+from feed_watchdog.rest_api.deps.stream import get_by_slug
 from feed_watchdog.rest_api.deps.user import get_current_user
 from feed_watchdog.rest_api.routers.core import ListResponse
+from feed_watchdog.rest_api.settings import Settings, get_settings
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
@@ -79,8 +79,9 @@ class StreamListResp(ListResponse):
 
 
 @router.get("/streams/", response_model=StreamListResp)
+@inject
 async def find(
-    fetcher: StreamFetcher = Depends(get_stream_fetcher),
+    fetcher: StreamFetcher = Depends(Provide(get_stream_fetcher)),
     pagination: Pagination = Depends(get_pagination_params),
     q: str = "",
     interval: str | None = Query(None),
@@ -106,23 +107,24 @@ async def find(
 @router.get("/streams/intervals/")
 @inject
 async def get_intervals(
-    intervals=Depends(Provide[Container.config.app.intervals]),
+    settings: Settings = Depends(Provide(get_settings)),
 ) -> list[dict]:
-    return intervals
+    return [interval.model_dump() for interval in settings.app.intervals]
 
 
 @router.get("/streams/message_templates/")
 @inject
 async def get_message_templates(
-    intervals=Depends(Provide[Container.config.app.message_templates]),
+    settings: Settings = Depends(Provide(get_settings)),
 ) -> list[dict]:
-    return intervals
+    return [template.model_dump() for template in settings.app.message_templates]
 
 
 @router.post("/streams/", response_model=StreamResp, status_code=201)
+@inject
 async def add(
     stream: StreamBody = Body(),
-    streams: IStreamRepository = Depends(get_stream_repo),
+    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
 ) -> Stream:
     await streams.add(stream.to_internal())
     result = await streams.get_by_slug(stream.slug)
@@ -132,10 +134,11 @@ async def add(
 
 
 @router.put("/streams/{slug}/", response_model=StreamResp, status_code=201)
+@inject
 async def update(
     slug: str,
     stream: StreamBody = Body(),
-    streams: IStreamRepository = Depends(get_stream_repo),
+    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
 ) -> Stream:
     updated = await streams.update(slug, stream.to_internal())
     if not updated:
@@ -148,6 +151,7 @@ async def update(
 
 
 @router.get("/streams/{slug}/", response_model=StreamResp)
+@inject
 async def detail(
     stream: Stream = Depends(get_by_slug),
 ) -> Stream:
@@ -155,9 +159,10 @@ async def detail(
 
 
 @router.delete("/streams/{slug}/", response_model=None, status_code=204)
+@inject
 async def delete(
     slug: str,
-    streams: IStreamRepository = Depends(get_stream_repo),
+    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
 ) -> None:
     deleted = await streams.delete_by_slug(slug)
     if not deleted:

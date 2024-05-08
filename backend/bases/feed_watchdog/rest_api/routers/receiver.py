@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
+from picodi import Provide, inject
 from pydantic import BaseModel
 
 from feed_watchdog.domain.interfaces import (
@@ -7,9 +8,12 @@ from feed_watchdog.domain.interfaces import (
     ReceiverQuery,
 )
 from feed_watchdog.domain.models import Receiver as ReceiverModel
+from feed_watchdog.rest_api.dependencies import (
+    get_receiver_repository,
+    get_stream_repository,
+)
 from feed_watchdog.rest_api.deps.pagination import Pagination, get_pagination_params
-from feed_watchdog.rest_api.deps.receiver import get_by_slug, get_receiver_repo
-from feed_watchdog.rest_api.deps.stream import get_stream_repo
+from feed_watchdog.rest_api.deps.receiver import get_by_slug
 from feed_watchdog.rest_api.deps.user import get_current_user
 from feed_watchdog.rest_api.routers.core import ListResponse
 
@@ -32,8 +36,9 @@ class Receivers(ListResponse):
 
 
 @router.get("/receivers/", response_model=Receivers)
+@inject
 async def find(
-    receivers: IReceiverRepository = Depends(get_receiver_repo),
+    receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
     q: str = "",
     pagination: Pagination = Depends(get_pagination_params),
 ) -> ListResponse:
@@ -51,9 +56,10 @@ async def find(
 
 
 @router.post("/receivers/", response_model=Receiver, status_code=201)
+@inject
 async def add(
     receiver: Receiver = Body(),
-    receivers: IReceiverRepository = Depends(get_receiver_repo),
+    receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
 ) -> ReceiverModel:
     await receivers.add(receiver.to_domain())
     result = await receivers.get_by_slug(receiver.slug)
@@ -63,10 +69,11 @@ async def add(
 
 
 @router.put("/receivers/{slug}/", response_model=Receiver, status_code=201)
+@inject
 async def update(
     slug: str,
     receiver: Receiver = Body(),
-    receivers: IReceiverRepository = Depends(get_receiver_repo),
+    receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
 ) -> ReceiverModel:
     updated = await receivers.update(slug, receiver.to_domain())
     if not updated:
@@ -79,6 +86,7 @@ async def update(
 
 
 @router.get("/receivers/{slug}/", response_model=Receiver)
+@inject
 async def detail(
     receiver: ReceiverModel = Depends(get_by_slug),
 ) -> ReceiverModel:
@@ -86,10 +94,11 @@ async def detail(
 
 
 @router.delete("/receivers/{slug}/", response_model=None, status_code=204)
+@inject
 async def delete(
     receiver: ReceiverModel = Depends(get_by_slug),
-    receivers: IReceiverRepository = Depends(get_receiver_repo),
-    streams: IStreamRepository = Depends(get_stream_repo),
+    receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
+    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
 ) -> None:
     if await streams.get_by_receiver_slug(receiver.slug):
         raise HTTPException(status_code=409, detail="Receiver is in use")

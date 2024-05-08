@@ -1,15 +1,16 @@
 from datetime import datetime
 
-from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException, status
-from motor.motor_asyncio import AsyncIOMotorClient
+from picodi import Provide, inject
 
 from feed_watchdog.domain.interfaces import IRefreshTokenRepository, IUserRepository
 from feed_watchdog.domain.models import User
-from feed_watchdog.repositories.user import MongoRefreshTokenRepository
 from feed_watchdog.rest_api.auth import InvalidTokenError, decode_token, oauth2_scheme
-from feed_watchdog.rest_api.container import Container
-from feed_watchdog.rest_api.deps.mongo import get_db
+from feed_watchdog.rest_api.dependencies import (
+    get_refresh_token_repository,
+    get_user_repository,
+)
+from feed_watchdog.rest_api.settings import Settings, get_settings
 
 INVALID_CREDENTIALS_EXC = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -18,20 +19,14 @@ INVALID_CREDENTIALS_EXC = HTTPException(
 )
 
 
-async def get_refresh_token_repo(
-    db: AsyncIOMotorClient = Depends(get_db),
-) -> IRefreshTokenRepository:
-    return MongoRefreshTokenRepository(db)
-
-
 @inject
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    user_repo: IUserRepository = Depends(Provide[Container.user_repository]),
-    secret: str = Depends(Provide[Container.config.auth.jwt_secret_key]),
+    user_repo: IUserRepository = Depends(Provide(get_user_repository)),
+    settings: Settings = Depends(Provide(get_settings)),
 ) -> User:
     try:
-        token_data = decode_token(token, secret=secret)
+        token_data = decode_token(token, secret=settings.auth.jwt_secret_key)
     except InvalidTokenError:
         raise INVALID_CREDENTIALS_EXC from None
 
@@ -53,11 +48,13 @@ async def get_current_user(
 @inject
 async def get_user_id_from_refresh_token(
     token: str = Depends(oauth2_scheme),
-    secret: str = Depends(Provide[Container.config.auth.jwt_refresh_secret_key]),
-    refresh_token_repo: IRefreshTokenRepository = Depends(get_refresh_token_repo),
+    refresh_token_repo: IRefreshTokenRepository = Depends(
+        Provide(get_refresh_token_repository)
+    ),
+    settings: Settings = Depends(Provide(get_settings)),
 ) -> str:
     try:
-        token_data = decode_token(token, secret=secret)
+        token_data = decode_token(token, secret=settings.auth.jwt_refresh_secret_key)
     except InvalidTokenError:
         raise INVALID_CREDENTIALS_EXC from None
 

@@ -15,4 +15,4 @@ class Publisher:
         encoded_data = {
             key: json.dumps(value).encode("utf-8") for key, value in data.items()
         }
-        await self._redis_client.xadd(channel, encoded_data)  # type: ignore[arg-type]
+        await self._redis_client.xadd(channel, encoded_data)

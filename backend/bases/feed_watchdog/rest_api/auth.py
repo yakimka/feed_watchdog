@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Union
 
-from dependency_injector.wiring import Provide, inject
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
+from picodi import Provide, inject
 from pydantic import BaseModel, ValidationError
 
-from feed_watchdog.rest_api.container import Container
+from feed_watchdog.rest_api.dependencies import get_option
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login", scheme_name="JWT")
 
@@ -26,9 +26,9 @@ def _create_token(
 @inject
 def create_access_token(
     subject: Union[str, Any],
-    expires_minutes: int = Provide[Container.config.auth.access_token_expire_minutes],
-    secret: str = Provide[Container.config.auth.jwt_secret_key],
-    algorithm: str = Provide[Container.config.auth.algorithm],
+    expires_minutes: int = Provide(get_option("auth.access_token_expire_minutes")),
+    secret: str = Provide(get_option("auth.jwt_secret_key")),
+    algorithm: str = Provide(get_option("auth.algorithm")),
 ) -> str:
     return _create_token(
         subject,
@@ -41,9 +41,9 @@ def create_access_token(
 @inject
 def create_refresh_token(
     subject: Union[str, Any],
-    expires_minutes: int = Provide[Container.config.auth.refresh_token_expire_minutes],
-    secret: str = Provide[Container.config.auth.jwt_refresh_secret_key],
-    algorithm: str = Provide[Container.config.auth.algorithm],
+    expires_minutes: int = Provide(get_option("auth.refresh_token_expire_minutes")),
+    secret: str = Provide(get_option("auth.jwt_refresh_secret_key")),
+    algorithm: str = Provide(get_option("auth.algorithm")),
 ) -> str:
     return _create_token(
         subject,
@@ -67,7 +67,7 @@ def decode_token(
     token: str,
     *,
     secret: str,
-    algorithms: list[str] = Provide[Container.config.auth.decode_algorithms]
+    algorithms: list[str] = Provide(get_option("auth.decode_algorithms")),
 ) -> TokenPayload:
     try:
         payload = jwt.decode(token, secret, algorithms=algorithms)
