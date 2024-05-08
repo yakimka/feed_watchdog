@@ -67,7 +67,7 @@ async def login(
 @router.post("/user/refresh_token/", response_model=TokenResponse)
 async def refresh(
     token: str = Depends(oauth2_scheme),
-    user_id: str = Depends(Provide(get_user_id_from_refresh_token)),
+    user_id: str = Depends(get_user_id_from_refresh_token),
 ):
     return {
         "access_token": create_access_token(user_id),

@@ -15,7 +15,7 @@ from feed_watchdog.rest_api.deps.user import get_current_user
 from feed_watchdog.rest_api.routers.core import ListResponse
 from feed_watchdog.rest_api.settings import Settings, get_settings
 
-router = APIRouter(dependencies=[Depends(Provide(get_current_user))])
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 class ModifierResp(BaseModel):
@@ -153,7 +153,7 @@ async def update(
 @router.get("/streams/{slug}/", response_model=StreamResp)
 @inject
 async def detail(
-    stream: Stream = Depends(Provide(get_by_slug)),
+    stream: Stream = Depends(get_by_slug),
 ) -> Stream:
     return stream
 

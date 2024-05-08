@@ -29,8 +29,8 @@ if TYPE_CHECKING:
     from feed_watchdog.domain.models import StreamWithRelations
 
 
-@inject
 @resource
+@inject
 async def get_redis(
     settings: Settings = Provide(get_settings),
 ) -> AsyncGenerator[aioredis.Redis, None]:
@@ -46,8 +46,8 @@ def get_publisher(redis: aioredis.Redis = Provide(get_redis)) -> Publisher:
     return Publisher(redis)
 
 
-@inject
 @resource
+@inject
 async def get_mongo_db(
     settings: Settings = Provide(get_settings),
 ) -> AsyncGenerator[AsyncIOMotorDatabase, None]:

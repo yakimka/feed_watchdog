@@ -17,7 +17,7 @@ from feed_watchdog.rest_api.deps.source import get_by_slug
 from feed_watchdog.rest_api.deps.user import get_current_user
 from feed_watchdog.rest_api.routers.core import ListResponse
 
-router = APIRouter(dependencies=[Depends(Provide(get_current_user))])
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 class Source(BaseModel):
@@ -107,7 +107,7 @@ async def detail(
 @router.delete("/sources/{slug}/", response_model=None, status_code=204)
 @inject
 async def delete(
-    source: SourceModel = Depends(Provide(get_by_slug)),
+    source: SourceModel = Depends(get_by_slug),
     sources: ISourceRepository = Depends(Provide(get_source_repository)),
     streams: IStreamRepository = Depends(Provide(get_stream_repository)),
 ) -> None:

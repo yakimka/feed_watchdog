@@ -22,8 +22,8 @@ INVALID_CREDENTIALS_EXC = HTTPException(
 @inject
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    user_repo: IUserRepository = Provide(get_user_repository),
-    settings: Settings = Provide(get_settings),
+    user_repo: IUserRepository = Depends(Provide(get_user_repository)),
+    settings: Settings = Depends(Provide(get_settings)),
 ) -> User:
     try:
         token_data = decode_token(token, secret=settings.auth.jwt_secret_key)
@@ -48,8 +48,10 @@ async def get_current_user(
 @inject
 async def get_user_id_from_refresh_token(
     token: str = Depends(oauth2_scheme),
-    refresh_token_repo: IRefreshTokenRepository = Provide(get_refresh_token_repository),
-    settings: Settings = Provide(get_settings),
+    refresh_token_repo: IRefreshTokenRepository = Depends(
+        Provide(get_refresh_token_repository)
+    ),
+    settings: Settings = Depends(Provide(get_settings)),
 ) -> str:
     try:
         token_data = decode_token(token, secret=settings.auth.jwt_refresh_secret_key)

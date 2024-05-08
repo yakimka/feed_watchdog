@@ -17,7 +17,7 @@ from feed_watchdog.rest_api.deps.receiver import get_by_slug
 from feed_watchdog.rest_api.deps.user import get_current_user
 from feed_watchdog.rest_api.routers.core import ListResponse
 
-router = APIRouter(dependencies=[Depends(Provide(get_current_user))])
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 class Receiver(BaseModel):
@@ -88,7 +88,7 @@ async def update(
 @router.get("/receivers/{slug}/", response_model=Receiver)
 @inject
 async def detail(
-    receiver: ReceiverModel = Depends(Provide(get_by_slug)),
+    receiver: ReceiverModel = Depends(get_by_slug),
 ) -> ReceiverModel:
     return receiver
 
@@ -96,7 +96,7 @@ async def detail(
 @router.delete("/receivers/{slug}/", response_model=None, status_code=204)
 @inject
 async def delete(
-    receiver: ReceiverModel = Depends(Provide(get_by_slug)),
+    receiver: ReceiverModel = Depends(get_by_slug),
     receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
     streams: IStreamRepository = Depends(Provide(get_stream_repository)),
 ) -> None:

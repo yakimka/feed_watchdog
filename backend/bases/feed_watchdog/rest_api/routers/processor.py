@@ -5,7 +5,7 @@ from feed_watchdog.domain.interfaces import IProcessorsConfigurationRepository
 from feed_watchdog.rest_api.dependencies import get_processors_conf_repository
 from feed_watchdog.rest_api.deps.user import get_current_user
 
-router = APIRouter(dependencies=[Depends(Provide(get_current_user))])
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 @router.get("/processors/config/{handler}/")
