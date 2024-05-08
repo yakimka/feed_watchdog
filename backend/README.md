@@ -31,3 +31,17 @@ make run-command args="migrate"
 ```bash
 make run-command args="create_user"
 ```
+
+### Working with polylith
+
+1. Check projectstructure:
+
+```bash
+make poetry args="poly check --alias python-jose=jose"
+```
+
+2. Sow info about libs:
+
+```bash
+make poetry args="poly libs --alias python-jose=jose"
+```
