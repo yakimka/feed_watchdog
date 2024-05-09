@@ -2,16 +2,20 @@ import json
 import logging
 from typing import Any, AsyncGenerator, Literal
 
+from picodi import Provide, inject
 from redis import asyncio as aioredis
+
+from feed_watchdog.workers.dependencies import get_pub_sub_redis_client
 
 logger = logging.getLogger(__name__)
 
 
 class Subscriber:
+    @inject
     def __init__(
         self,
         *,
-        redis_client: aioredis.Redis,
+        redis_client: aioredis.Redis = Provide(get_pub_sub_redis_client),
         topic_name: str,
         group_id: str,
         consumer_id: str,

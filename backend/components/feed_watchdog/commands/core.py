@@ -2,14 +2,14 @@ import importlib
 from argparse import ArgumentParser, Namespace
 from inspect import isclass
 from pathlib import Path
-from typing import Generator
+from typing import Awaitable, Generator
 
 
 class BaseCommand:
     def setup(self) -> None:
         pass
 
-    def handle(self, args: Namespace) -> None:
+    def handle(self, args: Namespace) -> Awaitable | None:
         raise NotImplementedError
 
     def add_arguments(self, parser: ArgumentParser) -> None:
