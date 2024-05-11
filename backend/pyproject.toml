@@ -37,14 +37,13 @@ aiogram = {version = "^2.20"}
 APScheduler = "^3.10.4"
 async-timeout = {version = "^4.0.2"}
 dacite = "^1.8.0"
-dependency-injector = "^4.41.0"
 fastapi = "^0.111.0"
 feedparser = {version = "^6.0.10"}
 httpx = {version = "^0.25.0"}
 mongodex = "^0.0.1"
 motor = "^3.2.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-picodi = "^0.4.3"
+picodi = "^0.5.0"
 pydantic-settings = "^2.0.2"
 python-decouple = "^3.6"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}

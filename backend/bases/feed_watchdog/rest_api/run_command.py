@@ -2,25 +2,28 @@ import argparse
 import logging
 from pathlib import Path
 
-from feed_watchdog.commands.core import parse_command_and_args
-from feed_watchdog.rest_api.container import wire_modules
+import picodi
+
+from feed_watchdog.commands.core import choose_and_setup_command, find_commands_in_dir
 
 CURR_DIR = Path(__file__).parent
 
 
 def main() -> None:
     setup()
+    commands = list(
+        find_commands_in_dir(CURR_DIR / "commands", "feed_watchdog.rest_api.commands")
+    )
+    picodi.init_resources()
     parser = argparse.ArgumentParser()
-    worker, args = parse_command_and_args(
+    worker, args = choose_and_setup_command(
         parser=parser,
-        path_to_commands=CURR_DIR / "commands",
-        import_path="feed_watchdog.rest_api.commands",
+        commands_to_setup=commands,
     )
     worker.handle(args)
 
 
 def setup() -> None:
-    wire_modules()
     logging.basicConfig(level=logging.INFO)
 
 

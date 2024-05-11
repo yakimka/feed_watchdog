@@ -76,6 +76,7 @@ def main(argv: list[str]) -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=8001)
     args = parser.parse_args(argv[1:])
+    print("Starting server on port", args.port)
     run_server(port=args.port)
 
 

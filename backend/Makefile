@@ -64,8 +64,13 @@ clean-all:  ## Clean up all
 	rm -rf .mypy_cache
 	rm -rf .pytest_cache
 
-.PHONY: run-command
-run-command:  ## Run command with args
+.PHONY: run-module
+run-module:  ## Run command with args
+	$(RUN) poetry run python -m $(args)
+
+
+.PHONY: run-api-command
+run-api-command:  ## Run command with args
 	$(RUN) poetry run python -m feed_watchdog.rest_api.run_command $(args)
 
 .PHONY: help

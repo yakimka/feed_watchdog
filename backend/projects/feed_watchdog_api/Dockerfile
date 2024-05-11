@@ -5,12 +5,11 @@ FROM $FRONTEND_IMAGE as frontend
 FROM python:3.11-slim-bullseye as builder
 
 ARG WHEEL=feed_watchdog_api-0.1.0-py3-none-any.whl
-ENV VENV=/venv
-ENV PATH="$VENV/bin:$PATH"
+ENV VIRTUAL_ENV=/venv
 
 WORKDIR /code
 
-RUN python -m venv $VENV
+RUN python -m venv $VIRTUAL_ENV
 
 # for caching purposes in CI
 # waiting for https://github.com/moby/buildkit/issues/1512
@@ -34,10 +33,10 @@ COPY --from=frontend /app/frontend/dist /frontend
 
 RUN useradd -M appuser --uid=1000 --shell=/bin/false
 USER appuser
+ENV VIRTUAL_ENV=/venv
 
-ENV PATH="/venv/bin:$PATH"
 WORKDIR /opt/app
 
-COPY --from=builder /venv /venv
+COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
 
 CMD ["uvicorn", "feed_watchdog.rest_api.core:app", "--host", "0.0.0.0", "--port", "8000"]
