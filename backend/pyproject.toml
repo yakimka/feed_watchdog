@@ -56,7 +56,7 @@ tldextract = {version = "^3.2.1"}
 uvicorn = {extras = ["standart"], version = "^0.29.0"}
 
 [tool.poetry.group.dev.dependencies]
-hypothesis = "^6.46.3"
+hypothesis = "^6.100.6"
 isort = "^5.10.1"
 mypy = "^1.5.1"
 pre-commit = "^3.3.3"
