@@ -39,4 +39,5 @@ class CreateUserCommand(BaseCommand):
             password=hash_password(user_data.password),
         )
         await user_repo.create_user(new_user)
+        print("Created user with ID:", new_user.id)
         return new_user

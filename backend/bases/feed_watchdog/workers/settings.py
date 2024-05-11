@@ -32,6 +32,7 @@ class Settings(BaseSettings):
         env_prefix="FW_WRK_",
         env_nested_delimiter="__",
         env_file=".env",
+        extra="ignore",
     )
 
 
