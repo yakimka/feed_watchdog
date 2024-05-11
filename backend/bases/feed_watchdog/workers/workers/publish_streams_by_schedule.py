@@ -21,19 +21,13 @@ logger = logging.getLogger(__name__)
 
 
 class ProcessStreamsByScheduleWorker(BaseCommand):
-    def handle(self, args) -> None:  # noqa: U100
-        loop = asyncio.new_event_loop()
-        loop.create_task(self._run_scheduler())
-        try:
-            loop.run_forever()
-        finally:
-            loop.close()
-
-    async def _run_scheduler(self) -> None:
+    async def handle(self, args) -> None:  # noqa: U100
         logger.info("Starting scheduler")
         scheduler = AsyncIOScheduler()
         await add_interval_jobs(scheduler)
         scheduler.start()
+        while True:
+            await asyncio.sleep(1000)
 
 
 @inject
