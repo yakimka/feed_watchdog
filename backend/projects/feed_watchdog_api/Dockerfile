@@ -34,6 +34,7 @@ COPY --from=frontend /app/frontend/dist /frontend
 RUN useradd -M appuser --uid=1000 --shell=/bin/false
 USER appuser
 ENV VIRTUAL_ENV=/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /opt/app
 
