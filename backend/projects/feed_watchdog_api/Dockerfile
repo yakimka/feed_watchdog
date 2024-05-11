@@ -6,6 +6,7 @@ FROM python:3.11-slim-bullseye as builder
 
 ARG WHEEL=feed_watchdog_api-0.1.0-py3-none-any.whl
 ENV VIRTUAL_ENV=/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /code
 
