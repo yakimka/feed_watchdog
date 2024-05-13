@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
+import picodi
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
-from picodi import picodi
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette_exporter import PrometheusMiddleware, handle_metrics
