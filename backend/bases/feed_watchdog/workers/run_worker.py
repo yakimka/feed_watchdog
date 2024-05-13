@@ -10,6 +10,7 @@ from picodi import Provide, inject
 from feed_watchdog.commands.core import choose_and_setup_command, find_commands_in_dir
 from feed_watchdog.handlers import init_handlers_config
 from feed_watchdog.sentry.setup import setup_logging as setup_sentry_logging
+from feed_watchdog.workers.dependencies import init_lock
 from feed_watchdog.workers.settings import Settings, get_settings
 
 CURR_DIR = Path(__file__).parent
@@ -24,6 +25,7 @@ async def main() -> None:
         )
     )
     await picodi.init_resources()
+    await init_lock()
 
     parser = argparse.ArgumentParser()
     worker, args = choose_and_setup_command(

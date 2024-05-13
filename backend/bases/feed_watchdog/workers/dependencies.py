@@ -7,6 +7,7 @@ from redis import asyncio as aioredis
 from feed_watchdog.api_client.client import FeedWatchdogAPIClient
 from feed_watchdog.pubsub.publisher import Publisher
 from feed_watchdog.repositories.post import RedisPostRepository
+from feed_watchdog.synchronize import lock
 from feed_watchdog.workers.settings import Settings, get_settings
 
 
@@ -43,6 +44,13 @@ async def get_storage_redis_client(
         yield redis
     finally:
         await redis.aclose()  # type: ignore[attr-defined]
+
+
+@inject
+async def init_lock(
+    redis: aioredis.Redis = Provide(get_storage_redis_client),
+) -> None:
+    return lock.init(redis)
 
 
 @resource

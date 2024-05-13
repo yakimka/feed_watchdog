@@ -24,6 +24,7 @@ from feed_watchdog.repositories.user import (
     MongoUserRepository,
 )
 from feed_watchdog.rest_api.settings import Settings, get_settings
+from feed_watchdog.synchronize import lock
 
 if TYPE_CHECKING:
     from feed_watchdog.domain.models import StreamWithRelations
@@ -39,6 +40,13 @@ async def get_redis(
         yield redis
     finally:
         await redis.aclose()  # type: ignore[attr-defined]
+
+
+@inject
+async def init_lock(
+    redis: aioredis.Redis = Provide(get_redis),
+) -> None:
+    return lock.init(redis)
 
 
 @inject
