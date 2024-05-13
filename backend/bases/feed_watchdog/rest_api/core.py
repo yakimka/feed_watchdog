@@ -1,14 +1,15 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
+import picodi
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
-from picodi import picodi
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 
 from feed_watchdog.repositories.exceptions import ValueExistsError
+from feed_watchdog.rest_api.dependencies import init_lock
 from feed_watchdog.rest_api.errors import ErrorResponse, FieldError
 from feed_watchdog.rest_api.routers import router
 from feed_watchdog.rest_api.settings import get_settings
@@ -21,6 +22,7 @@ setup_sentry.setup_fastapi(settings.sentry.dsn)
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: U100
     await picodi.init_resources()
+    await init_lock()
     yield
     await picodi.shutdown_resources()
 
