@@ -39,15 +39,15 @@ services:
 
   publish_streams_by_schedule_worker:
     <<: *fw-worker-common
-    command: python -m feed_watchdog.workers.run_worker publish_streams_by_schedule
+    command: poetry run python -m feed_watchdog.workers.run_worker publish_streams_by_schedule
 
   fetch_posts_from_streams_worker:
     <<: *fw-worker-common
-    command: python -m feed_watchdog.workers.run_worker fetch_posts_from_streams
+    command: poetry run python -m feed_watchdog.workers.run_worker fetch_posts_from_streams
 
   send_messages_worker:
     <<: *fw-worker-common
-    command: python -m feed_watchdog.workers.run_worker send_messages
+    command: poetry run python -m feed_watchdog.workers.run_worker send_messages
 
   mock_feed_server:
     image: feed_watchdog:dev
