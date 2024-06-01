@@ -98,7 +98,7 @@ class SqliteRefreshTokenRepository(IRefreshTokenRepository):
 
     async def create(self, refresh_token: RefreshToken) -> str:
         cursor = self._conn.execute(
-            "INSERT INTO refresh_tokens (user_id, token) VALUES (?, ?, ?)",
+            "INSERT INTO refresh_tokens (user_id, token) VALUES (?, ?)",
             (refresh_token.user_id, refresh_token.token),
         )
         self._conn.commit()

@@ -29,14 +29,14 @@ def sqlite_conn():
         yield conn
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def user_repo(sqlite_conn):
     user_repo_ = SqliteUserRepository(sqlite_conn)
     with picodi.registry.override(get_user_repository, lambda: user_repo_):
         yield user_repo_
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def refresh_token_repo(sqlite_conn):
     refresh_token_repo_ = SqliteRefreshTokenRepository(sqlite_conn)
     with picodi.registry.override(
