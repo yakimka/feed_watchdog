@@ -1,4 +1,3 @@
-import sqlite3
 from contextlib import closing
 
 import picodi
@@ -20,9 +19,7 @@ from feed_watchdog.rest_api.dependencies import (
 @pytest.fixture(autouse=True)
 async def _setup_picodi():
     yield
-    singleton = picodi._picodi._scopes[picodi._picodi.SingletonScope]
-    singleton._store.clear()
-    await picodi.shutdown_resources()
+    await picodi.shutdown_dependencies()
 
 
 @pytest.fixture()

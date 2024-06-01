@@ -13,7 +13,6 @@ def create_tables(conn: sqlite3.Connection) -> None:
             id INTEGER PRIMARY KEY,
             user_id TEXT NOT NULL,
             token TEXT UNIQUE NOT NULL,
-            created_at TIMESTAMP NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
         );
         """)

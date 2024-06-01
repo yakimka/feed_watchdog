@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, AsyncGenerator, Callable, Protocol
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from picodi import Provide, inject, resource
+from picodi import Provide, SingletonScope, dependency, inject
 from redis import asyncio as aioredis
 
 from feed_watchdog.domain.interfaces import (
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from feed_watchdog.domain.models import StreamWithRelations
 
 
-@resource
+@dependency(scope_class=SingletonScope)
 @inject
 async def get_redis(
     settings: Settings = Provide(get_settings),
@@ -54,7 +54,7 @@ def get_publisher(redis: aioredis.Redis = Provide(get_redis)) -> Publisher:
     return Publisher(redis)
 
 
-@resource
+@dependency(scope_class=SingletonScope)
 @inject
 async def get_mongo_db(
     settings: Settings = Provide(get_settings),

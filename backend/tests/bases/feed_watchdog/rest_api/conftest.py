@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from feed_watchdog.domain.models import UserInDB
 from feed_watchdog.rest_api.core import app as fw_app
 from feed_watchdog.utils.security import hash_password
+
+if TYPE_CHECKING:
+    from fastapi import FastAPI
 
 
 @pytest.fixture()
