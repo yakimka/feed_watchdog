@@ -1848,13 +1848,13 @@ full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7
 
 [[package]]
 name = "starlette-exporter"
-version = "0.21.0"
+version = "0.22.0"
 description = "Prometheus metrics exporter for Starlette applications."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "starlette_exporter-0.21.0-py3-none-any.whl", hash = "sha256:f6c66fe241c7cc3634ba9d35231684bffb620ea35671e71cd788c26a50a7caaa"},
-    {file = "starlette_exporter-0.21.0.tar.gz", hash = "sha256:ca513b173003439303e931f467054c9fe75e7c98439f2ae17e94c9c3bcf18dfd"},
+    {file = "starlette_exporter-0.22.0-py3-none-any.whl", hash = "sha256:62b848a632b7eea673c820e1c004a69c166870585c9e3dc2f1f535526486e1d7"},
+    {file = "starlette_exporter-0.22.0.tar.gz", hash = "sha256:90adda8b318ea789beba0b31018c7cafabb0938bc9cf6b6b6de460d5336b3d9c"},
 ]
 
 [package.dependencies]
@@ -2396,4 +2396,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5bda2af01bb76d31d4df3e529256dd46aee639044f171ee7036fd84ae45bd323"
+content-hash = "7967090ed128464623d39288a8e43c28e15b21f5c3cc2aa0b4c09802c9262c5f"
