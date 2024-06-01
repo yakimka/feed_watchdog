@@ -24,7 +24,7 @@ async def main() -> None:
             import_path="feed_watchdog.workers.workers",
         )
     )
-    await picodi.init_resources()
+    await picodi.init_dependencies()
     await init_lock()
 
     parser = argparse.ArgumentParser()
@@ -38,7 +38,7 @@ async def main() -> None:
         if inspect.isawaitable(result):
             await result
     finally:
-        await picodi.shutdown_resources()
+        await picodi.shutdown_dependencies()
 
 
 @inject

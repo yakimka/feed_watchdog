@@ -21,10 +21,10 @@ setup_sentry.setup_fastapi(settings.sentry.dsn)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: U100
-    await picodi.init_resources()
+    await picodi.init_dependencies()
     await init_lock()
     yield
-    await picodi.shutdown_resources()
+    await picodi.shutdown_dependencies()
 
 
 app = FastAPI(lifespan=lifespan)

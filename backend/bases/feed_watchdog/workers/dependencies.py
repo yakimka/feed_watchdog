@@ -1,7 +1,7 @@
 from typing import Any, AsyncGenerator, Callable
 
 import httpx
-from picodi import Provide, inject, resource
+from picodi import Provide, SingletonScope, dependency, inject
 from redis import asyncio as aioredis
 
 from feed_watchdog.api_client.client import FeedWatchdogAPIClient
@@ -34,7 +34,7 @@ def get_httpx_stream_client(
     return httpx.AsyncClient(headers=headers, transport=transport, timeout=timeout)
 
 
-@resource
+@dependency(scope_class=SingletonScope)
 @inject
 async def get_storage_redis_client(
     settings: Settings = Provide(get_settings),
@@ -53,7 +53,7 @@ async def init_lock(
     return lock.init(redis)
 
 
-@resource
+@dependency(scope_class=SingletonScope)
 @inject
 async def get_pub_sub_redis_client(
     settings: Settings = Provide(get_settings),

@@ -14,7 +14,7 @@ def main() -> None:
     commands = list(
         find_commands_in_dir(CURR_DIR / "commands", "feed_watchdog.rest_api.commands")
     )
-    picodi.init_resources()
+    picodi.init_dependencies()
     parser = argparse.ArgumentParser()
     worker, args = choose_and_setup_command(
         parser=parser,
