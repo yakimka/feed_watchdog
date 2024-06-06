@@ -44,7 +44,7 @@ mongodex = "^0.0.1"
 motor = "^3.2.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 picodi = "^0.10.0"
-pydantic-settings = "^2.0.2"
+pydantic-settings = "^2.3.1"
 python-decouple = "^3.6"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 python-multipart = "^0.0.9"
