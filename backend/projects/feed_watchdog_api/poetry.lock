@@ -1264,13 +1264,13 @@ totp = ["cryptography"]
 
 [[package]]
 name = "picodi"
-version = "0.10.0"
+version = "0.16.0"
 description = "Simple Dependency Injection for Python"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "picodi-0.10.0-py3-none-any.whl", hash = "sha256:9b096d6a6b2d6af12c4cb10f59d37437088f006fe6d4085ab2cc2e0bce31cdb2"},
-    {file = "picodi-0.10.0.tar.gz", hash = "sha256:a4957a439c4b6e30555b4b147e17b689114272bb38de53ea57e6e3164008068a"},
+    {file = "picodi-0.16.0-py3-none-any.whl", hash = "sha256:492fb1c6593c1b1ca30d6df7d13549aff967c11a30d9c3db6a9ebc0cc425ee7a"},
+    {file = "picodi-0.16.0.tar.gz", hash = "sha256:0fe502676d591f606bfbf94adc953337a2a42970ba592aea419ac25f9fc813ba"},
 ]
 
 [[package]]
@@ -2396,4 +2396,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "7967090ed128464623d39288a8e43c28e15b21f5c3cc2aa0b4c09802c9262c5f"
+content-hash = "48693da135ac3b192104b7d069ba900a27f9b2e7dff0e1612cbf602761799dfe"
