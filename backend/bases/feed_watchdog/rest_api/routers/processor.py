@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
-from picodi import Provide, inject
+from picodi import inject
+from picodi.integrations.fastapi import Provide
 
 from feed_watchdog.domain.interfaces import IProcessorsConfigurationRepository
 from feed_watchdog.rest_api.dependencies import get_processors_conf_repository

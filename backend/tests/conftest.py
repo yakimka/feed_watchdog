@@ -18,6 +18,7 @@ from feed_watchdog.rest_api.dependencies import (
 
 @pytest.fixture(autouse=True)
 async def _setup_picodi():
+    await picodi.init_dependencies()
     yield
     await picodi.shutdown_dependencies()
 
@@ -32,7 +33,7 @@ def sqlite_conn():
 @pytest.fixture(autouse=True)
 def user_repo(sqlite_conn):
     user_repo_ = SqliteUserRepository(sqlite_conn)
-    with picodi.registry.override(get_user_repository, lambda: user_repo_):
+    with picodi.registry.override(get_user_repository, lambda *_, **__: user_repo_):
         yield user_repo_
 
 
@@ -40,7 +41,7 @@ def user_repo(sqlite_conn):
 def refresh_token_repo(sqlite_conn):
     refresh_token_repo_ = SqliteRefreshTokenRepository(sqlite_conn)
     with picodi.registry.override(
-        get_refresh_token_repository, lambda: refresh_token_repo_
+        get_refresh_token_repository, lambda *_, **__: refresh_token_repo_
     ):
         yield refresh_token_repo_
 
@@ -56,3 +57,4 @@ async def redis_pubsub_server(redis_pubsub_server_url) -> aioredis.Redis:
     await redis.ping()
     yield redis
     await redis.flushdb()
+    await redis.close()

@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, AsyncGenerator, Callable, Protocol
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from picodi import Provide, SingletonScope, dependency, inject
+from picodi import SingletonScope, dependency, inject
+from picodi.integrations.fastapi import Provide
 from redis import asyncio as aioredis
 
 from feed_watchdog.domain.interfaces import (
@@ -36,10 +37,8 @@ async def get_redis(
     settings: Settings = Provide(get_settings),
 ) -> AsyncGenerator[aioredis.Redis, None]:
     redis = aioredis.from_url(url=settings.redis.pub_sub_url)
-    try:
-        yield redis
-    finally:
-        await redis.aclose()  # type: ignore[attr-defined]
+    async with redis as conn:
+        yield conn
 
 
 @inject
@@ -59,7 +58,7 @@ def get_publisher(redis: aioredis.Redis = Provide(get_redis)) -> Publisher:
 async def get_mongo_db(
     settings: Settings = Provide(get_settings),
 ) -> AsyncGenerator[AsyncIOMotorDatabase, None]:
-    client = AsyncIOMotorClient(settings.mongo.url)
+    client: AsyncIOMotorClient = AsyncIOMotorClient(settings.mongo.url)
     try:
         yield client.get_database()
     finally:

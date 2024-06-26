@@ -1,4 +1,5 @@
-from picodi import Provide, inject
+from picodi import inject
+from picodi.integrations.fastapi import Provide
 
 from feed_watchdog.commands.core import BaseCommand
 from feed_watchdog.migrations.mongo import migrate

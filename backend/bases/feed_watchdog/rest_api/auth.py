@@ -3,7 +3,8 @@ from typing import Any, Union
 
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
-from picodi import Provide, inject
+from picodi import inject
+from picodi.integrations.fastapi import Provide
 from pydantic import BaseModel, ValidationError
 
 from feed_watchdog.rest_api.dependencies import get_option

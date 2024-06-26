@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from picodi import Provide, inject
+from picodi import inject
+from picodi.integrations.fastapi import Provide
 from pydantic import BaseModel, Field
 
 from feed_watchdog.domain.interfaces import (
@@ -41,7 +42,7 @@ class Sources(ListResponse):
 @router.get("/sources/", response_model=Sources)
 @inject
 async def find(
-    sources: ISourceRepository = Depends(Provide(get_source_repository)),
+    sources: ISourceRepository = Provide(get_source_repository, wrap=True),
     q: str = "",
     pagination: Pagination = Depends(get_pagination_params),
 ) -> ListResponse:
@@ -61,7 +62,7 @@ async def find(
 @router.get("/sources/tags/", response_model=list[str])
 @inject
 async def tags(
-    sources: ISourceRepository = Depends(Provide(get_source_repository)),
+    sources: ISourceRepository = Provide(get_source_repository, wrap=True),
 ) -> list[str]:
     return await sources.get_all_tags()
 
@@ -70,7 +71,7 @@ async def tags(
 @inject
 async def add(
     source: Source = Body(),
-    sources: ISourceRepository = Depends(Provide(get_source_repository)),
+    sources: ISourceRepository = Provide(get_source_repository, wrap=True),
 ) -> SourceModel:
     await sources.add(source.to_domain())
     result = await sources.get_by_slug(source.slug)
@@ -84,7 +85,7 @@ async def add(
 async def update(
     slug: str,
     source: Source = Body(),
-    sources: ISourceRepository = Depends(Provide(get_source_repository)),
+    sources: ISourceRepository = Provide(get_source_repository, wrap=True),
 ) -> SourceModel:
     updated = await sources.update(slug, source.to_domain())
     if not updated:
@@ -108,8 +109,8 @@ async def detail(
 @inject
 async def delete(
     source: SourceModel = Depends(get_by_slug),
-    sources: ISourceRepository = Depends(Provide(get_source_repository)),
-    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
+    sources: ISourceRepository = Provide(get_source_repository, wrap=True),
+    streams: IStreamRepository = Provide(get_stream_repository, wrap=True),
 ) -> None:
     if await streams.get_by_source_slug(source.slug):
         raise HTTPException(status_code=409, detail="Source is in use")
