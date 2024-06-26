@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from picodi import Provide, inject
+from picodi import inject
+from picodi.integrations.fastapi import Provide
 from pydantic import BaseModel
 
 from feed_watchdog.domain.interfaces import IRefreshTokenRepository, IUserRepository
@@ -35,7 +36,7 @@ class LoginData(BaseModel):
 @inject
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    user_repo: IUserRepository = Depends(Provide(get_user_repository)),
+    user_repo: IUserRepository = Provide(get_user_repository, wrap=True),
     refresh_token_repo: IRefreshTokenRepository = Depends(
         Provide(get_refresh_token_repository)
     ),

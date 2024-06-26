@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from picodi import Provide, inject
+from picodi import inject
+from picodi.integrations.fastapi import Provide
 from pydantic import BaseModel
 
 from feed_watchdog.domain.interfaces import (
@@ -38,7 +39,7 @@ class Receivers(ListResponse):
 @router.get("/receivers/", response_model=Receivers)
 @inject
 async def find(
-    receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
+    receivers: IReceiverRepository = Provide(get_receiver_repository, wrap=True),
     q: str = "",
     pagination: Pagination = Depends(get_pagination_params),
 ) -> ListResponse:
@@ -59,7 +60,7 @@ async def find(
 @inject
 async def add(
     receiver: Receiver = Body(),
-    receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
+    receivers: IReceiverRepository = Provide(get_receiver_repository, wrap=True),
 ) -> ReceiverModel:
     await receivers.add(receiver.to_domain())
     result = await receivers.get_by_slug(receiver.slug)
@@ -73,7 +74,7 @@ async def add(
 async def update(
     slug: str,
     receiver: Receiver = Body(),
-    receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
+    receivers: IReceiverRepository = Provide(get_receiver_repository, wrap=True),
 ) -> ReceiverModel:
     updated = await receivers.update(slug, receiver.to_domain())
     if not updated:
@@ -97,8 +98,8 @@ async def detail(
 @inject
 async def delete(
     receiver: ReceiverModel = Depends(get_by_slug),
-    receivers: IReceiverRepository = Depends(Provide(get_receiver_repository)),
-    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
+    receivers: IReceiverRepository = Provide(get_receiver_repository, wrap=True),
+    streams: IStreamRepository = Provide(get_stream_repository, wrap=True),
 ) -> None:
     if await streams.get_by_receiver_slug(receiver.slug):
         raise HTTPException(status_code=409, detail="Receiver is in use")

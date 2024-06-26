@@ -1,5 +1,5 @@
-def test_cant_login_with_wrong_password(client):
-    response = client.post(
+async def test_cant_login_with_wrong_password(client):
+    response = await client.post(
         "/api/user/login", data={"username": "me@me.com", "password": "wrong"}
     )
 
@@ -7,8 +7,8 @@ def test_cant_login_with_wrong_password(client):
     assert response.json() == {"detail": "Incorrect email or password"}
 
 
-def test_can_login(client, admin_user):
-    response = client.post(
+async def test_can_login(client, admin_user):
+    response = await client.post(
         "/api/user/login", data={"username": admin_user.email, "password": "12345678"}
     )
 

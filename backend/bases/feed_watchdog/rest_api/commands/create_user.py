@@ -2,7 +2,8 @@ import asyncio
 import getpass
 from uuid import uuid4
 
-from picodi import Provide, inject
+from picodi import inject
+from picodi.integrations.fastapi import Provide
 from pydantic import BaseModel
 
 from feed_watchdog.commands.core import BaseCommand

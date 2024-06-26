@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
-from picodi import Provide, inject
+from picodi import inject
+from picodi.integrations.fastapi import Provide
 from pydantic import BaseModel
 
 from feed_watchdog.domain.interfaces import IStreamRepository, StreamQuery
@@ -81,7 +82,7 @@ class StreamListResp(ListResponse):
 @router.get("/streams/", response_model=StreamListResp)
 @inject
 async def find(
-    fetcher: StreamFetcher = Depends(Provide(get_stream_fetcher)),
+    fetcher: StreamFetcher = Provide(get_stream_fetcher, wrap=True),
     pagination: Pagination = Depends(get_pagination_params),
     q: str = "",
     interval: str | None = Query(None),
@@ -107,7 +108,7 @@ async def find(
 @router.get("/streams/intervals/")
 @inject
 async def get_intervals(
-    settings: Settings = Depends(Provide(get_settings)),
+    settings: Settings = Provide(get_settings, wrap=True),
 ) -> list[dict]:
     return [interval.model_dump() for interval in settings.app.intervals]
 
@@ -115,7 +116,7 @@ async def get_intervals(
 @router.get("/streams/message_templates/")
 @inject
 async def get_message_templates(
-    settings: Settings = Depends(Provide(get_settings)),
+    settings: Settings = Provide(get_settings, wrap=True),
 ) -> list[dict]:
     return [template.model_dump() for template in settings.app.message_templates]
 
@@ -124,7 +125,7 @@ async def get_message_templates(
 @inject
 async def add(
     stream: StreamBody = Body(),
-    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
+    streams: IStreamRepository = Provide(get_stream_repository, wrap=True),
 ) -> Stream:
     await streams.add(stream.to_internal())
     result = await streams.get_by_slug(stream.slug)
@@ -138,7 +139,7 @@ async def add(
 async def update(
     slug: str,
     stream: StreamBody = Body(),
-    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
+    streams: IStreamRepository = Provide(get_stream_repository, wrap=True),
 ) -> Stream:
     updated = await streams.update(slug, stream.to_internal())
     if not updated:
@@ -162,7 +163,7 @@ async def detail(
 @inject
 async def delete(
     slug: str,
-    streams: IStreamRepository = Depends(Provide(get_stream_repository)),
+    streams: IStreamRepository = Provide(get_stream_repository, wrap=True),
 ) -> None:
     deleted = await streams.delete_by_slug(slug)
     if not deleted:

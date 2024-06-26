@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from feed_watchdog.domain.models import UserInDB
 from feed_watchdog.rest_api.core import app as fw_app
@@ -19,8 +19,11 @@ def app() -> FastAPI:
 
 
 @pytest.fixture()
-def client(app) -> TestClient:
-    return TestClient(app)
+async def client(app) -> AsyncClient:
+    async with AsyncClient(
+        app=app, base_url="http://test", follow_redirects=True
+    ) as client:
+        yield client
 
 
 @pytest.fixture()

@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from fastapi import Depends, HTTPException, status
-from picodi import Provide, inject
+from picodi import inject
+from picodi.integrations.fastapi import Provide
 
 from feed_watchdog.domain.interfaces import IRefreshTokenRepository, IUserRepository
 from feed_watchdog.domain.models import User
@@ -22,8 +23,8 @@ INVALID_CREDENTIALS_EXC = HTTPException(
 @inject
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    user_repo: IUserRepository = Depends(Provide(get_user_repository)),
-    settings: Settings = Depends(Provide(get_settings)),
+    user_repo: IUserRepository = Provide(get_user_repository, wrap=True),
+    settings: Settings = Provide(get_settings, wrap=True),
 ) -> User:
     try:
         token_data = decode_token(token, secret=settings.auth.jwt_secret_key)
@@ -51,7 +52,7 @@ async def get_user_id_from_refresh_token(
     refresh_token_repo: IRefreshTokenRepository = Depends(
         Provide(get_refresh_token_repository)
     ),
-    settings: Settings = Depends(Provide(get_settings)),
+    settings: Settings = Provide(get_settings, wrap=True),
 ) -> str:
     try:
         token_data = decode_token(token, secret=settings.auth.jwt_refresh_secret_key)
