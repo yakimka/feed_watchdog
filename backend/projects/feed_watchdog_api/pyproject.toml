@@ -25,7 +25,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-aiogram = "^2.20"
+aiogram = "^3.10"
 apscheduler = "^3.10.4"
 dacite = "^1.8.0"
 fastapi = "^0.111.0"
