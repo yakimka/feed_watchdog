@@ -230,16 +230,5 @@ jobs:
     needs: [release-image]
     if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master'
     steps:
-      - name: install ssh keys
-        # check this thread to understand why its needed:
-        # https://stackoverflow.com/a/70447517
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} -p  > ~/.ssh/known_hosts
-      - name: connect and update
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} \
-            "cd ~/projects && ./update_feed_watchdog.sh"
-      - name: cleanup
-        run: rm -rf ~/.ssh
+      - name: Update service
+        run: curl -v ${{ secrets.UPDATE_URL }}
