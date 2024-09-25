@@ -21,7 +21,7 @@ def app() -> FastAPI:
 @pytest.fixture()
 async def client(app) -> AsyncClient:
     async with AsyncClient(
-        app=app, base_url="http://test", follow_redirects=True
+        app=app, base_url="http://test", follow_redirects=True, timeout=2
     ) as client:
         yield client
 
